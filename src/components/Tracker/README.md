@@ -22,7 +22,9 @@ class BasicMapExample extends React.Component {
           source: new OSMSource(),
         }),
       }),
-      new TrackerLayer(),
+      new TrackerLayer({
+        onClick: f => console.log(f),
+      }),
     ];
   }
 

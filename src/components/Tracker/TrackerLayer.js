@@ -2,7 +2,7 @@ import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'react-spatial/layers/VectorLayer';
 import LineString from 'ol/geom/LineString';
-import { Style, Circle, Fill, Stroke, Icon } from 'ol/style';
+import { Style, Icon } from 'ol/style';
 import { buffer, getWidth, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
 import { getRadius, bgColors, textColors } from '../../config/tracker';
@@ -51,6 +51,21 @@ class TrackerLayer extends VectorLayer {
     }, (this.requestIntervalSeconds - 1) * 1000);
   }
 
+  getFeatureAtCoordinate(coordinate) {
+    const res = this.map.getView().getResolution();
+    const ext = buffer([...coordinate, ...coordinate], 10 * res);
+    const features = this.tracker.getPointFeatures();
+
+    for (let i = 0; i < features.length; i += 1) {
+      const featureCoord = features[i].getGeometry().getCoordinates();
+      if (containsCoordinate(ext, featureCoord)) {
+        return features[i];
+      }
+    }
+
+    return null;
+  }
+
   init(map) {
     super.init(map);
 
@@ -67,24 +82,19 @@ class TrackerLayer extends VectorLayer {
         this.currentZoom = z;
         this.styleCache = {};
       }
-
       this.showTrajectories();
     });
 
     this.map.on('pointermove', e => {
-      const features = this.tracker.getPointFeatures();
-      const ext = buffer([...e.coordinate, ...e.coordinate], 50);
-      let hoverFeatureId = null;
+      const feature = this.getFeatureAtCoordinate(e.coordinate);
 
-      for (let i = 0; i < features.length; i += 1) {
-        const featureCoord = features[i].getGeometry().getCoordinates();
-        if (containsCoordinate(ext, featureCoord)) {
-          hoverFeatureId = features[i].get('id');
-          break;
-        }
-      }
+      this.map.getTarget().style.cursor = feature ? 'pointer' : 'auto';
+      this.hoverFeatureId = feature ? feature.get('id') : null;
+    });
 
-      this.hoverFeatureId = hoverFeatureId;
+    this.map.on('singleclick', e => {
+      const feature = this.getFeatureAtCoordinate(e.coordinate);
+      this.clickCallbacks.forEach(c => c(feature ? [feature] : [], this, e));
     });
 
     this.showTrajectories();
