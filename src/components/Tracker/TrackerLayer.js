@@ -2,10 +2,10 @@ import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'react-spatial/layers/VectorLayer';
 import LineString from 'ol/geom/LineString';
-import { Style, Icon } from 'ol/style';
-import { buffer, getWidth } from 'ol/extent';
+import { Style, Circle, Fill, Stroke, Icon } from 'ol/style';
+import { buffer, getWidth, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
-import { getRadius } from '../../config/tracker';
+import { getRadius, bgColors, textColors } from '../../config/tracker';
 
 /**
  * Class for Tracker layer.
@@ -26,7 +26,6 @@ class TrackerLayer extends VectorLayer {
       name: 'Tracker',
       olLayer: new OLVectorLayer({
         zIndex: 5,
-        style: (f, r) => this.style(f, r),
         source: new VectorSource(),
       }),
       ...options,
@@ -41,6 +40,8 @@ class TrackerLayer extends VectorLayer {
     this.requestIntervalSeconds = 10;
 
     this.intervalStarted = false;
+
+    this.hoverFeatureId = null;
   }
 
   startInterval() {
@@ -67,61 +68,88 @@ class TrackerLayer extends VectorLayer {
         this.styleCache = {};
       }
 
-      window.clearTimeout(this.moveTimeout);
-      this.moveTimeout = window.setTimeout(() => this.showTrajectories(), 1000);
+      this.showTrajectories();
+    });
+
+    this.map.on('pointermove', e => {
+      const features = this.tracker.getPointFeatures();
+      const ext = buffer([...e.coordinate, ...e.coordinate], 50);
+      let hoverFeatureId = null;
+
+      for (let i = 0; i < features.length; i += 1) {
+        const featureCoord = features[i].getGeometry().getCoordinates();
+        if (containsCoordinate(ext, featureCoord)) {
+          hoverFeatureId = features[i].get('id');
+          break;
+        }
+      }
+
+      this.hoverFeatureId = hoverFeatureId;
     });
 
     this.showTrajectories();
     this.startInterval();
-    this.tracker.setStyle(f => this.style(f));
+    this.tracker.setStyle((props, r) => this.style(props, r));
   }
 
-  style(f) {
-    const type = f.get('type');
-    const name = f.get('name');
-    const z = this.currentZoom || 1;
-    this.styleCache[z] = this.styleCache[z] || {};
+  style(feature) {
+    const props = feature.getProperties();
+    const { type, name, id } = props;
+    const z = Math.min(Math.floor(this.currentZoom || 1), 16);
+    const hover = this.hoverFeatureId === id;
 
-    if (!this.styleCache[z][name]) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const rad = Math.max(2, getRadius(type, z)) + 5;
-      canvas.width = rad * 2 + 4;
-      canvas.height = rad * 2 + 4;
+    this.styleCache[z] = this.styleCache[z] || {};
+    this.styleCache[z][type] = this.styleCache[z][type] || {};
+    this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
+
+    if (!this.styleCache[z][type][name][hover]) {
+      let radius = getRadius(type, z);
+
+      if (hover) {
+        radius += 5;
+      }
+
+      const c = document.createElement('canvas');
+      c.width = radius * 2 + 4; // + 4 for border
+      c.height = c.width;
+      const ctx = c.getContext('2d');
 
       ctx.beginPath();
-      ctx.arc(rad + 2, rad + 2, rad, 0, 2 * Math.PI);
-      ctx.lineWidth = 2;
+      ctx.arc(radius + 2, radius + 2, radius, 0, 2 * Math.PI, false);
+      ctx.fillStyle = bgColors[type];
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#003300';
       ctx.stroke();
 
-      ctx.fillStyle = 'red';
-      ctx.fill();
-
-      if (rad > 8) {
-        const textSize = Math.max(10, rad);
-        ctx.lineWidth = 1;
-        ctx.font = `100 ${textSize}px Arial`;
+      if (z > 12) {
+        const fontSize = Math.max(radius, 10);
+        ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
-        ctx.strokeText(
-          f.get('name'),
-          canvas.width / 2,
-          (canvas.height + textSize - 3) / 2,
-        );
+        ctx.fillStyle = textColors[type];
+        ctx.font = `${fontSize}px Arial`;
+
+        const textSize = ctx.measureText(name);
+
+        if (textSize.width < c.width - 6 && fontSize < c.height - 6) {
+          ctx.fillText(name, radius + 2, radius + 2);
+        }
       }
 
       const img = new Image();
-      img.src = canvas.toDataURL();
+      img.src = c.toDataURL();
 
-      this.styleCache[z][name] = new Style({
+      this.styleCache[z][type][name][hover] = new Style({
         image: new Icon({
           snapToPixel: false,
+          anchor: [0.5, 0.5],
+          imgSize: [c.width, c.height],
           img,
-          imgSize: [canvas.width, canvas.height],
         }),
       });
     }
 
-    return this.styleCache[z][name];
+    return this.styleCache[z][type][name][hover];
   }
 
   fetchTrajectories() {
@@ -176,8 +204,8 @@ class TrackerLayer extends VectorLayer {
 
   showTrajectories() {
     this.fetchTrajectories().then(data => {
-      this.tracker.clear();
       this.currentOffset = data.o || 0;
+      const trajectories = {};
 
       for (let i = 0; i < data.a.length; i += 1) {
         const coords = [];
@@ -210,16 +238,18 @@ class TrackerLayer extends VectorLayer {
 
         if (coords.length && timeIntervals.length) {
           const geometry = new LineString(coords);
-
-          this.tracker.addTrajectory(data.a[i].i, {
+          trajectories[data.a[i].i] = {
             id: data.a[i].i,
+            type: data.a[i].t,
+            name: data.a[i].n,
             geom: geometry,
             timeOffset: this.currentOffset,
             time_intervals: timeIntervals,
-          });
+          };
         }
       }
 
+      this.tracker.setTrajectories(trajectories);
       this.olLayer.changed();
     });
   }

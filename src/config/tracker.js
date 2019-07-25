@@ -18,4 +18,26 @@ export const getRadius = (type, zoom) => {
   }
 };
 
-export default getRadius;
+export const bgColors = [
+  '#ffb400',
+  '#ff5400',
+  '#ff8080',
+  '#ea0000',
+  '#3000ff',
+  '#ffb400',
+  '#41a27b',
+  '#00d237',
+  '#b5b5b5',
+];
+
+export const textColors = [
+  '#000000',
+  '#ffffff',
+  '#000000',
+  '#ffffff',
+  '#ffffff',
+  '#000000',
+  '#ffffff',
+  '#000000',
+  '#000000',
+];

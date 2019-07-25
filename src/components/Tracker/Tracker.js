@@ -19,14 +19,17 @@ export default class Tracker {
     this.trajectories = {};
     this.pointFeatures = [];
     this.rotationCache = {};
-    this.renderFps = 1000 / 60;
+    this.renderFps = 16;
+    this.layer = options.layer;
 
-    this.layer = new VectorLayer({
-      zIndex: 1,
-      source: new VectorSource(),
-    });
+    if (!this.layer) {
+      this.layer = new VectorLayer({
+        zIndex: 1,
+        source: new VectorSource(),
+      });
 
-    this.map.addLayer(this.layer);
+      this.map.addLayer(this.layer);
+    }
 
     this.defaultStyle = new Style({
       image: new Circle({
@@ -38,17 +41,19 @@ export default class Tracker {
 
     this.updateTrajectories();
 
-    /**
-     * To enable smooth moving, slow down on move start
-     * and speed up on move end.
-     */
     this.map.on('movestart', () => {
-      this.renderFps *= 100;
+      this.renderFps = 1;
     });
 
     this.map.on('moveend', () => {
-      this.renderFps /= 100;
+      const view = this.map.getView();
+      this.renderFps = Math.max(view.getZoom());
+      this.resolution = view.getResolution();
     });
+  }
+
+  setTrajectories(trajectories) {
+    this.trajectories = trajectories;
   }
 
   /**
@@ -154,14 +159,14 @@ export default class Tracker {
       const feature = this.pointFeatures[i];
       evt.vectorContext.drawFeature(
         feature,
-        this.style ? this.style(feature) : this.defaultStyle,
+        this.style ? this.style(feature, this.resolution) : this.defaultStyle,
       );
     }
 
     window.clearTimeout(this.renderTimeout);
     this.renderTimeout = window.setTimeout(() => {
       this.layer.changed();
-    }, this.renderFps);
+    }, 60 / this.renderFps);
   }
 
   removeOutsideExtent(extent) {
