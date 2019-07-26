@@ -215,7 +215,7 @@ class TrackerLayer extends VectorLayer {
   showTrajectories() {
     this.fetchTrajectories().then(data => {
       this.currentOffset = data.o || 0;
-      const trajectories = {};
+      const trajectories = [];
 
       for (let i = 0; i < data.a.length; i += 1) {
         const coords = [];
@@ -248,14 +248,14 @@ class TrackerLayer extends VectorLayer {
 
         if (coords.length && timeIntervals.length) {
           const geometry = new LineString(coords);
-          trajectories[data.a[i].i] = {
+          trajectories.push({
             id: data.a[i].i,
             type: data.a[i].t,
             name: data.a[i].n,
             geom: geometry,
             timeOffset: this.currentOffset,
             time_intervals: timeIntervals,
-          };
+          });
         }
       }
 

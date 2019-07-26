@@ -16,7 +16,7 @@ export default class Tracker {
       typeof opts.interpolate === 'undefined' ? true : opts.interpolate;
 
     this.map = map;
-    this.trajectories = {};
+    this.trajectories = [];
     this.pointFeatures = [];
     this.rotationCache = {};
     this.renderFps = 16;
@@ -65,13 +65,12 @@ export default class Tracker {
    *   true, the trajectory is drawn first and appears on bottom.
    */
   addTrajectory(id, traj, addOnTop) {
+    const trajectory = { ...traj, id };
+
     if (addOnTop) {
-      delete this.trajectories[id];
-      const topTrajectory = {};
-      topTrajectory[id] = traj;
-      this.trajectories = Object.assign(topTrajectory, this.trajectories);
+      this.trajectories.unshift(trajectory);
     } else {
-      this.trajectories[id] = traj;
+      this.trajectories.push(trajectory);
     }
   }
 
@@ -80,7 +79,12 @@ export default class Tracker {
    * @param {Number} id The trajectory id
    */
   removeTrajectory(id) {
-    delete this.trajectories[id];
+    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
+      if (this.trajectories[i].id === id) {
+        this.trajectories.splice(i, 1);
+        break;
+      }
+    }
   }
 
   /**
@@ -89,11 +93,9 @@ export default class Tracker {
    * @param {*} value Attribute value.
    */
   removeTrajectoryByAttribute(attributeName, value) {
-    const trajKeys = Object.keys(this.trajectories);
-    for (let i = trajKeys.length - 1; i >= 0; i -= 1) {
-      const key = trajKeys[i];
-      if (this.trajectories[key][attributeName] === value) {
-        delete this.trajectories[key];
+    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
+      if (this.trajectories[i][attributeName] === value) {
+        this.removeTrajectory(this.trajectories[i].id);
 
         /* eslint-disable */
         console.log(`Deleted trajectory with ${attributeName} = ${value}.`);
@@ -115,7 +117,7 @@ export default class Tracker {
    */
   clear() {
     this.layer.getSource().clear();
-    this.trajectories = {};
+    this.trajectories = [];
   }
 
   /**
@@ -170,27 +172,22 @@ export default class Tracker {
   }
 
   removeOutsideExtent(extent) {
-    const trajKeys = Object.keys(this.trajectories);
-    for (let i = 0; i < trajKeys.length; i += 1) {
-      const key = trajKeys[i];
-      const trajectory = this.trajectories[key];
-
-      if (!containsCoordinate(extent, getCenter(trajectory.geometry))) {
-        delete this.trajectories[key];
+    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
+      const center = getCenter(this.trajectories[i].geometry);
+      if (!containsCoordinate(extent, center)) {
+        this.removeTrajectory(this.trajectories[i].id);
       }
     }
   }
 
   updateTrajectories() {
     const currTime = Date.now();
-    const trajKeys = Object.keys(this.trajectories);
     const pointFeatures = [];
 
-    for (let i = 0, len = trajKeys.length; i < len; i += 1) {
-      const k = trajKeys[i];
-      const props = this.trajectories[k];
-      const intervals = props.time_intervals;
-      let now = currTime - (props.timeOffset || 0);
+    for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
+      const traj = this.trajectories[i];
+      const intervals = traj.time_intervals;
+      let now = currTime - (traj.timeOffset || 0);
 
       // the time interval will never start in the future
       if (intervals[0][0] > now) {
@@ -224,19 +221,19 @@ export default class Tracker {
           ? timeFrac * (endFrac - startFrac) + startFrac
           : 0;
 
-        props.rotation = rotation === null ? props.rotation : rotation;
-        props.geometry =
-          props.geom instanceof Point
-            ? props.geom
-            : new Point(props.geom.getCoordinateAt(geomFrac));
+        traj.rotation = rotation === null ? traj.rotation : rotation;
+        traj.geometry =
+          traj.geom instanceof Point
+            ? traj.geom
+            : new Point(traj.geom.getCoordinateAt(geomFrac));
 
         if (end === intervals[intervals.length - 1][0]) {
-          props.end_fraction = timeFrac;
+          traj.end_fraction = timeFrac;
         }
 
-        pointFeatures.push(new Feature(props));
+        pointFeatures.push(new Feature(traj));
       } else {
-        delete this.trajectories[k];
+        this.removeTrajectory(traj.id);
       }
     }
 
