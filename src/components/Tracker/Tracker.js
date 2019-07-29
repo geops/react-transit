@@ -1,10 +1,3 @@
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import { Style, Fill, Circle } from 'ol/style';
-import { getCenter, containsCoordinate } from 'ol/extent';
-import Point from 'ol/geom/Point';
-import Feature from 'ol/Feature';
-
 /**
  * Tracker for OpenLayers.
  */
@@ -17,43 +10,48 @@ export default class Tracker {
 
     this.map = map;
     this.trajectories = [];
-    this.pointFeatures = [];
     this.rotationCache = {};
     this.renderFps = 16;
-    this.layer = options.layer;
 
-    if (!this.layer) {
-      this.layer = new VectorLayer({
-        zIndex: 1,
-        source: new VectorSource(),
-      });
+    this.renderTrajectory();
 
-      this.map.addLayer(this.layer);
-    }
-
-    this.defaultStyle = new Style({
-      image: new Circle({
-        fill: new Fill({
-          color: 'red',
-        }),
-      }),
+    this.map.on('change:size', () => {
+      [this.canvas.width, this.canvas.height] = this.map.getSize();
     });
 
-    this.updateTrajectories();
+    // we draw directly on the canvas since openlayers is too slow
+    this.canvas = document.createElement('canvas');
+    this.canvas.style = [
+      'position: absolute',
+      'top: 0',
+      'bottom: 0',
+      'right: 0',
+      'left: 0',
+      'pointer-events: none',
+    ].join(';');
 
-    this.map.on('movestart', () => {
-      this.renderFps = 1;
+    this.canvasContext = this.canvas.getContext('2d');
+
+    this.map.once('postrender', () => {
+      this.map.getTarget().appendChild(this.canvas);
+    });
+
+    this.map.on('postcompose', () => {
+      this.renderTrajectory();
     });
 
     this.map.on('moveend', () => {
-      const view = this.map.getView();
-      this.renderFps = Math.max(view.getZoom());
-      this.resolution = view.getResolution();
+      this.renderFps = this.map.getView().getZoom();
     });
   }
 
   setTrajectories(trajectories) {
+    this.clear();
     this.trajectories = trajectories;
+  }
+
+  getTrajectories() {
+    return this.trajectories;
   }
 
   /**
@@ -105,19 +103,12 @@ export default class Tracker {
   }
 
   /**
-   * Return a list of features.
-   * @return {Array.<ol.Feature>}
-   */
-  getPointFeatures() {
-    return this.pointFeatures;
-  }
-
-  /**
    * Clear the tracker layer.
    */
   clear() {
-    this.layer.getSource().clear();
-    this.trajectories = [];
+    if (this.canvas) {
+      this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
   }
 
   /**
@@ -134,55 +125,11 @@ export default class Tracker {
    */
   setStyle(s) {
     this.style = s;
-    this.reload();
   }
 
-  /**
-   * Force map redraw.
-   */
-  changed() {
-    this.map.changed();
-  }
-
-  /**
-   * Update trajectories.
-   */
-  reload() {
-    this.animationStartTime = new Date().getTime();
-    this.layer.un('postcompose', e => this.render(e));
-    this.layer.on('postcompose', e => this.render(e));
-  }
-
-  /**
-   * Draw renderd point.
-   */
-  render(evt) {
-    for (let i = 0, len = this.pointFeatures.length; i < len; i += 1) {
-      const feature = this.pointFeatures[i];
-      evt.vectorContext.drawFeature(
-        feature,
-        this.style ? this.style(feature, this.resolution) : this.defaultStyle,
-      );
-    }
-
-    window.clearTimeout(this.renderTimeout);
-    this.renderTimeout = window.setTimeout(() => {
-      this.layer.changed();
-    }, 60 / this.renderFps);
-  }
-
-  removeOutsideExtent(extent) {
-    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
-      const center = getCenter(this.trajectories[i].geometry);
-      if (!containsCoordinate(extent, center)) {
-        this.removeTrajectory(this.trajectories[i].id);
-      }
-    }
-  }
-
-  updateTrajectories() {
+  renderTrajectory() {
     const currTime = Date.now();
-    const pointFeatures = [];
+    this.clear();
 
     for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
       const traj = this.trajectories[i];
@@ -200,10 +147,9 @@ export default class Tracker {
       let end = 0;
       let startFrac = 0;
       let endFrac = 0;
-      let rotation;
 
       for (j = 0; j < intervals.length - 1; j += 1) {
-        [start, startFrac, rotation] = intervals[j];
+        [start, startFrac] = intervals[j];
         [end, endFrac] = intervals[j + 1];
 
         if (start <= now && now <= end) {
@@ -221,28 +167,24 @@ export default class Tracker {
           ? timeFrac * (endFrac - startFrac) + startFrac
           : 0;
 
-        traj.rotation = rotation === null ? traj.rotation : rotation;
-        traj.geometry =
-          traj.geom instanceof Point
-            ? traj.geom
-            : new Point(traj.geom.getCoordinateAt(geomFrac));
+        traj.coordinate = traj.geom.getCoordinateAt(geomFrac);
+        const px = this.map.getPixelFromCoordinate(traj.coordinate);
+        const vehicleImg = this.style(traj, this.map.getView().getResolution());
 
-        if (end === intervals[intervals.length - 1][0]) {
-          traj.end_fraction = timeFrac;
-        }
-
-        pointFeatures.push(new Feature(traj));
+        this.canvasContext.drawImage(
+          vehicleImg,
+          px[0] - vehicleImg.width / 2,
+          px[1] - vehicleImg.width / 2,
+        );
       } else {
         this.removeTrajectory(traj.id);
       }
     }
 
-    this.pointFeatures = pointFeatures;
-
     window.clearTimeout(this.updateTimeout);
     this.updateTimeout = window.setTimeout(() => {
-      this.updateTrajectories();
-    }, this.renderFps);
+      this.renderTrajectory();
+    }, 1000 / this.renderFps);
   }
 
   /**
@@ -250,7 +192,6 @@ export default class Tracker {
    */
   destroy() {
     this.clear();
-    this.layer.un('postcompose', this.render, this);
     this.map.removeLayer(this.layer);
     window.clearTimeout(this.renderTimeout);
   }

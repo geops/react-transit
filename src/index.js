@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
+
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';

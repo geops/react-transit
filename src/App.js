@@ -1,26 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import BasicMap from 'react-spatial/components/BasicMap';
+import Layer from 'react-spatial/Layer';
+import TileLayer from 'ol/layer/Tile';
+import OSMSource from 'ol/source/OSM';
+import TrackerLayer from './components/Tracker/TrackerLayer';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const layers = [
+    new Layer({
+      name: 'Layer',
+      olLayer: new TileLayer({
+        source: new OSMSource(),
+      }),
+    }),
+    new TrackerLayer(),
+  ];
+
+  return <BasicMap center={[951560, 6002550]} zoom={14} layers={layers} />;
 }
 
 export default App;

@@ -1,9 +1,9 @@
 {
   "name": "react-public-transport",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
-    "babel-loader": "^8.0.6",
+    "abortcontroller-polyfill": "^1.3.0",
+    "babel-preset-react-app": "^9.0.0",
     "ol": "^5.3.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -14,6 +14,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:es": "bash ./scripts/build-es.sh",
     "test": "react-scripts test",
     "format": "prettier --write 'src/**/*.js' && stylelint 'src/**/*.css' 'src/**/*.scss' --fix",
     "eject": "react-scripts eject",
@@ -36,6 +37,10 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/runtime": "^7.3.1",
+    "babel-loader": "8.0.5",
+    "babel-plugin-named-asset-import": "^0.3.0",
     "stylelint": "^10.1.0"
   }
 }
