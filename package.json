@@ -4,22 +4,27 @@
   "dependencies": {
     "abortcontroller-polyfill": "^1.3.0",
     "babel-preset-react-app": "^9.0.0",
+    "node-sass": "^4.11.0",
     "ol": "^5.3.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
-    "react-spatial": "^0.0.14-beta.54",
-    "react-styleguidist": "^9.1.11"
+    "react-spatial": "^0.0.14-beta.54"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "node ./scripts/build-non-split.js && yarn build:es && node scripts/prepare-package.js",
+    "build:prod": "REACT_APP_ENV='prod' yarn build",
     "build:es": "bash ./scripts/build-es.sh",
-    "test": "react-scripts test",
-    "format": "prettier --write 'src/**/*.js' && stylelint 'src/**/*.css' 'src/**/*.scss' --fix",
+    "test": "react-scripts test --env=jsdom --transformIgnorePatterns \"/node_modules/(?!(jsts|ol|react-spatial|ole)/).*/\"",
+    "test:coverage": "yarn test --coverage --coverageDirectory=coverage",
+    "lint": "eslint 'src/**/*.js' && stylelint 'src/**/*.css' 'src/**/*.scss'",
+    "format": "prettier --write 'src/**/*.js' && eslint 'src/**/*.js' --fix && stylelint 'src/**/*.css' 'src/**/*.scss' --fix",
     "eject": "react-scripts eject",
-    "doc": "npx styleguidist build",
-    "doc:server": "npx styleguidist server"
+    "doc": "styleguidist build",
+    "doc:server": "styleguidist server",
+    "publish:build": "rm -rf build && yarn version && yarn run build:prod && yarn publish build/ --access public --non-interactive --no-git-tag-version",
+    "cp": "generact --root src/components"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -39,8 +44,30 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/runtime": "^7.3.1",
-    "babel-loader": "8.0.5",
     "babel-plugin-named-asset-import": "^0.3.0",
-    "stylelint": "^10.1.0"
+    "canvas": "^2.3.1",
+    "cypress": "^3.1.5",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.8.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "fetch-mock": "^7.2.5",
+    "generact": "^0.4.0",
+    "husky": "^2.4.1",
+    "jest": "24.7.1",
+    "jest-canvas-mock": "^2.0.0-alpha.2",
+    "jest-serializer-html": "^7.0.0",
+    "lint-staged": "^8.2.1",
+    "node-fetch": "^2.3.0",
+    "prettier": "^1.16.3",
+    "react-styleguidist": "^9.0.2",
+    "react-test-renderer": "^16.5.2",
+    "redux-mock-store": "^1.5.3",
+    "rewire": "^4.0.1",
+    "stylelint": "^10.0.1",
+    "stylelint-config-recommended-scss": "^3.2.0",
+    "stylelint-config-standard": "^18.2.0",
+    "stylelint-scss": "^3.5.1"
   }
 }
