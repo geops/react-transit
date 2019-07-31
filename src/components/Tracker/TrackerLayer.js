@@ -43,8 +43,8 @@ class TrackerLayer extends VectorLayer {
 
     this.url =
       options.url ||
-      'https://backend1.tracker.geops.de/trajectories' ||
-      'https://tracker.geops.io/trajectories';
+      'https://backend1.tracker.geops.de' ||
+      'https://tracker.geops.io';
 
     this.styleCache = {};
 
