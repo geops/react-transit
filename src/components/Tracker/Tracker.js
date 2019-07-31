@@ -11,7 +11,8 @@ export default class Tracker {
     this.map = map;
     this.trajectories = [];
     this.rotationCache = {};
-    this.renderFps = 16;
+    this.renderFps = 60;
+    this.speed = 1;
 
     this.renderTrajectory();
 
@@ -36,22 +37,37 @@ export default class Tracker {
       this.map.getTarget().appendChild(this.canvas);
     });
 
-    this.map.on('postcompose', () => {
+    this.map.on('postrender', () => {
       this.renderTrajectory();
     });
 
     this.map.on('moveend', () => {
-      this.renderFps = this.map.getView().getZoom();
+      // this.renderFps = this.map.getView().getZoom();
     });
   }
 
   setTrajectories(trajectories) {
-    this.clear();
     this.trajectories = trajectories;
   }
 
   getTrajectories() {
     return this.trajectories;
+  }
+
+  getSpeed() {
+    return this.speed;
+  }
+
+  setSpeed(speed) {
+    this.speed = speed;
+  }
+
+  getCurrTime() {
+    return this.currTime;
+  }
+
+  setCurrTime(time) {
+    this.currTime = time;
   }
 
   /**
@@ -128,7 +144,12 @@ export default class Tracker {
   }
 
   renderTrajectory() {
-    const currTime = Date.now();
+    this.startRenderTime = new Date();
+    window.clearTimeout(this.updateTimeout);
+    if (!this.currTime) {
+      return;
+    }
+    const currTime = this.currTime || Date.now();
     this.clear();
 
     for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
@@ -180,11 +201,13 @@ export default class Tracker {
         this.removeTrajectory(traj.id);
       }
     }
-
-    window.clearTimeout(this.updateTimeout);
+    const nextTickInMs = 1000 / this.renderFps;
     this.updateTimeout = window.setTimeout(() => {
+      this.currTime.setMilliseconds(
+        this.currTime.getMilliseconds() + (new Date() - this.startRenderTime),
+      );
       this.renderTrajectory();
-    }, 1000 / this.renderFps);
+    }, nextTickInMs);
   }
 
   /**

@@ -8,6 +8,7 @@
     "ol": "^5.3.3",
     "prop-types": "^15.6.2",
     "react": "^16.8.6",
+    "react-datepicker": "^2.8.0",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
     "react-spatial": "^0.0.14-beta.54"
@@ -17,7 +18,7 @@
     "build": "node ./scripts/build-non-split.js && yarn build:es && node scripts/prepare-package.js",
     "build:prod": "REACT_APP_ENV='prod' yarn build",
     "build:es": "bash ./scripts/build-es.sh",
-    "test": "react-scripts test --env=jsdom --transformIgnorePatterns \"/node_modules/(?!(jsts|ol|react-spatial|ole)/).*/\"",
+    "test": "react-scripts test --env=jsdom --transformIgnorePatterns \"/node_modules/(?!(jsts|ol|react-spatial|ole|react-datepicker)/).*/\"",
     "test:coverage": "yarn test --coverage --coverageDirectory=coverage",
     "lint": "eslint 'src/**/*.js' && stylelint 'src/**/*.css' 'src/**/*.scss'",
     "format": "prettier --write 'src/**/*.js' && eslint 'src/**/*.js' --fix && stylelint 'src/**/*.css' 'src/**/*.scss' --fix",
@@ -70,5 +71,14 @@
     "stylelint-config-recommended-scss": "^3.2.0",
     "stylelint-config-standard": "^18.2.0",
     "stylelint-scss": "^3.5.1"
+  },
+  "jest": {
+    "coverageReporters": [
+      "text",
+      "html"
+    ],
+    "snapshotSerializers": [
+      "jest-serializer-html"
+    ]
   }
 }

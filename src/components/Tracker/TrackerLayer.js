@@ -33,24 +33,59 @@ class TrackerLayer extends VectorLayer {
       ...options,
     });
 
-    this.url = options.url || 'https://backend1.tracker.geops.de/trajectories';
+    this.url =
+      options.url ||
+      'https://backend1.tracker.geops.de/trajectories' ||
+      'https://tracker.geops.io/trajectories';
 
     this.styleCache = {};
 
     this.currentOffset = 0;
 
-    this.requestIntervalSeconds = 10;
+    this.requestIntervalSeconds = 3;
 
     this.intervalStarted = false;
 
     this.hoverVehicleId = null;
+
+    this.startTime = new Date();
+
+    this.currTime = this.startTime;
+
+    this.speed = 1;
   }
 
   startInterval() {
     window.clearInterval(this.updateInterval);
     this.updateInterval = window.setInterval(() => {
       this.updateTrajectories();
-    }, (this.requestIntervalSeconds - 1) * 1000);
+    }, this.requestIntervalSeconds * 1000);
+  }
+
+  getCurrTime() {
+    return this.currTime;
+  }
+
+  setCurrTime(time) {
+    this.tracker.setCurrTime(new Date(time));
+    this.currTime = time;
+  }
+
+  getStartTime() {
+    return this.startTime;
+  }
+
+  setStartTime(time) {
+    this.startTime = time;
+  }
+
+  getSpeed() {
+    return this.speed;
+  }
+
+  setSpeed(speed) {
+    this.tracker.setSpeed(speed);
+    this.speed = speed;
   }
 
   getVehicleAtCoordinate(coordinate) {
@@ -85,7 +120,7 @@ class TrackerLayer extends VectorLayer {
         this.styleCache = {};
       }
 
-      this.updateTrajectories();
+      // this.updateTrajectories();
     });
 
     this.map.on('pointermove', e => {
@@ -170,9 +205,11 @@ class TrackerLayer extends VectorLayer {
 
     const ext = this.map.getView().calculateExtent();
     const bufferExt = buffer(ext, getWidth(ext) / 10);
-    const now = new Date();
-    const later = new Date();
-    later.setSeconds(later.getSeconds() + this.requestIntervalSeconds);
+    const now = this.currTime;
+    const later = new Date(now);
+    later.setSeconds(
+      later.getSeconds() + this.requestIntervalSeconds * this.speed * 2,
+    );
 
     const btime = [
       now.getHours() - 2,
@@ -201,6 +238,7 @@ class TrackerLayer extends VectorLayer {
       fl: 1,
       s: 0,
       z: this.map.getView().getZoom(),
+      // toff: this.currTime.getTime() / 1000,
     };
 
     if (this.lastRequestTime) {
@@ -218,6 +256,8 @@ class TrackerLayer extends VectorLayer {
   }
 
   updateTrajectories() {
+    this.startUpdateTime = new Date();
+    this.olLayer.getSource().clear();
     this.fetchTrajectories().then(data => {
       this.currentOffset = data.o || 0;
       const trajectories = [];
@@ -225,23 +265,25 @@ class TrackerLayer extends VectorLayer {
       for (let i = 0; i < data.a.length; i += 1) {
         const coords = [];
         const timeIntervals = [];
-        const path = data.a[i].p;
+        const paths = data.a[i].p;
 
-        for (let j = 0; j < path.length; j += 1) {
-          const startTime = path[j][0].a || data.t;
-          const endTime = path[j][path[j].length - 1].a || data.t + 20;
+        for (let j = 0; j < paths.length; j += 1) {
+          const path = paths[j];
+          const startTime = path[0].a || data.t;
+          const endTime = path[path.length - 1].a || data.t + 20;
 
           timeIntervals.unshift([startTime * 1000, 0, null]);
           timeIntervals.push([endTime * 1000, 1, null]);
 
-          for (let k = 0; k < path[j].length; k += 1) {
-            const px = [path[j][k].x, path[j][k].y];
+          for (let k = 0; k < path.length; k += 1) {
+            const px = [path[k].x, path[k].y];
             coords.push(this.map.getCoordinateFromPixel(px));
           }
         }
 
         if (coords.length && timeIntervals.length) {
           const geometry = new LineString(coords);
+          // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
           trajectories.push({
             id: data.a[i].i,
             type: data.a[i].t,
