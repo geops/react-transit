@@ -23,6 +23,14 @@ class TrackerLayer extends VectorLayer {
     return [now.getFullYear(), month, day].join('');
   }
 
+  static getTimeString(time) {
+    return [
+      time.getHours() - 2,
+      time.getMinutes(),
+      `${time.getSeconds()}.${time.getMilliseconds()}`,
+    ].join(':');
+  }
+
   constructor(options = {}) {
     super({
       name: 'Tracker',
@@ -195,14 +203,7 @@ class TrackerLayer extends VectorLayer {
     return this.styleCache[z][type][name][hover];
   }
 
-  fetchTrajectories() {
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-
-    this.abortController = new AbortController();
-    const { signal } = this.abortController;
-
+  getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
     const bufferExt = buffer(ext, getWidth(ext) / 10);
     const now = this.currTime;
@@ -211,25 +212,18 @@ class TrackerLayer extends VectorLayer {
       later.getSeconds() + this.requestIntervalSeconds * this.speed * 2,
     );
 
-    const btime = [
-      now.getHours() - 2,
-      now.getMinutes(),
-      `${now.getSeconds()}.${now.getMilliseconds()}`,
-    ].join(':');
+    const btime = TrackerLayer.getTimeString(now);
 
-    const urlParams = {
+    const params = {
+      ...extraParams,
       swy: bufferExt[0],
-      swx: bufferExt[1], // EPSG:brosi
+      swx: bufferExt[1],
       nex: bufferExt[3],
       ney: bufferExt[2],
       orx: ext[0],
       ory: ext[3],
       btime,
-      etime: [
-        later.getHours() - 2,
-        later.getMinutes(),
-        `${later.getSeconds()}.${later.getMilliseconds()}`,
-      ].join(':'),
+      etime: TrackerLayer.getTimeString(later),
       date: TrackerLayer.getDateString(now),
       rid: 1,
       a: 1,
@@ -241,17 +235,29 @@ class TrackerLayer extends VectorLayer {
       // toff: this.currTime.getTime() / 1000,
     };
 
-    if (this.lastRequestTime) {
-      // urlParams.diff = Date.now() / 1000;
+    return Object.keys(params)
+      .map(k => `${k}=${params[k]}`)
+      .join('&');
+  }
+
+  fetchTrajectory(id) {
+    const params = this.getUrlParams({
+      id,
+      time: TrackerLayer.getTimeString(new Date()),
+    });
+
+    const url = `${this.url}/trajectory?${params}`;
+    return fetch(url).then(res => res.json());
+  }
+
+  fetchTrajectories() {
+    if (this.abortController) {
+      this.abortController.abort();
     }
 
-    const getParams = Object.keys(urlParams)
-      .map(k => `${k}=${urlParams[k]}`)
-      .join('&');
-
-    const trackerUrl = `${this.url}?${getParams}`;
-
-    this.lastRequestTime = btime;
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+    const trackerUrl = `${this.url}/trajectories?${this.getUrlParams()}`;
     return fetch(trackerUrl, { signal }).then(data => data.json());
   }
 
