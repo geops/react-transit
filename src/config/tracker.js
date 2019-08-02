@@ -18,6 +18,18 @@ export const getRadius = (type, zoom) => {
   }
 };
 
+export const types = [
+  'Tram',
+  'Subway / Metro / S-Bahn',
+  'Train',
+  'Bus',
+  'Ferry',
+  'Cable Car',
+  'Gondola',
+  'Funicular',
+  'Long distance bus',
+];
+
 export const bgColors = [
   '#ffb400',
   '#ff5400',
@@ -40,4 +52,28 @@ export const textColors = [
   '#ffffff',
   '#000000',
   '#000000',
+];
+
+export const timeSteps = [
+  100000,
+  50000,
+  40000,
+  30000,
+  20000,
+  15000,
+  10000,
+  5000,
+  2000,
+  1000,
+  400,
+  300,
+  250,
+  180,
+  90,
+  60,
+  50,
+  40,
+  30,
+  20,
+  20,
 ];

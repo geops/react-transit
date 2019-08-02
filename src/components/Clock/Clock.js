@@ -1,12 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function Clock({ time }) {
-  return <>{`${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`}</>;
+const pad = integer => {
+  return integer < 10 ? `0${integer}` : integer;
+};
+
+function Clock({ date }) {
+  return (
+    <>{`${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+      date.getSeconds(),
+    )}`}</>
+  );
 }
 
 Clock.propTypes = {
-  time: PropTypes.object.isRequired,
+  date: PropTypes.object.isRequired,
 };
 
 export default Clock;

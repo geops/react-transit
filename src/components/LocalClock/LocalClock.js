@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function LocalClock({ time, timeZone }) {
+function LocalClock({ date, timeZone }) {
   let child = <i>?</i>;
 
   if (timeZone && timeZone !== 'UTC') {
-    const localTime = new Date(time.getTime() + timeZone.os * 1000);
+    const localTime = new Date(date.getTime() + timeZone.os * 1000);
     child = (
       <span>
         {`${localTime.getUTCHours()}:${localTime.getUTCMinutes()}:${localTime.getUTCSeconds()} ('}${
@@ -19,7 +19,7 @@ function LocalClock({ time, timeZone }) {
 }
 
 LocalClock.propTypes = {
-  time: PropTypes.object.isRequired,
+  date: PropTypes.object.isRequired,
   timeZone: PropTypes.shape({
     os: PropTypes.number,
     c: PropTypes.string,

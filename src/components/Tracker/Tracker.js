@@ -12,9 +12,6 @@ export default class Tracker {
     this.trajectories = [];
     this.rotationCache = {};
     this.renderFps = 60;
-    this.speed = 1;
-
-    this.renderTrajectory();
 
     this.map.on('change:size', () => {
       [this.canvas.width, this.canvas.height] = this.map.getSize();
@@ -36,14 +33,6 @@ export default class Tracker {
     this.map.once('postrender', () => {
       this.map.getTarget().appendChild(this.canvas);
     });
-
-    this.map.on('postrender', () => {
-      this.renderTrajectory();
-    });
-
-    this.map.on('moveend', () => {
-      // this.renderFps = this.map.getView().getZoom();
-    });
   }
 
   setTrajectories(trajectories) {
@@ -52,22 +41,6 @@ export default class Tracker {
 
   getTrajectories() {
     return this.trajectories;
-  }
-
-  getSpeed() {
-    return this.speed;
-  }
-
-  setSpeed(speed) {
-    this.speed = speed;
-  }
-
-  getCurrTime() {
-    return this.currTime;
-  }
-
-  setCurrTime(time) {
-    this.currTime = time;
   }
 
   /**
@@ -143,13 +116,7 @@ export default class Tracker {
     this.style = s;
   }
 
-  renderTrajectory() {
-    this.startRenderTime = new Date();
-    window.clearTimeout(this.updateTimeout);
-    if (!this.currTime) {
-      return;
-    }
-    const currTime = this.currTime || Date.now();
+  renderTrajectory(currTime = Date.now()) {
     this.clear();
 
     for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
@@ -168,7 +135,6 @@ export default class Tracker {
       let end = 0;
       let startFrac = 0;
       let endFrac = 0;
-
       for (j = 0; j < intervals.length - 1; j += 1) {
         [start, startFrac] = intervals[j];
         [end, endFrac] = intervals[j + 1];
@@ -201,13 +167,6 @@ export default class Tracker {
         this.removeTrajectory(traj.id);
       }
     }
-    const nextTickInMs = 1000 / this.renderFps;
-    this.updateTimeout = window.setTimeout(() => {
-      this.currTime.setMilliseconds(
-        this.currTime.getMilliseconds() + (new Date() - this.startRenderTime),
-      );
-      this.renderTrajectory();
-    }, nextTickInMs);
   }
 
   /**

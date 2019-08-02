@@ -50,15 +50,15 @@ class TrackerLayer extends VectorLayer {
 
     this.currentOffset = 0;
 
-    this.requestIntervalSeconds = 3;
+    this.requestIntervalSeconds = 2;
 
     this.intervalStarted = false;
 
     this.hoverVehicleId = null;
 
-    this.startTime = new Date();
+    this.currTime = new Date();
 
-    this.currTime = this.startTime;
+    this.lastUpdateTime = new Date();
 
     this.speed = 1;
   }
@@ -70,21 +70,26 @@ class TrackerLayer extends VectorLayer {
     }, this.requestIntervalSeconds * 1000);
   }
 
+  startUpdateTime() {
+    window.clearInterval(this.updateTime);
+    this.updateTime = setInterval(() => {
+      this.currTime.setMilliseconds(
+        this.currTime.getMilliseconds() +
+          (new Date() - this.lastUpdateTime) * this.speed,
+      );
+      this.setCurrTime(this.currTime);
+    }, 1000 / 60);
+  }
+
   getCurrTime() {
     return this.currTime;
   }
 
   setCurrTime(time) {
-    this.tracker.setCurrTime(new Date(time));
-    this.currTime = time;
-  }
-
-  getStartTime() {
-    return this.startTime;
-  }
-
-  setStartTime(time) {
-    this.startTime = time;
+    const newTime = new Date(time);
+    this.currTime = newTime;
+    this.lastUpdateTime = new Date();
+    this.tracker.renderTrajectory(this.currTime);
   }
 
   getSpeed() {
@@ -92,7 +97,6 @@ class TrackerLayer extends VectorLayer {
   }
 
   setSpeed(speed) {
-    this.tracker.setSpeed(speed);
     this.speed = speed;
   }
 
@@ -120,6 +124,10 @@ class TrackerLayer extends VectorLayer {
       canvas: this.canvas,
     });
 
+    this.map.on('postrender', () => {
+      this.tracker.renderTrajectory(this.currTime);
+    });
+
     this.map.on('moveend', () => {
       const z = this.map.getView().getZoom();
 
@@ -128,7 +136,8 @@ class TrackerLayer extends VectorLayer {
         this.styleCache = {};
       }
 
-      // this.updateTrajectories();
+      this.tracker.renderTrajectory(this.currTime);
+      this.updateTrajectories();
     });
 
     this.map.on('pointermove', e => {
@@ -151,11 +160,12 @@ class TrackerLayer extends VectorLayer {
 
     this.updateTrajectories();
     this.startInterval();
+    this.startUpdateTime();
     this.tracker.setStyle((props, r) => this.style(props, r));
   }
 
   style(props) {
-    const { type, name, id } = props;
+    const { type, name, id, color } = props;
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.hoverVehicleId === id;
 
@@ -177,7 +187,7 @@ class TrackerLayer extends VectorLayer {
 
       ctx.beginPath();
       ctx.arc(radius + 2, radius + 2, radius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = bgColors[type];
+      ctx.fillStyle = color || bgColors[type];
       ctx.fill();
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#003300';
@@ -207,10 +217,21 @@ class TrackerLayer extends VectorLayer {
     const ext = this.map.getView().calculateExtent();
     const bufferExt = buffer(ext, getWidth(ext) / 10);
     const now = this.currTime;
-    const later = new Date(now);
-    later.setSeconds(
-      later.getSeconds() + this.requestIntervalSeconds * this.speed * 2,
-    );
+
+    let diff = true;
+
+    if (
+      this.later &&
+      now.getTime() > this.later.getTime() - 3000 * this.speed
+    ) {
+      diff = false;
+    }
+
+    if (!this.later || !diff) {
+      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbbitrary value
+      const later = new Date(now.getTime() + intervalMilliscds);
+      this.later = later;
+    }
 
     const btime = TrackerLayer.getTimeString(now);
 
@@ -223,7 +244,7 @@ class TrackerLayer extends VectorLayer {
       orx: ext[0],
       ory: ext[3],
       btime,
-      etime: TrackerLayer.getTimeString(later),
+      etime: TrackerLayer.getTimeString(this.later),
       date: TrackerLayer.getDateString(now),
       rid: 1,
       a: 1,
@@ -262,16 +283,16 @@ class TrackerLayer extends VectorLayer {
   }
 
   updateTrajectories() {
-    this.startUpdateTime = new Date();
-    this.olLayer.getSource().clear();
     this.fetchTrajectories().then(data => {
+      // For debug purpose , display the trajectory
+      // this.olLayer.getSource().clear();
       this.currentOffset = data.o || 0;
       const trajectories = [];
 
       for (let i = 0; i < data.a.length; i += 1) {
         const coords = [];
         const timeIntervals = [];
-        const paths = data.a[i].p;
+        const { i: id, p: paths, t: type, n: name, c: color } = data.a[i];
 
         for (let j = 0; j < paths.length; j += 1) {
           const path = paths[j];
@@ -289,18 +310,19 @@ class TrackerLayer extends VectorLayer {
 
         if (coords.length && timeIntervals.length) {
           const geometry = new LineString(coords);
+          // For debug purpose , display the trajectory
           // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
           trajectories.push({
-            id: data.a[i].i,
-            type: data.a[i].t,
-            name: data.a[i].n,
+            id,
+            type,
+            name,
+            color: color && `#${color}`,
             geom: geometry,
             timeOffset: this.currentOffset,
             time_intervals: timeIntervals,
           });
         }
       }
-
       this.tracker.setTrajectories(trajectories);
     });
   }
