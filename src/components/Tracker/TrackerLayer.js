@@ -306,8 +306,10 @@ class TrackerLayer extends VectorLayer {
             // If a pixel is defined with a time we add it to timeIntervals.
             if (timeAtPixelInScds) {
               const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
-              const timeFrac =
-                (timeAtPixelInMilliscds - startTime) / (endTime - startTime);
+              const timeFrac = Math.max(
+                (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
+                0,
+              );
 
               timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
               if (d) {
@@ -324,7 +326,7 @@ class TrackerLayer extends VectorLayer {
           }
         }
 
-        if (coords.length && timeIntervals.length) {
+        if (coords.length) {
           const geometry = new LineString(coords);
           // For debug purpose , display the trajectory
           // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
