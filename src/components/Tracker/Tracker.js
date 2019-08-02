@@ -1,3 +1,5 @@
+import { LineString } from 'ol/geom';
+
 /**
  * Tracker for OpenLayers.
  */
@@ -135,9 +137,11 @@ export default class Tracker {
       let end = 0;
       let startFrac = 0;
       let endFrac = 0;
+      let numCoordStart = 0;
+      let numCoordEnd = intervals.length - 1;
       for (j = 0; j < intervals.length - 1; j += 1) {
-        [start, startFrac] = intervals[j];
-        [end, endFrac] = intervals[j + 1];
+        [start, startFrac, , numCoordStart] = intervals[j];
+        [end, endFrac, , numCoordEnd] = intervals[j + 1];
 
         if (start <= now && now <= end) {
           break;
@@ -150,11 +154,19 @@ export default class Tracker {
       if (start && end) {
         // interpolate position based on the temporal fraction
         const timeFrac = Math.min((now - start) / (end - start), 1);
-        const geomFrac = this.interpolate
-          ? timeFrac * (endFrac - startFrac) + startFrac
-          : 0;
+        const geomFrac = this.interpolate ? timeFrac : 0;
 
-        traj.coordinate = traj.geom.getCoordinateAt(geomFrac);
+        if (startFrac > 0 || endFrac < 1) {
+          const coords = traj.geom.getCoordinates();
+          const intervalGeom = new LineString(
+            coords.slice(numCoordStart, numCoordEnd - numCoordStart + 1),
+          );
+
+          traj.coordinate = intervalGeom.getCoordinateAt(geomFrac);
+        } else {
+          traj.coordinate = traj.geom.getCoordinateAt(geomFrac);
+        }
+
         const px = this.map.getPixelFromCoordinate(traj.coordinate);
         const vehicleImg = this.style(traj, this.map.getView().getResolution());
 
