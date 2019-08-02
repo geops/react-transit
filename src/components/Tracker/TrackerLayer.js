@@ -296,10 +296,8 @@ class TrackerLayer extends VectorLayer {
 
         for (let j = 0; j < paths.length; j += 1) {
           const path = paths[j];
-          const startTime = (path[0].a + path[0].d || data.t) * 1000;
-          const endTime =
-            (path[path.length - 1].a + path[path.length - 1].d || data.t + 20) *
-            1000;
+          const startTime = (path[0].a || data.t) * 1000;
+          const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
 
           for (let k = 0; k < path.length; k += 1) {
             const { x, y, a: timeAtPixelInScds, d } = path[k];
@@ -307,11 +305,21 @@ class TrackerLayer extends VectorLayer {
 
             // If a pixel is defined with a time we add it to timeIntervals.
             if (timeAtPixelInScds) {
-              const timeAtPixelInMilliscds = (timeAtPixelInScds + d) * 1000;
+              const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
               const timeFrac =
                 (timeAtPixelInMilliscds - startTime) / (endTime - startTime);
 
               timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
+              if (d) {
+                const afterStopTimeInMilliscds = (timeAtPixelInScds + d) * 1000;
+                timeIntervals.push([
+                  afterStopTimeInMilliscds,
+                  (afterStopTimeInMilliscds - startTime) /
+                    (endTime - startTime),
+                  null,
+                  k,
+                ]);
+              }
             }
           }
         }
