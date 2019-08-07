@@ -296,19 +296,37 @@ class TrackerLayer extends VectorLayer {
 
         for (let j = 0; j < paths.length; j += 1) {
           const path = paths[j];
-          const startTime = path[0].a || data.t;
-          const endTime = path[path.length - 1].a || data.t + 20;
-
-          timeIntervals.unshift([startTime * 1000, 0, null]);
-          timeIntervals.push([endTime * 1000, 1, null]);
+          const startTime = (path[0].a || data.t) * 1000;
+          const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
 
           for (let k = 0; k < path.length; k += 1) {
-            const px = [path[k].x, path[k].y];
-            coords.push(this.map.getCoordinateFromPixel(px));
+            const { x, y, a: timeAtPixelInScds, d } = path[k];
+            coords.push(this.map.getCoordinateFromPixel([x, y]));
+
+            // If a pixel is defined with a time we add it to timeIntervals.
+            if (timeAtPixelInScds) {
+              const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
+              const timeFrac = Math.max(
+                (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
+                0,
+              );
+
+              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
+              if (d) {
+                const afterStopTimeInMilliscds = (timeAtPixelInScds + d) * 1000;
+                timeIntervals.push([
+                  afterStopTimeInMilliscds,
+                  (afterStopTimeInMilliscds - startTime) /
+                    (endTime - startTime),
+                  null,
+                  k,
+                ]);
+              }
+            }
           }
         }
 
-        if (coords.length && timeIntervals.length) {
+        if (coords.length) {
           const geometry = new LineString(coords);
           // For debug purpose , display the trajectory
           // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
