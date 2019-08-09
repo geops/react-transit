@@ -6,7 +6,12 @@ import LineString from 'ol/geom/LineString';
 import Feature from 'ol/Feature';
 import { buffer, containsCoordinate, getWidth } from 'ol/extent';
 import Tracker from './Tracker';
-import { getRadius, bgColors, textColors } from '../../config/tracker';
+import {
+  getRadius,
+  bgColors,
+  textColors,
+  timeSteps,
+} from '../../config/tracker';
 
 /**
  * Trackerlayer.
@@ -50,7 +55,7 @@ class TrackerLayer extends VectorLayer {
 
     this.currentOffset = 0;
 
-    this.requestIntervalSeconds = 2;
+    this.requestIntervalSeconds = 3;
 
     this.intervalStarted = false;
 
@@ -60,7 +65,11 @@ class TrackerLayer extends VectorLayer {
 
     this.lastUpdateTime = new Date();
 
+    this.lastRequestTime = 0;
+
     this.speed = 1;
+
+    this.fps = 60;
   }
 
   startInterval() {
@@ -71,14 +80,18 @@ class TrackerLayer extends VectorLayer {
   }
 
   startUpdateTime() {
-    window.clearInterval(this.updateTime);
+    this.stopUpdateTime();
     this.updateTime = setInterval(() => {
       this.currTime.setMilliseconds(
         this.currTime.getMilliseconds() +
           (new Date() - this.lastUpdateTime) * this.speed,
       );
       this.setCurrTime(this.currTime);
-    }, 1000 / 60);
+    }, 1000 / this.fps);
+  }
+
+  stopUpdateTime() {
+    window.clearInterval(this.updateTime);
   }
 
   getCurrTime() {
@@ -134,8 +147,11 @@ class TrackerLayer extends VectorLayer {
       if (z !== this.currentZoom) {
         this.currentZoom = z;
         this.styleCache = {};
+        this.fps = Math.round(
+          Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
+        );
+        this.startUpdateTime();
       }
-
       this.tracker.renderTrajectory(this.currTime);
       this.updateTrajectories();
     });
@@ -228,7 +244,7 @@ class TrackerLayer extends VectorLayer {
     }
 
     if (!this.later || !diff) {
-      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbbitrary value
+      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
       const later = new Date(now.getTime() + intervalMilliscds);
       this.later = later;
     }
@@ -251,10 +267,17 @@ class TrackerLayer extends VectorLayer {
       cd: 1,
       nm: 1,
       fl: 1,
-      s: 0,
+      s: this.map.getView().getZoom() < 10 ? 1 : 0,
       z: this.map.getView().getZoom(),
       // toff: this.currTime.getTime() / 1000,
     };
+
+    // Allow to load only differences between the last request,
+    // but currently the Tracker render method doesn't manage to render only diff.
+    /* if (diff) {
+      // Not working
+      params.diff = this.lastRequestTime;
+    } */
 
     return Object.keys(params)
       .map(k => `${k}=${params[k]}`)
@@ -286,6 +309,8 @@ class TrackerLayer extends VectorLayer {
     this.fetchTrajectories().then(data => {
       // For debug purpose , display the trajectory
       // this.olLayer.getSource().clear();
+
+      this.lastRequestTime = data.t;
       this.currentOffset = data.o || 0;
       const trajectories = [];
 
@@ -300,7 +325,8 @@ class TrackerLayer extends VectorLayer {
           const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
 
           for (let k = 0; k < path.length; k += 1) {
-            const { x, y, a: timeAtPixelInScds, d } = path[k];
+            // d: delay. When the train is stopped at a station.
+            const { x, y, a: timeAtPixelInScds, d: delay } = path[k];
             coords.push(this.map.getCoordinateFromPixel([x, y]));
 
             // If a pixel is defined with a time we add it to timeIntervals.
@@ -312,8 +338,9 @@ class TrackerLayer extends VectorLayer {
               );
 
               timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
-              if (d) {
-                const afterStopTimeInMilliscds = (timeAtPixelInScds + d) * 1000;
+              if (delay) {
+                const afterStopTimeInMilliscds =
+                  (timeAtPixelInScds + delay) * 1000;
                 timeIntervals.push([
                   afterStopTimeInMilliscds,
                   (afterStopTimeInMilliscds - startTime) /
