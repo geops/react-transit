@@ -26,7 +26,7 @@ const decreaseSpeed = speed => {
   if (nextSpeed < 0.1) {
     return speed;
   }
-  return nextSpeed < 1 ? nextSpeed.toFixed(1) : nextSpeed;
+  return nextSpeed;
 };
 
 const defaultRenderButton = (icon, onClick) => {
@@ -55,7 +55,7 @@ function TrackerControl({
       {renderButton(iconSpeedDown, () => setSpeed(decreaseSpeed(speed)))}
       {renderButton(iconSpeedReset, () => setSpeed(1))}
       {renderButton(iconSpeedUp, () => setSpeed(increaseSpeed(speed)))}
-      <span>{`${speed}x`}</span>
+      <span>{`${speed < 1 ? speed.toFixed(1) : speed}x`}</span>
     </>
   );
 }
