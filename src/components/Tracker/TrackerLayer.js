@@ -133,9 +133,7 @@ class TrackerLayer extends VectorLayer {
   init(map) {
     super.init(map);
 
-    this.tracker = new Tracker(map, {
-      canvas: this.canvas,
-    });
+    this.tracker = new Tracker(map);
 
     this.map.on('postrender', () => {
       this.tracker.renderTrajectory(this.currTime);
@@ -355,13 +353,15 @@ class TrackerLayer extends VectorLayer {
 
         if (coords.length) {
           const geometry = new LineString(coords);
+          console.log(textColors[type]);
           // For debug purpose , display the trajectory
           // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
           trajectories.push({
             id,
             type,
             name,
-            color: color && `#${color}`,
+            color: (color && `#${color}`) || bgColors[type],
+            textColor: textColors[type],
             geom: geometry,
             timeOffset: this.currentOffset,
             time_intervals: timeIntervals,
