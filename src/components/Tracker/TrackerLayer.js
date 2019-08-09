@@ -1,6 +1,6 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'react-spatial/layers/VectorLayer';
+import Layer from 'react-spatial/Layer';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import Feature from 'ol/Feature';
@@ -17,7 +17,7 @@ import {
  * Trackerlayer.
  * Responsible for loading tracker data.
  */
-class TrackerLayer extends VectorLayer {
+class TrackerLayer extends Layer {
   static getDateString(now) {
     const n = now || new Date();
     let month = (n.getMonth() + 1).toString();
@@ -70,6 +70,13 @@ class TrackerLayer extends VectorLayer {
     this.speed = 1;
 
     this.fps = 60;
+
+    this.clickCallbacks = [];
+
+    // Add click callback
+    if (options.onClick) {
+      this.onClick(options.onClick);
+    }
   }
 
   startInterval() {
@@ -163,15 +170,24 @@ class TrackerLayer extends VectorLayer {
     });
 
     this.map.on('singleclick', e => {
+      if (!this.clickCallbacks.length) {
+        return;
+      }
+
       const vehicle = this.getVehicleAtCoordinate(e.coordinate);
       const features = [];
 
       if (vehicle) {
         const geom = vehicle.coordinate ? new Point(vehicle.coordinate) : null;
         features.push(new Feature({ geometry: geom, ...vehicle }));
-      }
 
-      this.clickCallbacks.forEach(c => c(features, this, e));
+        if (features.length) {
+          const featId = features[0].get('id');
+          this.fetchTrajStations(featId).then(r => {
+            this.clickCallbacks.forEach(c => c(r, this, e));
+          });
+        }
+      }
     });
 
     this.updateTrajectories();
@@ -229,6 +245,14 @@ class TrackerLayer extends VectorLayer {
     return this.styleCache[z][type][name][hover];
   }
 
+  onClick(callback) {
+    if (typeof callback === 'function') {
+      this.clickCallbacks.push(callback);
+    } else {
+      throw new Error('callback must be of type function.');
+    }
+  }
+
   getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
     const bufferExt = buffer(ext, getWidth(ext) / 10);
@@ -282,6 +306,16 @@ class TrackerLayer extends VectorLayer {
     return Object.keys(params)
       .map(k => `${k}=${params[k]}`)
       .join('&');
+  }
+
+  fetchTrajStations(id) {
+    const params = this.getUrlParams({
+      id,
+      time: TrackerLayer.getTimeString(new Date()),
+    });
+
+    const url = `${this.url}/trajstations?${params}`;
+    return fetch(url).then(res => res.json());
   }
 
   fetchTrajectory(id) {

@@ -191,6 +191,7 @@ export default class Tracker {
       }
 
       if (coord) {
+        traj.coordinate = coord;
         const px = this.map.getPixelFromCoordinate(coord);
         const vehicleImg = this.style(traj, this.map.getView().getResolution());
 
