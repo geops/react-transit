@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import firstStation from '../../images/RouteSchedule/firstStation.png';
 import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
+import { bgColors } from '../../config/tracker';
 
 const pad = number => {
   return `${number < 10 ? '0' : ''}${number}`;
@@ -122,7 +123,9 @@ const defaultProps = {
       <div className="rt-route-header">
         <span
           style={{
-            backgroundColor: `#${lineInfos.c}`,
+            backgroundColor: lineInfos.c
+              ? `#${lineInfos.c}`
+              : bgColors[lineInfos.t],
             color: `#${lineInfos.tc}`,
           }}
           className="rt-route-icon"
