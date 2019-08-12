@@ -4,8 +4,6 @@ import firstStation from '../../images/RouteSchedule/firstStation.png';
 import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
 
-import './RouteSchedule.scss';
-
 const pad = number => {
   return `${number < 10 ? '0' : ''}${number}`;
 };
@@ -187,7 +185,6 @@ const defaultProps = {
 };
 
 /**
- * RouteSchedule.
  * Displaying all stops of a line, and their informations.
  */
 

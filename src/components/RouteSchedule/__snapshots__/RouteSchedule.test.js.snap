@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RouteSchedule matches snapshots. 1`] = `
+<div
+  className="rt-route-wrapper"
+>
+  <div
+    className="rt-route-header"
+  >
+    <span
+      className="rt-route-icon"
+      style={
+        Object {
+          "backgroundColor": "#ff8a00",
+          "color": "#",
+        }
+      }
+    >
+      3
+    </span>
+    <div
+      className="rt-route-title"
+    >
+      <span
+        className="rt-route-name"
+      >
+        Station name
+      </span>
+      <span>
+        T 3
+      </span>
+    </div>
+  </div>
+  <div
+    className="rt-route-body"
+  >
+    <div
+      className="rt-route-station"
+      onClick={[Function]}
+      onKeyPress={[Function]}
+      role="button"
+      tabIndex={0}
+    >
+      <div
+        className="rt-route-delay"
+      />
+      <div
+        className="rt-route-times"
+      >
+        <span
+          className="rt-route-time-arrival"
+        >
+          09:57
+        </span>
+        <span
+          className="rt-route-time-departure"
+        >
+          09:57
+        </span>
+      </div>
+      <img
+        alt="routeScheduleLine"
+        className="rt-route-icon"
+        src="firstStation.png"
+      />
+      <div>
+        first stop
+      </div>
+    </div>
+    <div
+      className="rt-route-station"
+      onClick={[Function]}
+      onKeyPress={[Function]}
+      role="button"
+      tabIndex={0}
+    >
+      <div
+        className="rt-route-delay"
+      />
+      <div
+        className="rt-route-times"
+      >
+        <span
+          className="rt-route-time-arrival"
+        >
+          10:08
+        </span>
+        <span
+          className="rt-route-time-departure"
+        >
+          10:08
+        </span>
+      </div>
+      <img
+        alt="routeScheduleLine"
+        className="rt-route-icon"
+        src="lastStation.png"
+      />
+      <div>
+        second stop
+      </div>
+    </div>
+  </div>
+</div>
+`;

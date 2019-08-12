@@ -15,7 +15,7 @@ import Clock from './components/Clock';
 import RouteSchedule from './components/RouteSchedule';
 import LocalClock from './components/LocalClock';
 
-import './App.scss';
+import './themes/default/index.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 
 class App extends Component {
@@ -97,7 +97,7 @@ class App extends Component {
           layers={this.layers}
         />
         <Dialog
-          className="tm-route-dialog"
+          className="rt-route-dialog"
           onClose={() => this.toggleRouteSchedule()}
           isOpen={isRouteScheduleOpen}
         >
