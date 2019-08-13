@@ -10,7 +10,7 @@ import Dialog from 'react-spatial/components/Dialog';
 import Footer from 'react-spatial/components/Footer';
 import DatePicker from 'react-datepicker';
 import TrackerControl from './components/TrackerControl';
-import TrackerLayer from './components/Tracker/TrackerLayer';
+import TrajservLayer from './layers/TrajservLayer';
 import Clock from './components/Clock';
 import RouteSchedule from './components/RouteSchedule';
 import LocalClock from './components/LocalClock';
@@ -36,14 +36,12 @@ class App extends Component {
       }),
     });
 
-    this.trackerLayer = new TrackerLayer({
-      onClick: e => {
-        if (e && 'sts' in e) {
-          this.setState({
-            isRouteScheduleOpen: true,
-            lineInfos: e,
-          });
-        }
+    this.trackerLayer = new TrajservLayer({
+      onClick: trajectory => {
+        this.setState({
+          isRouteScheduleOpen: true,
+          lineInfos: trajectory,
+        });
       },
     });
 

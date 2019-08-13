@@ -11,8 +11,8 @@ exports[`RouteSchedule matches snapshots. 1`] = `
       className="rt-route-icon"
       style={
         Object {
-          "backgroundColor": "#ff8a00",
-          "color": "#",
+          "backgroundColor": "ff8a00",
+          "color": "black",
         }
       }
     >
@@ -43,19 +43,30 @@ exports[`RouteSchedule matches snapshots. 1`] = `
     >
       <div
         className="rt-route-delay"
-      />
+      >
+        <span
+          className="rt-route-delay-arrival green"
+        >
+          +01m
+        </span>
+        <span
+          className="rt-route-delay-arrival green"
+        >
+          +01m
+        </span>
+      </div>
       <div
         className="rt-route-times"
       >
         <span
           className="rt-route-time-arrival"
         >
-          09:57
+          16:45
         </span>
         <span
           className="rt-route-time-departure"
         >
-          09:57
+          16:45
         </span>
       </div>
       <img
@@ -76,19 +87,30 @@ exports[`RouteSchedule matches snapshots. 1`] = `
     >
       <div
         className="rt-route-delay"
-      />
+      >
+        <span
+          className="rt-route-delay-arrival green"
+        >
+          +02m
+        </span>
+        <span
+          className="rt-route-delay-arrival green"
+        >
+          +02m
+        </span>
+      </div>
       <div
         className="rt-route-times"
       >
         <span
           className="rt-route-time-arrival"
         >
-          10:08
+          16:55
         </span>
         <span
           className="rt-route-time-departure"
         >
-          10:08
+          16:55
         </span>
       </div>
       <img

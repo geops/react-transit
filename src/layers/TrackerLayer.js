@@ -1,17 +1,9 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Layer from 'react-spatial/Layer';
-import Point from 'ol/geom/Point';
-import LineString from 'ol/geom/LineString';
-import Feature from 'ol/Feature';
 import { buffer, containsCoordinate, getWidth } from 'ol/extent';
 import Tracker from './Tracker';
-import {
-  getRadius,
-  bgColors,
-  textColors,
-  timeSteps,
-} from '../../config/tracker';
+import { getRadius, bgColors, textColors, timeSteps } from '../config/tracker';
 
 /**
  * Trackerlayer.
@@ -45,11 +37,6 @@ class TrackerLayer extends Layer {
       }),
       ...options,
     });
-
-    this.url =
-      options.url ||
-      'https://backend1.tracker.geops.de' ||
-      'https://tracker.geops.io';
 
     this.styleCache = {};
 
@@ -169,27 +156,6 @@ class TrackerLayer extends Layer {
       this.hoverVehicleId = vehicle ? vehicle.id : null;
     });
 
-    this.map.on('singleclick', e => {
-      if (!this.clickCallbacks.length) {
-        return;
-      }
-
-      const vehicle = this.getVehicleAtCoordinate(e.coordinate);
-      const features = [];
-
-      if (vehicle) {
-        const geom = vehicle.coordinate ? new Point(vehicle.coordinate) : null;
-        features.push(new Feature({ geometry: geom, ...vehicle }));
-
-        if (features.length) {
-          const featId = features[0].get('id');
-          this.fetchTrajStations(featId).then(r => {
-            this.clickCallbacks.forEach(c => c(r, this, e));
-          });
-        }
-      }
-    });
-
     this.updateTrajectories();
     this.startInterval();
     this.startUpdateTime();
@@ -306,104 +272,6 @@ class TrackerLayer extends Layer {
     return Object.keys(params)
       .map(k => `${k}=${params[k]}`)
       .join('&');
-  }
-
-  fetchTrajStations(id) {
-    const params = this.getUrlParams({
-      id,
-      time: TrackerLayer.getTimeString(new Date()),
-    });
-
-    const url = `${this.url}/trajstations?${params}`;
-    return fetch(url).then(res => res.json());
-  }
-
-  fetchTrajectory(id) {
-    const params = this.getUrlParams({
-      id,
-      time: TrackerLayer.getTimeString(new Date()),
-    });
-
-    const url = `${this.url}/trajectory?${params}`;
-    return fetch(url).then(res => res.json());
-  }
-
-  fetchTrajectories() {
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-
-    this.abortController = new AbortController();
-    const { signal } = this.abortController;
-    const trackerUrl = `${this.url}/trajectories?${this.getUrlParams()}`;
-    return fetch(trackerUrl, { signal }).then(data => data.json());
-  }
-
-  updateTrajectories() {
-    this.fetchTrajectories().then(data => {
-      // For debug purpose , display the trajectory
-      // this.olLayer.getSource().clear();
-
-      this.lastRequestTime = data.t;
-      this.currentOffset = data.o || 0;
-      const trajectories = [];
-
-      for (let i = 0; i < data.a.length; i += 1) {
-        const coords = [];
-        const timeIntervals = [];
-        const { i: id, p: paths, t: type, n: name, c: color } = data.a[i];
-
-        for (let j = 0; j < paths.length; j += 1) {
-          const path = paths[j];
-          const startTime = (path[0].a || data.t) * 1000;
-          const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
-
-          for (let k = 0; k < path.length; k += 1) {
-            // d: delay. When the train is stopped at a station.
-            const { x, y, a: timeAtPixelInScds, d: delay } = path[k];
-            coords.push(this.map.getCoordinateFromPixel([x, y]));
-
-            // If a pixel is defined with a time we add it to timeIntervals.
-            if (timeAtPixelInScds) {
-              const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
-              const timeFrac = Math.max(
-                (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
-                0,
-              );
-
-              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
-              if (delay) {
-                const afterStopTimeInMilliscds =
-                  (timeAtPixelInScds + delay) * 1000;
-                timeIntervals.push([
-                  afterStopTimeInMilliscds,
-                  (afterStopTimeInMilliscds - startTime) /
-                    (endTime - startTime),
-                  null,
-                  k,
-                ]);
-              }
-            }
-          }
-        }
-
-        if (coords.length) {
-          const geometry = new LineString(coords);
-          // For debug purpose , display the trajectory
-          // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
-          trajectories.push({
-            id,
-            type,
-            name,
-            color: color && `#${color}`,
-            geom: geometry,
-            timeOffset: this.currentOffset,
-            time_intervals: timeIntervals,
-          });
-        }
-      }
-      this.tracker.setTrajectories(trajectories);
-    });
   }
 }
 

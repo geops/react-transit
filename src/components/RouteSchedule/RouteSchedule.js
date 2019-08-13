@@ -5,10 +5,18 @@ import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
 import { bgColors } from '../../config/tracker';
 
+/**
+ * Returns a paded number (with leading 0 for integer < 10).
+ * @param {Number} number number.
+ */
 const pad = number => {
   return `${number < 10 ? '0' : ''}${number}`;
 };
 
+/**
+ * Returns a 'hh:mm' string from a time.
+ * @param {Number} t time in milliseconds.
+ */
 const getTimeString = t => {
   if (t === -1) {
     return '';
@@ -18,6 +26,10 @@ const getTimeString = t => {
   return `${pad(h)}:${pad(m)}`;
 };
 
+/**
+ * Returns a color class to display the delay.
+ * @param {Number} time Delay time in milliseconds.
+ */
 const getDelayString = t => {
   const h = Math.floor(t / 3600000);
   const m = Math.floor((t % 3600000) / 60000);
@@ -41,6 +53,10 @@ const getDelayString = t => {
   return `${pad(h)}h${pad(m)}m${pad(s)}s`;
 };
 
+/**
+ * Returns a color class to display the delay.
+ * @param {Number} time Delay time in milliseconds.
+ */
 const getDelayColor = time => {
   const secs = Math.round(((time / 1800 / 2) * 3600) / 1000);
   if (secs >= 3600) {
@@ -58,6 +74,11 @@ const getDelayColor = time => {
   return 'green';
 };
 
+/**
+ * Returns an image for first, middle or last stations.
+ * @param {Number} index index of the station in the list.
+ * @param {Number} length Length of the stations list.
+ */
 const renderStationImg = (index, length) => {
   if (index === 0) {
     return (
@@ -123,27 +144,26 @@ const defaultProps = {
       <div className="rt-route-header">
         <span
           style={{
-            backgroundColor: lineInfos.c
-              ? `#${lineInfos.c}`
-              : bgColors[lineInfos.t],
-            color: `#${lineInfos.tc}`,
+            backgroundColor:
+              lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
+            color: lineInfos.color || 'black',
           }}
           className="rt-route-icon"
         >
-          {lineInfos.sn}
+          {lineInfos.shortName}
         </span>
         <div className="rt-route-title">
-          <span className="rt-route-name">{lineInfos.hs}</span>
-          <span>{lineInfos.ln}</span>
+          <span className="rt-route-name">{lineInfos.destination}</span>
+          <span>{lineInfos.longName}</span>
         </div>
       </div>
     );
   },
   renderStations: (lineInfos, stationTabIndex, onStationClick) => (
     <div className="rt-route-body">
-      {lineInfos.sts.map((stop, idx) => (
+      {lineInfos.stations.map((stop, idx) => (
         <div
-          key={stop.sid}
+          key={stop.stationId}
           role="button"
           className="rt-route-station"
           onClick={e => onStationClick(stop, e)}
@@ -151,35 +171,35 @@ const defaultProps = {
           onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
         >
           <div className="rt-route-delay">
-            {stop.ad ? (
+            {stop.arrivalDelay ? (
               <span
                 className={`rt-route-delay-arrival${` ${getDelayColor(
-                  stop.ad,
+                  stop.arrivalDelay,
                 )}`}`}
               >
-                {`+${getDelayString(stop.ad)}`}
+                {`+${getDelayString(stop.arrivalDelay)}`}
               </span>
             ) : null}
-            {stop.dd ? (
+            {stop.departureDelay ? (
               <span
                 className={`rt-route-delay-arrival${` ${getDelayColor(
-                  stop.dd,
+                  stop.departureDelay,
                 )}`}`}
               >
-                {`+${getDelayString(stop.dd)}`}
+                {`+${getDelayString(stop.departureDelay)}`}
               </span>
             ) : null}
           </div>
           <div className="rt-route-times">
             <span className="rt-route-time-arrival">
-              {getTimeString(stop.at)}
+              {getTimeString(stop.arrivalTime)}
             </span>
             <span className="rt-route-time-departure">
-              {getTimeString(stop.dt)}
+              {getTimeString(stop.departureTime)}
             </span>
           </div>
-          {renderStationImg(idx, lineInfos.sts.length)}
-          <div>{stop.n}</div>
+          {renderStationImg(idx, lineInfos.stations.length)}
+          <div>{stop.stationName}</div>
         </div>
       ))}
     </div>

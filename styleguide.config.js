@@ -23,11 +23,12 @@ module.exports = {
       context: 'README.md',
     },
     {
+      name: 'Basic usage',
+      content: 'src/layers/README.md',
+    },
+    {
       name: 'Components',
-      components: [
-        'src/components/Tracker/TrackerLayer.js',
-        'src/components/RouteSchedule/RouteSchedule.js',
-      ],
+      components: ['src/components/RouteSchedule/RouteSchedule.js'],
       exampleMode: 'expand',
       usageMode: 'collapse',
     },

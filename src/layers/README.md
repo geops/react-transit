@@ -1,6 +1,6 @@
 #
 
-This demonstrates the use of TrackerLayer.
+This demonstrates the use of TrajservLayer.
 
 ```jsx
 import React from 'react';
@@ -8,7 +8,7 @@ import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/Layer';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
-import TrackerLayer from 'react-transit/components/Tracker/TrackerLayer';
+import TrajservLayer from 'react-transit/layers/TrajservLayer';
 
 class BasicMapExample extends React.Component {
   constructor(props) {
@@ -21,7 +21,7 @@ class BasicMapExample extends React.Component {
           source: new OSMSource(),
         }),
       }),
-      new TrackerLayer({
+      new TrajservLayer({
         onClick: f => console.log(f),
       }),
     ];

@@ -9,7 +9,7 @@ import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/Layer';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
-import TrackerLayer from 'react-transit/components/Tracker/TrackerLayer';
+import TrajservLayer from 'react-transit/layers/TrajservLayer';
 import RouteSchedule from 'react-transit/components/RouteSchedule';
 
 class BasicMapExample extends React.Component {
@@ -28,14 +28,12 @@ class BasicMapExample extends React.Component {
           source: new OSMSource(),
         }),
       }),
-      new TrackerLayer({
-        onClick: e => {
-          if (e && 'sts' in e) {
-            this.setState({
-              isRouteScheduleOpen: true,
-              lineInfos: e,
-            });
-          }
+      new TrajservLayer({
+        onClick: trajectory => {
+          this.setState({
+            isRouteScheduleOpen: true,
+            lineInfos: trajectory,
+          });
         },
       }),
     ];
