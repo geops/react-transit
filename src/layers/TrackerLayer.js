@@ -259,6 +259,8 @@ class TrackerLayer extends Layer {
       fl: 1,
       s: this.map.getView().getZoom() < 10 ? 1 : 0,
       z: this.map.getView().getZoom(),
+      key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
+
       // toff: this.currTime.getTime() / 1000,
     };
 

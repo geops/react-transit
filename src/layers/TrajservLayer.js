@@ -111,10 +111,7 @@ class TrajservLayer extends TrackerLayer {
   constructor(options = {}) {
     super({ ...options });
 
-    this.url =
-      options.url ||
-      'https://backend1.tracker.geops.de' ||
-      'https://tracker.geops.io';
+    this.url = options.url || 'https://api.geops.io/tracker';
   }
 
   init(map) {
