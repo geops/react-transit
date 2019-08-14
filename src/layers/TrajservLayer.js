@@ -154,9 +154,14 @@ class TrajservLayer extends TrackerLayer {
 
     // Setting filters from the permalink.
     const parameters = { ...qs.parse(window.location.search) };
+
     if (parameters[TRAIN_FILTER] || parameters[OPERATOR_FILTER]) {
-      const trainFilter = parameters[TRAIN_FILTER].split(',');
-      const operatorFilter = parameters[OPERATOR_FILTER].split(',');
+      const trainFilter = parameters[TRAIN_FILTER]
+        ? parameters[TRAIN_FILTER].split(',')
+        : null;
+      const operatorFilter = parameters[OPERATOR_FILTER]
+        ? parameters[OPERATOR_FILTER].split(',')
+        : null;
 
       this.filterFc = TrajservLayer.createFilter(trainFilter, operatorFilter);
     }
