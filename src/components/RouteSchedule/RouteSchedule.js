@@ -112,7 +112,24 @@ const propTypes = {
   /**
    * Trajectory stations informations.
    */
-  lineInfos: PropTypes.object,
+  lineInfos: PropTypes.shape({
+    backgroundColor: PropTypes.string,
+    bicyclesAllowed: PropTypes.number,
+    color: PropTypes.string,
+    destination: PropTypes.string,
+    feedsId: PropTypes.number,
+    id: PropTypes.number,
+    longName: PropTypes.string,
+    operatingInformations: PropTypes.object,
+    operator: PropTypes.string,
+    operatorTimeZone: PropTypes.string,
+    operatorUrl: PropTypes.string,
+    realTime: PropTypes.number,
+    shortName: PropTypes.string,
+    stations: PropTypes.array,
+    vehiculeType: PropTypes.number,
+    wheelchairAccessible: PropTypes.number,
+  }),
 
   /**
    * HTML tabIndex attribute

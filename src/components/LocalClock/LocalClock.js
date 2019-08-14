@@ -19,7 +19,7 @@ function LocalClock({ date, timeZone }) {
 }
 
 LocalClock.propTypes = {
-  date: PropTypes.object.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
   timeZone: PropTypes.shape({
     os: PropTypes.number,
     c: PropTypes.string,
