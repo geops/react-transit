@@ -23,6 +23,8 @@ class BasicMapExample extends React.Component {
       }),
       new TrajservLayer({
         onClick: f => console.log(f),
+        train: ['S12', 'S15', 'IR'],
+        operator: 'SBB',
       }),
     ];
   }

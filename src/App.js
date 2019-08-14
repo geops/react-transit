@@ -66,13 +66,6 @@ class App extends Component {
     return () => clearTimeout(nextTick);
   }
 
-  toggleRouteSchedule() {
-    const { isRouteScheduleOpen } = this.state;
-    this.setState({
-      isRouteScheduleOpen: !isRouteScheduleOpen,
-    });
-  }
-
   animateToStation(station) {
     const view = this.map.getView();
     const zoom = view.getZoom();
@@ -81,6 +74,13 @@ class App extends Component {
       { zoom },
       { center: transform(station.p, 'EPSG:4326', 'EPSG:3857') },
     );
+  }
+
+  toggleRouteSchedule() {
+    const { isRouteScheduleOpen } = this.state;
+    this.setState({
+      isRouteScheduleOpen: !isRouteScheduleOpen,
+    });
   }
 
   render() {

@@ -123,6 +123,11 @@ export default class Tracker {
 
     for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
       const traj = this.trajectories[i];
+
+      if (this.filter && !this.filter(traj)) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
       const intervals = traj.time_intervals;
       let coord = null;
       if (intervals && intervals.length) {
@@ -171,7 +176,7 @@ export default class Tracker {
       } else if (traj.geom) {
         // if there is no time intervals but a geometry that means the bus is stopped at a station
         // Example in json:
-        /* 
+        /*
           {
             "i": 9551952,
             "t": 0,
