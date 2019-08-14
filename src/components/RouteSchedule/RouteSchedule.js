@@ -132,19 +132,14 @@ const propTypes = {
   }),
 
   /**
-   * HTML tabIndex attribute
-   */
-  stationTabIndex: PropTypes.number,
-
-  /**
    * Render Header of the route scheduler.
    */
-  renderHeader: PropTypes.func,
+  header: PropTypes.func,
 
   /**
    * Render Body of the route scheduler.
    */
-  renderStations: PropTypes.func,
+  stations: PropTypes.func,
 
   /**
    * Function triggered on station's click event.
@@ -155,91 +150,92 @@ const propTypes = {
 const defaultProps = {
   className: 'rt-route-wrapper',
   lineInfos: null,
-  stationTabIndex: 0,
-  renderHeader: lineInfos => {
-    return (
-      <div className="rt-route-header">
-        <span
-          style={{
-            backgroundColor:
-              lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
-            color: lineInfos.color || 'black',
-          }}
-          className="rt-route-icon"
-        >
-          {lineInfos.shortName}
-        </span>
-        <div className="rt-route-title">
-          <span className="rt-route-name">{lineInfos.destination}</span>
-          <span>{lineInfos.longName}</span>
-        </div>
-      </div>
-    );
-  },
-  renderStations: (lineInfos, stationTabIndex, onStationClick) => (
-    <div className="rt-route-body">
-      {lineInfos.stations.map((stop, idx) => (
-        <div
-          key={stop.stationId}
-          role="button"
-          className="rt-route-station"
-          onClick={e => onStationClick(stop, e)}
-          tabIndex={stationTabIndex}
-          onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
-        >
-          <div className="rt-route-delay">
-            {stop.arrivalDelay ? (
-              <span
-                className={`rt-route-delay-arrival${` ${getDelayColor(
-                  stop.arrivalDelay,
-                )}`}`}
-              >
-                {`+${getDelayString(stop.arrivalDelay)}`}
-              </span>
-            ) : null}
-            {stop.departureDelay ? (
-              <span
-                className={`rt-route-delay-arrival${` ${getDelayColor(
-                  stop.departureDelay,
-                )}`}`}
-              >
-                {`+${getDelayString(stop.departureDelay)}`}
-              </span>
-            ) : null}
-          </div>
-          <div className="rt-route-times">
-            <span className="rt-route-time-arrival">
-              {getTimeString(stop.arrivalTime)}
-            </span>
-            <span className="rt-route-time-departure">
-              {getTimeString(stop.departureTime)}
-            </span>
-          </div>
-          {renderStationImg(idx, lineInfos.stations.length)}
-          <div>{stop.stationName}</div>
-        </div>
-      ))}
-    </div>
-  ),
+  header: null,
+  stations: null,
   onStationClick: () => {},
 };
+
+const renderHeader = lineInfos => {
+  return (
+    <div className="rt-route-header">
+      <span
+        style={{
+          backgroundColor:
+            lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
+          color: lineInfos.color || 'black',
+        }}
+        className="rt-route-icon"
+      >
+        {lineInfos.shortName}
+      </span>
+      <div className="rt-route-title">
+        <span className="rt-route-name">{lineInfos.destination}</span>
+        <span>{lineInfos.longName}</span>
+      </div>
+    </div>
+  );
+};
+
+const renderStations = (lineInfos, onStationClick) => (
+  <div className="rt-route-body">
+    {lineInfos.stations.map((stop, idx) => (
+      <div
+        key={stop.stationId}
+        role="button"
+        className="rt-route-station"
+        onClick={e => onStationClick(stop, e)}
+        tabIndex={0}
+        onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
+      >
+        <div className="rt-route-delay">
+          {stop.arrivalDelay ? (
+            <span
+              className={`rt-route-delay-arrival${` ${getDelayColor(
+                stop.arrivalDelay,
+              )}`}`}
+            >
+              {`+${getDelayString(stop.arrivalDelay)}`}
+            </span>
+          ) : null}
+          {stop.departureDelay ? (
+            <span
+              className={`rt-route-delay-arrival${` ${getDelayColor(
+                stop.departureDelay,
+              )}`}`}
+            >
+              {`+${getDelayString(stop.departureDelay)}`}
+            </span>
+          ) : null}
+        </div>
+        <div className="rt-route-times">
+          <span className="rt-route-time-arrival">
+            {getTimeString(stop.arrivalTime)}
+          </span>
+          <span className="rt-route-time-departure">
+            {getTimeString(stop.departureTime)}
+          </span>
+        </div>
+        {renderStationImg(idx, lineInfos.stations.length)}
+        <div>{stop.stationName}</div>
+      </div>
+    ))}
+  </div>
+);
 
 /**
  * Displaying all stops of a line, and their informations.
  */
-
 function RouteSchedule({
   className,
   lineInfos,
-  renderHeader,
-  renderStations,
-  stationTabIndex,
+  header,
+  stations,
   onStationClick,
 }) {
   return lineInfos ? (
     <div className={className}>
-      {renderHeader(lineInfos)}
-      {renderStations(lineInfos, stationTabIndex, onStationClick)}
+      {header || renderHeader(lineInfos)}
+      {stations || renderStations(lineInfos, onStationClick)}
     </div>
   ) : null;
 }
