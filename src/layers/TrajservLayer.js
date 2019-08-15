@@ -248,7 +248,7 @@ class TrajservLayer extends TrackerLayer {
           for (let k = 0; k < path.length; k += 1) {
             // d: delay. When the train is stopped at a station.
             const { x, y, a: timeAtPixelInScds, d: delay } = path[k];
-            coords.push(this.map.getCoordinateFromPixel([x, y]));
+            coords.push([x, y]);
 
             // If a pixel is defined with a time we add it to timeIntervals.
             if (timeAtPixelInScds) {
