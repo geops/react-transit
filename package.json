@@ -23,7 +23,6 @@
     "prebuild": "rm -rf build/",
     "build": "buble --no modules,asyncAwait -i src -o build --objectAssign Object.assign --sourcemap, && cp -t build package.json README.md LICENSE && cp -rf src/images build",
     "postbuild": "cp package.json build/ && cd src && find .  -name '*.scss' | cpio -pdm ../build",
-    "build:es": "bash ./scripts/build-es.sh",
     "test": "react-scripts test --env=jsdom --transformIgnorePatterns \"/node_modules/(?!(jsts|ol|react-spatial|ole|react-datepicker)/).*/\"",
     "test:coverage": "yarn test --coverage --coverageDirectory=coverage",
     "lint": "eslint 'src/**/*.js' && stylelint 'src/**/*.css' 'src/**/*.scss'",
@@ -31,7 +30,8 @@
     "eject": "react-scripts eject",
     "doc": "bash ./scripts/prepare-doc.sh",
     "doc:server": "styleguidist server",
-    "publish:build": "rm -rf build && yarn version && yarn run build:prod && yarn publish build/ --access public --non-interactive --no-git-tag-version",
+    "publish:public": "yarn version && git push origin HEAD && yarn build && yarn publish build/",
+    "publish:beta": "yarn publish:public --tag beta",
     "cp": "generact --root src/components"
   },
   "eslintConfig": {
