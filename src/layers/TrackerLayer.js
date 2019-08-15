@@ -221,7 +221,7 @@ class TrackerLayer extends Layer {
 
   getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
-    const bufferExt = buffer(ext, getWidth(ext) / 10);
+    const bbox = buffer(ext, getWidth(ext) / 10).join(',');
     const now = this.currTime;
 
     let diff = true;
@@ -243,12 +243,7 @@ class TrackerLayer extends Layer {
 
     const params = {
       ...extraParams,
-      swy: bufferExt[0],
-      swx: bufferExt[1],
-      nex: bufferExt[3],
-      ney: bufferExt[2],
-      orx: ext[0],
-      ory: ext[3],
+      bbox,
       btime,
       etime: TrackerLayer.getTimeString(this.later),
       date: TrackerLayer.getDateString(now),
