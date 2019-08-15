@@ -155,26 +155,24 @@ const defaultProps = {
   onStationClick: () => {},
 };
 
-const renderHeader = lineInfos => {
-  return (
-    <div className="rt-route-header">
-      <span
-        style={{
-          backgroundColor:
-            lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
-          color: lineInfos.color || 'black',
-        }}
-        className="rt-route-icon"
-      >
-        {lineInfos.shortName}
-      </span>
-      <div className="rt-route-title">
-        <span className="rt-route-name">{lineInfos.destination}</span>
-        <span>{lineInfos.longName}</span>
-      </div>
+const renderHeader = lineInfos => (
+  <div className="rt-route-header">
+    <span
+      style={{
+        backgroundColor:
+          lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
+        color: lineInfos.color || 'black',
+      }}
+      className="rt-route-icon"
+    >
+      {lineInfos.shortName}
+    </span>
+    <div className="rt-route-title">
+      <span className="rt-route-name">{lineInfos.destination}</span>
+      <span>{lineInfos.longName}</span>
     </div>
-  );
-};
+  </div>
+);
 
 const renderStations = (lineInfos, onStationClick) => (
   <div className="rt-route-body">
