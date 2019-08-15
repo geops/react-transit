@@ -72,7 +72,7 @@ class App extends Component {
     view.cancelAnimations();
     view.animate(
       { zoom },
-      { center: transform(station.p, 'EPSG:4326', 'EPSG:3857') },
+      { center: transform(station.coordinates, 'EPSG:4326', 'EPSG:3857') },
     );
   }
 
