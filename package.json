@@ -10,9 +10,11 @@
     "prop-types": "^15.6.2",
     "react": "^16.8.6",
     "react-datepicker": "^2.8.0",
+    "react-dom": "^16.8.6",
     "react-icons": "^3.7.0",
     "react-scripts": "^3.0.1",
-    "react-spatial": "^0.0.14-beta.62"
+    "react-spatial": "^0.0.14-beta.62",
+    "react-styleguidist": "^9.0.2"
   },
   "peerDependency": {
     "ol": "^5.3.3",
@@ -73,8 +75,6 @@
     "node-sass": "^4.11.0",
     "node-fetch": "^2.3.0",
     "prettier": "^1.16.3",
-    "react-dom": "^16.8.6",
-    "react-styleguidist": "^9.0.2",
     "react-test-renderer": "^16.5.2",
     "redux-mock-store": "^1.5.3",
     "rewire": "^4.0.1",
