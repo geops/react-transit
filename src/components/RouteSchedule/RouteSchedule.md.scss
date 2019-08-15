@@ -3,10 +3,24 @@
   position: relative;
 
   .rt-route-dialog {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    background: white;
+    position: absolute;
+    margin: auto;
+    left: 30px;
+    top: 30px;
     height: 80%;
     max-height: 80%;
 
-    .rt-route-dialog-2 {
+    .tm-dialog-header {
+      position: absolute;
+      cursor: pointer;
+      top: 10px;
+      right: 10px;
+      padding: 5px;
+    }
+
+    .rt-route-dialog-children {
       height: 100%;
 
       .rt-route-wrapper {
