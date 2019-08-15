@@ -4,6 +4,7 @@ const { version } = require('./package.json');
 module.exports = {
   version,
   require: [
+    path.join(__dirname, 'src/themes/default/examples.scss'),
     path.join(__dirname, 'src/styleguidist/styleguidist.css'),
     'react-app-polyfill/ie11',
     'react-app-polyfill/stable',
@@ -13,14 +14,21 @@ module.exports = {
     url: 'https://github.com/geops/react-public-transport',
     text: 'Fork me on GitHub',
   },
+  moduleAliases: {
+    'react-transit': path.resolve(__dirname, 'src'),
+  },
   sections: [
     {
       name: '',
       context: 'README.md',
     },
     {
+      name: 'Basic usage',
+      content: 'src/layers/README.md',
+    },
+    {
       name: 'Components',
-      content: 'src/components/Tracker/README.md',
+      components: ['src/components/RouteSchedule/RouteSchedule.js'],
       exampleMode: 'expand',
       usageMode: 'collapse',
     },

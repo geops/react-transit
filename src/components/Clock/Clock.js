@@ -14,7 +14,7 @@ function Clock({ date }) {
 }
 
 Clock.propTypes = {
-  date: PropTypes.object.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
 };
 
 export default Clock;
