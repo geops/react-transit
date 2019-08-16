@@ -15,6 +15,10 @@ export default class Tracker {
     this.rotationCache = {};
     this.renderFps = 60;
 
+    this.map.once('rendercomplete', () => {
+      [this.canvas.width, this.canvas.height] = this.map.getSize();
+    });
+
     this.map.on('change:size', () => {
       [this.canvas.width, this.canvas.height] = this.map.getSize();
     });
