@@ -147,16 +147,9 @@
     }
   },
   "jest": {
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "^.+\\.svg$": "jest-svg-transformer",
-      "\\.(jpg|jpeg|png|gif|webp)$": "jest-transform-file"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(jsts|ol)/)"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)"
+    "coverageReporters": [
+      "text",
+      "html"
     ],
     "moduleNameMapper": {
       "^.+\\.scss$": "identity-obj-proxy"
@@ -164,7 +157,18 @@
     "snapshotSerializers": [
       "jest-serializer-html"
     ],
-    "testEnvironment": "jest-environment-jsdom-fourteen"
+    "testEnvironment": "jest-environment-jsdom-fourteen",
+    "testMatch": [
+      "<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.svg$": "jest-svg-transformer",
+      "\\.(jpg|jpeg|png|gif|webp)$": "jest-transform-file"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jsts|ol)/)"
+    ]
   },
   "husky": {
     "hooks": {
