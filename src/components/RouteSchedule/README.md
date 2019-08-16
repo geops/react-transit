@@ -54,7 +54,7 @@ class BasicMapExample extends React.Component {
         <BasicMap center={[951560, 6002550]} zoom={14} layers={this.layers} />
         <Dialog
           className="rt-route-dialog"
-          classNameChildren="rt-route-dialog-2"
+          classNameChildren="rt-route-dialog-children"
           onClose={() => this.toggleRouteSchedule()}
           isOpen={isRouteScheduleOpen}
         >
