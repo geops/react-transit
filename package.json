@@ -75,6 +75,7 @@
   },
   "scripts": {
     "build": "buble --no modules,asyncAwait -i src -o build --objectAssign Object.assign --sourcemap, && cp -t build package.json README.md LICENSE && cp -rf src/images build",
+    "coverage": "yarn test --coverage --coverageDirectory=coverage",
     "cp": "generact --root src/components",
     "doc": "bash ./scripts/prepare-doc.sh",
     "doc:server": "styleguidist server",
@@ -85,7 +86,6 @@
     "publish:public": "yarn version && git push origin HEAD && yarn build && yarn publish build/",
     "publish:beta": "yarn publish:public --tag beta",
     "test": "jest",
-    "test:coverage": "yarn test --coverage --coverageDirectory=coverage",
     "start": "yarn doc:server"
   },
   "browserslist": {
@@ -147,10 +147,6 @@
     }
   },
   "jest": {
-    "coverageReporters": [
-      "text",
-      "html"
-    ],
     "moduleNameMapper": {
       "^.+\\.scss$": "identity-obj-proxy"
     },
