@@ -7,9 +7,11 @@ const pad = integer => {
 
 function Clock({ date }) {
   return (
-    <>{`${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-      date.getSeconds(),
-    )}`}</>
+    <>
+      {`${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+        date.getSeconds(),
+      )}`}
+    </>
   );
 }
 
