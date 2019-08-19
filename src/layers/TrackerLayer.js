@@ -8,6 +8,7 @@ import { getRadius, bgColors, textColors, timeSteps } from '../config/tracker';
 /**
  * Trackerlayer.
  * Responsible for loading tracker data.
+ * extents Layer from /react-spatial/layer (https://react-spatial.geops.de/docjs.html)
  * @class
  * @inheritDoc
  * @param {Object} options
