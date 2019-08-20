@@ -1,6 +1,6 @@
 {
   "name": "react-transit",
-  "version": "0.1.1-beta.1",
+  "version": "0.1.1-beta.3",
   "description": "Components to display transit data in React map apps.",
   "license": "MIT",
   "dependencies": {
