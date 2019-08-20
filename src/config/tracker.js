@@ -8,25 +8,25 @@ const trackerRaduisMapping = {
   6: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 9, 11],
   7: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 9, 11],
   8: [1, 1, 1, 1, 1, 2, 3, 3, 3, 4, 4, 5, 6, 7, 10, 11, 11],
+  9: [1, 1, 1, 1, 1, 2, 3, 4, 4, 5, 5, 5, 7, 8, 11, 12, 12], // Rail
 };
 
 export const types = [
   'Tram',
   'Subway / Metro / S-Bahn',
   'Train',
-  'Rail', // New endpoint use Rail instead of Train.
   'Bus',
   'Ferry',
   'Cable Car',
   'Gondola',
   'Funicular',
   'Long distance bus',
+  'Rail', // New endpoint use Rail instead of Train.
 ];
 
 export const bgColors = [
   '#ffb400',
   '#ff5400',
-  '#ff8080',
   '#ff8080',
   '#ea0000',
   '#3000ff',
@@ -34,17 +34,18 @@ export const bgColors = [
   '#41a27b',
   '#00d237',
   '#b5b5b5',
+  '#ff8080',
 ];
 
 export const textColors = [
   '#000000',
   '#ffffff',
   '#000000',
-  '#000000',
   '#ffffff',
   '#ffffff',
   '#000000',
   '#ffffff',
+  '#000000',
   '#000000',
   '#000000',
 ];
