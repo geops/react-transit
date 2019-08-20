@@ -15,7 +15,6 @@ class TrajservLayerOld extends TrajservLayer {
         attr_det: 1,
       })}`,
     ).then(data => {
-      // For debug purpose , display the trajectory
       // this.olLayer.getSource().clear();
 
       this.lastRequestTime = data.t;
