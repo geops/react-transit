@@ -12,7 +12,7 @@ const OPERATOR_FILTER = 'operator_filter';
 /**
  * Responsible for loading tracker data from Trajserv.
  * @class
- * @param {Object} options
+ * @param {Object} [options]
  * @inheritDoc
  */
 class TrajservLayer extends TrackerLayer {
@@ -119,6 +119,11 @@ class TrajservLayer extends TrackerLayer {
     };
   }
 
+  /**
+   * Create a filter based on train and operator
+   * @param {string} train 
+   * @param {string} operator 
+   */
   static createFilter(train, operator) {
     const filterList = [];
 
@@ -158,7 +163,7 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Initialize the layer and listen to feature clicks.
-   * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map)
    */
   init(map) {
     super.init(map);
@@ -201,7 +206,6 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Destroy the layer.
-   *
    */
   destroy() {
     super.destroy();

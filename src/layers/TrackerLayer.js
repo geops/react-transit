@@ -16,10 +16,10 @@ import {
 /**
  * Trackerlayer.
  * Responsible for loading tracker data.
- * extents Layer from /react-spatial/layer (https://react-spatial.geops.de/docjs.html)
+ * extents Layer from {@link https://react-spatial.geops.de/docjs.html react-spatial/Layer}
  * @class
  * @inheritDoc
- * @param {Object} options
+ * @param {Object} [options]
  */
 class TrackerLayer extends Layer {
   static getDateString(now) {
@@ -147,6 +147,10 @@ class TrackerLayer extends Layer {
     this.speed = speed;
   }
 
+  /**
+   * fetch Trajectories at given URL
+   * @param {string} url 
+   */
   fetchTrajectories(url) {
     if (this.abortController) {
       this.abortController.abort();
@@ -191,6 +195,13 @@ class TrackerLayer extends Layer {
     }
   }
 
+  /**
+   * Set visible
+   * @param {boolean} visible
+   * @param {boolean} stopPropagationDown Stops propagation down.
+   * @param {boolean} stopPropagationUp Stops propagation up.
+   * @param {boolean} stopPropagationSiblings Stops propagation toward siblings.
+   */
   setVisible(
     visible,
     stopPropagationDown = false,
@@ -231,10 +242,16 @@ class TrackerLayer extends Layer {
     this.hoverVehicleId = vehicle ? vehicle.id : null;
   }
 
+  /**
+   * Sestroy current layer.
+   */
   destroy() {
     unByKey([this.onMoveEndRef, this.onPointerMoveRef, this.onPostRenderRef]);
   }
 
+  /**
+   * Stop current layer,.
+   */
   stop() {
     if (this.canvas) {
       this.canvas.style.visibility = 'hidden';
@@ -242,6 +259,10 @@ class TrackerLayer extends Layer {
     this.destroy();
   }
 
+  /**
+   * Trackerlayer is started
+   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
+   */
   start(map) {
     this.stop();
 
