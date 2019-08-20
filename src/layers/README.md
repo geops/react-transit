@@ -8,7 +8,7 @@ import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/Layer';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
-import TrajservLayer from 'react-transit/layers/TrajservLayer';
+import TrackerMapboxSource from 'react-transit/layers/TrackerMapboxSource';
 
 class BasicMapExample extends React.Component {
   constructor(props) {
@@ -21,7 +21,8 @@ class BasicMapExample extends React.Component {
           source: new OSMSource(),
         }),
       }),
-      new TrajservLayer({
+      new TrackerMapboxSource({
+        name: 'Mapbox',
         onClick: f => console.log(f),
       }),
     ];
