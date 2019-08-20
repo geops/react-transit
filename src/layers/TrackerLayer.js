@@ -1,5 +1,6 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import { unByKey } from 'ol/Observable';
 import Layer from 'react-spatial/Layer';
 import { buffer, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
@@ -185,39 +186,86 @@ class TrackerLayer extends Layer {
   init(map) {
     super.init(map);
 
-    this.tracker = new Tracker(map, {
-      canvas: this.canvas,
-    });
+    if (this.getVisible()) {
+      this.start(map);
+    }
+  }
 
-    this.map.on('postrender', () => {
-      this.tracker.renderTrajectory(this.currTime);
-    });
+  setVisible(
+    visible,
+    stopPropagationDown = false,
+    stopPropagationUp = false,
+    stopPropagationSiblings = false,
+  ) {
+    super.setVisible(
+      visible,
+      stopPropagationDown,
+      stopPropagationUp,
+      stopPropagationSiblings,
+    );
+    if (this.getVisible()) {
+      this.start(this.map);
+    } else {
+      this.stop();
+    }
+  }
 
-    this.map.on('moveend', () => {
-      const z = this.map.getView().getZoom();
+  onMoveEnd() {
+    const z = this.map.getView().getZoom();
 
-      if (z !== this.currentZoom) {
-        this.currentZoom = z;
-        this.styleCache = {};
-        this.fps = Math.round(
-          Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
-        );
-        this.startUpdateTime();
-      }
-      this.tracker.renderTrajectory(this.currTime);
-      this.updateTrajectories();
-    });
-
-    this.map.on('pointermove', e => {
-      const vehicle = this.getVehicleAtCoordinate(e.coordinate);
-      this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
-      this.hoverVehicleId = vehicle ? vehicle.id : null;
-    });
-
+    if (z !== this.currentZoom) {
+      this.currentZoom = z;
+      this.styleCache = {};
+      this.fps = Math.round(
+        Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
+      );
+      this.startUpdateTime();
+    }
+    this.tracker.renderTrajectory(this.currTime);
     this.updateTrajectories();
+  }
+
+  onPointerMove(e) {
+    const vehicle = this.getVehicleAtCoordinate(e.coordinate);
+    this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
+    this.hoverVehicleId = vehicle ? vehicle.id : null;
+  }
+
+  destroy() {
+    unByKey([this.onMoveEndRef, this.onPointerMoveRef, this.onPostRenderRef]);
+  }
+
+  stop() {
+    if (this.canvas) {
+      this.canvas.style.visibility = 'hidden';
+    }
+    this.destroy();
+  }
+
+  start(map) {
+    this.stop();
+
+    if (!this.canvas) {
+      this.canvas = document.createElement('canvas');
+
+      this.tracker = new Tracker(map, {
+        canvas: this.canvas,
+      });
+
+      this.tracker.setStyle((props, r) => this.style(props, r));
+    }
+    this.canvas.style.visibility = 'visible';
+
+    this.onPostRenderRef = map.on('postrender', () => {
+      this.tracker.renderTrajectory(this.currTime);
+    });
+    this.onMoveEndRef = map.on('moveend', () => this.onMoveEnd());
+    this.onPointerMoveRef = map.on('pointermove', e => this.onPointerMove(e));
+
+    this.tracker.renderTrajectory(this.currTime);
     this.startInterval();
     this.startUpdateTime();
-    this.tracker.setStyle((props, r) => this.style(props, r));
+    this.updateTrajectories();
   }
 
   /**

@@ -1,3 +1,4 @@
+import { unByKey } from 'ol/Observable';
 import qs from 'query-string';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
@@ -174,7 +175,7 @@ class TrajservLayer extends TrackerLayer {
     }
     this.tracker.setFilter(this.filterFc);
 
-    this.map.on('singleclick', e => {
+    this.onSingleClickRef = this.map.on('singleclick', e => {
       if (!this.clickCallbacks.length) {
         return;
       }
@@ -194,6 +195,15 @@ class TrajservLayer extends TrackerLayer {
         }
       }
     });
+  }
+
+  /**
+   * Destroy the layer.
+   *
+   */
+  destroy() {
+    super.destroy();
+    unByKey(this.onSingleClickRef);
   }
 
   /**
@@ -272,41 +282,43 @@ class TrajservLayer extends TrackerLayer {
    * Update the trajectories
    */
   updateTrajectories() {
-    this.fetchTrajectories(
-      `${this.url}/trajectory_collection?${this.getUrlParams({
-        attr_det: 1,
-      })}`,
-    ).then(data => {
-      // For debug purpose , display the trajectory
-      // this.olLayer.getSource().clear();
-      const trajectories = [];
-      for (let i = 0; i < data.features.length; i += 1) {
-        const traj = data.features[i];
-        const {
-          ID: id,
-          ProductIdentifier: type,
-          PublishedLineName: name,
-          Operator: operator,
-          TimeIntervals: timeIntervals,
-          Color: color,
-          TextColor: textColor,
-          Delay: delay,
-        } = traj.properties;
+    if (this.getVisible()) {
+      this.fetchTrajectories(
+        `${this.url}/trajectory_collection?${this.getUrlParams({
+          attr_det: 1,
+        })}`,
+      ).then(data => {
+        // For debug purpose , display the trajectory
+        // this.olLayer.getSource().clear();
+        const trajectories = [];
+        for (let i = 0; i < data.features.length; i += 1) {
+          const traj = data.features[i];
+          const {
+            ID: id,
+            ProductIdentifier: type,
+            PublishedLineName: name,
+            Operator: operator,
+            TimeIntervals: timeIntervals,
+            Color: color,
+            TextColor: textColor,
+            Delay: delay,
+          } = traj.properties;
 
-        trajectories.push({
-          id,
-          type,
-          name,
-          color: color && `#${color}`,
-          textColor: textColor && `#${textColor}`,
-          delay,
-          operator,
-          timeIntervals,
-          geometry: new LineString(traj.geometry.coordinates),
-        });
-      }
-      this.tracker.setTrajectories(trajectories);
-    });
+          trajectories.push({
+            id,
+            type,
+            name,
+            color: color && `#${color}`,
+            textColor: textColor && `#${textColor}`,
+            delay,
+            operator,
+            timeIntervals,
+            geometry: new LineString(traj.geometry.coordinates),
+          });
+        }
+        this.tracker.setTrajectories(trajectories);
+      });
+    }
   }
 }
 
