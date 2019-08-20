@@ -184,7 +184,6 @@ class TrackerLayer extends Layer {
   style(props) {
     const { type, name, id, color, textColor, delay } = props;
     if (delay > 0) {
-      // console.log(delay, getDelayColor(delay), getDelayText(delay));
     }
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.hoverVehicleId === id;
