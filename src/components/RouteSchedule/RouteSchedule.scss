@@ -1,0 +1,103 @@
+.rt-route-wrapper {
+  background-color: white;
+  width: 350px;
+  overflow: hidden;
+
+  .rt-route-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 10px 0 10px;
+
+    .rt-route-title {
+      display: flex;
+      flex-direction: column;
+
+      .rt-route-name {
+        padding-bottom: 8px;
+        font-weight: bold;
+      }
+    }
+
+    .rt-route-icon {
+      -webkit-border-radius: 20px;
+      -moz-border-radius: 20px;
+      border-radius: 20px;
+      min-width: 20px;
+      height: 20px;
+      line-height: 20px;
+      border: solid black 2px;
+      padding: 5px;
+      display: block;
+      float: left;
+      margin: 15px;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  }
+
+  .rt-route-body {
+    font-size: 14px;
+    max-height: 650px;
+    overflow: auto;
+    padding: 10px 20px;
+
+    .rt-route-station {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 4px;
+
+      &:hover {
+        color: white;
+        background-color: $primary-blue;
+      }
+
+      .rt-route-times,
+      .rt-route-delay {
+        display: flex;
+        flex-direction: column;
+        width: 40px;
+        min-width: 40px;
+        padding: 0 3px;
+
+        .green {
+          color: rgb(0, 160, 12);
+        }
+
+        .orange {
+          color: rgb(247, 191, 0);
+        }
+
+        .light-red {
+          color: rgb(255, 74, 0);
+        }
+
+        .middle-red {
+          color: rgb(232, 0, 0);
+        }
+
+        .dark-red {
+          color: rgb(237, 0, 76);
+        }
+      }
+
+      .rt-route-icon {
+        padding: 0 15px;
+      }
+    }
+
+    .rt-route-station:first-child {
+      .rt-route-time-arrival {
+        display: none;
+      }
+    }
+
+    .rt-route-station:last-child {
+      .rt-route-time-departure {
+        display: none;
+      }
+    }
+  }
+}

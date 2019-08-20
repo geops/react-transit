@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import ComponentsListRenderer from 'react-styleguidist/lib/client/rsg-components/ComponentsList/ComponentsListRenderer';
 import getUrl from 'react-styleguidist/lib/client/utils/getUrl';
 
+/* eslint-disable react/forbid-prop-types */
 const propTypes = {
   items: PropTypes.array.isRequired,
   classes: PropTypes.object,

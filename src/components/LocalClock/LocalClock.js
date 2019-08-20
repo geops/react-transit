@@ -6,20 +6,21 @@ function LocalClock({ date, timeZone }) {
 
   if (timeZone && timeZone !== 'UTC') {
     const localTime = new Date(date.getTime() + timeZone.os * 1000);
-    child = (
-      <span>
-        {`${localTime.getUTCHours()}:${localTime.getUTCMinutes()}:${localTime.getUTCSeconds()} ('}${
-          timeZone.c
-        })`}
-      </span>
-    );
+    child = `${localTime.getUTCHours()}:${localTime.getUTCMinutes()}:${localTime.getUTCSeconds()} ('}${
+      timeZone.c
+    })`;
   }
 
-  return <span>Local time: {child}</span>;
+  return (
+    <>
+      <span>Local time:</span>
+      <span>{child}</span>
+    </>
+  );
 }
 
 LocalClock.propTypes = {
-  date: PropTypes.object.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
   timeZone: PropTypes.shape({
     os: PropTypes.number,
     c: PropTypes.string,

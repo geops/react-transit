@@ -7,14 +7,16 @@ const pad = integer => {
 
 function Clock({ date }) {
   return (
-    <>{`${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-      date.getSeconds(),
-    )}`}</>
+    <>
+      {`${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+        date.getSeconds(),
+      )}`}
+    </>
   );
 }
 
 Clock.propTypes = {
-  date: PropTypes.object.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
 };
 
 export default Clock;

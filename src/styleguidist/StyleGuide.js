@@ -151,6 +151,7 @@ StyleGuideRenderer.defaultProps = {
   version: null,
 };
 
+/* eslint-disable react/forbid-prop-types */
 StyleGuideRenderer.propTypes = {
   classes: PropTypes.object.isRequired,
   children: PropTypes.node.isRequired,
