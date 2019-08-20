@@ -15,6 +15,10 @@ import {
 /**
  * Trackerlayer.
  * Responsible for loading tracker data.
+ * extents Layer from /react-spatial/layer (https://react-spatial.geops.de/docjs.html)
+ * @class
+ * @inheritDoc
+ * @param {Object} options
  */
 class TrackerLayer extends Layer {
   static getDateString(now) {
@@ -76,6 +80,9 @@ class TrackerLayer extends Layer {
     }
   }
 
+  /**
+   * Start the Interval
+   */
   startInterval() {
     window.clearInterval(this.updateInterval);
     this.updateInterval = window.setInterval(() => {
@@ -83,6 +90,9 @@ class TrackerLayer extends Layer {
     }, this.requestIntervalSeconds * 1000);
   }
 
+  /**
+   * Start the update time
+   */
   startUpdateTime() {
     this.stopUpdateTime();
     this.updateTime = setInterval(() => {
@@ -94,14 +104,25 @@ class TrackerLayer extends Layer {
     }, 1000 / this.fps);
   }
 
+  /**
+   * Stop the update time
+   */
   stopUpdateTime() {
     window.clearInterval(this.updateTime);
   }
 
+  /**
+   * Get the current time
+   * @returns {Date}
+   */
   getCurrTime() {
     return this.currTime;
   }
 
+  /**
+   * define the current time
+   * @param {dateString | value} time
+   */
   setCurrTime(time) {
     const newTime = new Date(time);
     this.currTime = newTime;
@@ -109,10 +130,18 @@ class TrackerLayer extends Layer {
     this.tracker.renderTrajectory(this.currTime);
   }
 
+  /**
+   * get the Speed
+   * @returns {number}
+   */
   getSpeed() {
     return this.speed;
   }
 
+  /**
+   * define speed
+   * @param {number} speed
+   */
   setSpeed(speed) {
     this.speed = speed;
   }
@@ -126,6 +155,12 @@ class TrackerLayer extends Layer {
     return fetch(url, { signal }).then(data => data.json());
   }
 
+  /**
+   * Returns the vehicle which are at the given coordinates
+   * Returns null when no vehicle is located at the given coordinates
+   * @param {ol.coordinate} coordinate
+   * @returns {ol.feature | null}
+   */
   getVehicleAtCoordinate(coordinate) {
     const res = this.map.getView().getResolution();
     const ext = buffer([...coordinate, ...coordinate], 10 * res);
@@ -143,6 +178,10 @@ class TrackerLayer extends Layer {
     return null;
   }
 
+  /**
+   * Initialize the layer and listen to feature clicks.
+   * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   */
   init(map) {
     super.init(map);
 
@@ -181,10 +220,12 @@ class TrackerLayer extends Layer {
     this.tracker.setStyle((props, r) => this.style(props, r));
   }
 
+  /**
+   * Define the style of the layer
+   * @param {Object} props Properties
+   */
   style(props) {
     const { type, name, id, color, textColor, delay } = props;
-    if (delay > 0) {
-    }
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.hoverVehicleId === id;
 
@@ -262,6 +303,12 @@ class TrackerLayer extends Layer {
     return this.styleCache[z][type][name][delay][hover];
   }
 
+  /**
+   * Listens to click events on the layer.
+   * @param {function} callback Callback function, called with the clicked
+   *   features (https://openlayers.org/en/latest/apidoc/module-ol_Feature.html),
+   *   the layer instance and the click event.
+   */
   onClick(callback) {
     if (typeof callback === 'function') {
       this.clickCallbacks.push(callback);

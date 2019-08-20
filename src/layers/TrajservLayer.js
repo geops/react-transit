@@ -10,10 +10,14 @@ const OPERATOR_FILTER = 'operator_filter';
 
 /**
  * Responsible for loading tracker data from Trajserv.
+ * @class
+ * @param {Object} options
+ * @inheritDoc
  */
 class TrajservLayer extends TrackerLayer {
   /**
    *  Translate the response date object into a readable object.
+   * @returns {array<Date>}
    */
   static translateDates(dates) {
     const newDates = [];
@@ -31,6 +35,7 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    *  Translate the response into a readable object.
+   * @returns {Object} returns a readable object
    */
   static translateTrajStationsResp(resp) {
     const stations = [];
@@ -150,6 +155,10 @@ class TrajservLayer extends TrackerLayer {
     this.filterFc = TrajservLayer.createFilter(options.train, options.operator);
   }
 
+  /**
+   * Initialize the layer and listen to feature clicks.
+   * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   */
   init(map) {
     super.init(map);
 
@@ -187,6 +196,10 @@ class TrajservLayer extends TrackerLayer {
     });
   }
 
+  /**
+   * Fetch specific trajectory by ID
+   * @param {number} trajId the ID of the trajectory
+   */
   fetchTrajectory(trajId) {
     const params = this.getUrlParams({
       id: trajId,
@@ -250,6 +263,9 @@ class TrajservLayer extends TrackerLayer {
       .join('&');
   }
 
+  /**
+   * Update the trajectories
+   */
   updateTrajectories() {
     this.fetchTrajectories(
       `${this.url}/trajectory_collection?${this.getUrlParams({

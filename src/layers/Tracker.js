@@ -2,6 +2,9 @@ import { LineString } from 'ol/geom';
 
 /**
  * Tracker for OpenLayers.
+ * @class
+ * @param {ol.map} map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+ * @param {Object} options
  */
 export default class Tracker {
   constructor(map, options) {
@@ -41,10 +44,18 @@ export default class Tracker {
     });
   }
 
+  /**
+   * Define the trajectories
+   * @param {array<ol.feature>} trajectories
+   */
   setTrajectories(trajectories) {
     this.trajectories = trajectories;
   }
 
+  /**
+   * Return the trajectories
+   * @returns {array<trajectory>} trajectories
+   */
   getTrajectories() {
     return this.trajectories;
   }
@@ -52,7 +63,7 @@ export default class Tracker {
   /**
    * Add a feature to the tracker.
    * @param {Number} id The feature id
-   * @param {ol.Feature} feature The tracker feature.
+   * @param {ol.Feature} traj The tracker feature.
    * @param {Boolean} addOnTop If true, the trajectory is added on top of
    *   the trajectory object. This affects the draw order. If addOnTop is
    *   true, the trajectory is drawn first and appears on bottom.
@@ -122,6 +133,10 @@ export default class Tracker {
     this.style = s;
   }
 
+  /**
+   *
+   * @param {Date} currTime
+   */
   renderTrajectory(currTime = Date.now()) {
     this.clear();
     const res = this.map.getView().getResolution();
