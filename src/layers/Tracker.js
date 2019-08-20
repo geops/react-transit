@@ -38,7 +38,7 @@ export default class Tracker {
     this.canvasContext = this.canvas.getContext('2d');
 
     this.map.once('postrender', () => {
-      this.map.getTarget().appendChild(this.canvas);
+      // this.map.getTarget().appendChild(this.canvas);
     });
   }
 
