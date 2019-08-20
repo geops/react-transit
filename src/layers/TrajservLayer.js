@@ -170,11 +170,13 @@ class TrajservLayer extends TrackerLayer {
     const opParam = parameters[OPERATOR_FILTER];
     if (trainParam || opParam) {
       this.filterFc = TrajservLayer.createFilter(
-        trainParam.split(','),
-        opParam.split(','),
+        trainParam ? trainParam.split(',') : undefined,
+        opParam ? opParam.split(',') : undefined,
       );
     }
-    this.tracker.setFilter(this.filterFc);
+    if (this.tracker && this.filterFc) {
+      this.tracker.setFilter(this.filterFc);
+    }
 
     this.onSingleClickRef = this.map.on('singleclick', e => {
       if (!this.clickCallbacks.length) {
