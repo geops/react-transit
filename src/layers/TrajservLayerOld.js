@@ -1,9 +1,7 @@
 import LineString from 'ol/geom/LineString';
 import TrajservLayer from './TrajservLayer';
 
-/**
- * Responsible for loading tracker data from Trajserv.
- */
+
 class TrajservLayerOld extends TrajservLayer {
   constructor(options = {}) {
     super({ ...options });
