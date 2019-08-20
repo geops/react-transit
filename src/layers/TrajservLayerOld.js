@@ -32,6 +32,7 @@ class TrajservLayerOld extends TrajservLayer {
           t: type,
           n: name,
           c: color,
+          d: textColor,
           ag: operator,
         } = data.a[i];
 
@@ -90,6 +91,7 @@ class TrajservLayerOld extends TrajservLayer {
             type,
             name,
             color: color && `#${color}`,
+            textColor: textColor && `#${textColor}`,
             delay,
             timeOffset: this.currentOffset,
             timeIntervals,
