@@ -124,22 +124,26 @@ export default class Tracker {
 
   renderTrajectory(currTime = Date.now()) {
     this.clear();
+    const res = this.map.getView().getResolution();
 
     for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
       const traj = this.trajectories[i];
+
+      // We simplify the traj object
+      const { id, geometry, timeIntervals, timeOffset } = traj;
 
       if (this.filter && !this.filter(traj)) {
         // eslint-disable-next-line no-continue
         continue;
       }
-      const intervals = traj.time_intervals;
+
       let coord = null;
-      if (intervals && intervals.length) {
-        let now = currTime - (traj.timeOffset || 0);
+      if (timeIntervals && timeIntervals.length) {
+        let now = currTime - (timeOffset || 0);
 
         // the time interval will never start in the future
-        if (intervals && intervals[0][0] > now) {
-          [[now]] = intervals;
+        if (timeIntervals && timeIntervals[0][0] > now) {
+          [[now]] = timeIntervals;
         }
 
         // find adjacent times in the interval list
@@ -149,10 +153,10 @@ export default class Tracker {
         let startFrac = 0;
         let endFrac = 0;
         let numCoordStart = 0;
-        let numCoordEnd = intervals.length - 1;
-        for (j = 0; j < intervals.length - 1; j += 1) {
-          [start, startFrac, , numCoordStart] = intervals[j];
-          [end, endFrac, , numCoordEnd] = intervals[j + 1];
+        let numCoordEnd = timeIntervals.length - 1;
+        for (j = 0; j < timeIntervals.length - 1; j += 1) {
+          [start, startFrac, , numCoordStart] = timeIntervals[j];
+          [end, endFrac, , numCoordEnd] = timeIntervals[j + 1];
 
           if (start <= now && now <= end) {
             break;
@@ -168,16 +172,16 @@ export default class Tracker {
           const geomFrac = this.interpolate ? timeFrac : 0;
 
           if (startFrac > 0 || endFrac < 1) {
-            const coords = traj.geom.getCoordinates();
+            const coords = geometry.getCoordinates();
             const intervalGeom = new LineString(
               coords.slice(numCoordStart, numCoordEnd + 1),
             );
             coord = intervalGeom.getCoordinateAt(geomFrac);
           } else {
-            coord = traj.geom.getCoordinateAt(geomFrac);
+            coord = geometry.getCoordinateAt(geomFrac);
           }
         }
-      } else if (traj.geom) {
+      } else if (geometry) {
         // if there is no time intervals but a geometry that means the bus is stopped at a station
         // Example in json:
         /*
@@ -196,21 +200,26 @@ export default class Tracker {
             ]
           },
           */
-        coord = traj.geom.getFirstCoordinate();
+        coord = geometry.getFirstCoordinate();
       }
 
       if (coord) {
-        traj.coordinate = coord;
+        this.trajectories[i].coordinate = coord;
         const px = this.map.getPixelFromCoordinate(coord);
-        const vehicleImg = this.style(traj, this.map.getView().getResolution());
 
+        if (!px) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+        const vehicleImg = this.style(traj, res);
+        console.log(vehicleImg.height);
         this.canvasContext.drawImage(
           vehicleImg,
-          px[0] - vehicleImg.width / 2,
-          px[1] - vehicleImg.width / 2,
+          px[0] - vehicleImg.height / 2,
+          px[1] - vehicleImg.height / 2,
         );
       } else {
-        this.removeTrajectory(traj.id);
+        this.removeTrajectory(id);
       }
     }
   }

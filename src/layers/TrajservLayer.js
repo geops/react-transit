@@ -1,7 +1,8 @@
-import LineString from 'ol/geom/LineString';
 import qs from 'query-string';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
+import { buffer, getWidth } from 'ol/extent';
+import { LineString } from 'ol/geom';
 import TrackerLayer from './TrackerLayer';
 
 const TRAIN_FILTER = 'train_filter';
@@ -115,6 +116,10 @@ class TrajservLayer extends TrackerLayer {
   static createFilter(train, operator) {
     const filterList = [];
 
+    if (!train && !operator) {
+      return null;
+    }
+
     if (train) {
       const trainList = typeof train === 'string' ? [train] : train;
       const trainFilter = t => trainList.indexOf(t.name) !== -1;
@@ -142,33 +147,23 @@ class TrajservLayer extends TrackerLayer {
     super({ ...options });
 
     this.url = options.url || 'https://api.geops.io/tracker';
-
-    this.filterFc =
-      options.train || options.operator
-        ? TrajservLayer.createFilter(options.train, options.operator)
-        : null;
+    this.filterFc = TrajservLayer.createFilter(options.train, options.operator);
   }
 
   init(map) {
     super.init(map);
 
     // Setting filters from the permalink.
-    const parameters = { ...qs.parse(window.location.search) };
-
-    if (parameters[TRAIN_FILTER] || parameters[OPERATOR_FILTER]) {
-      const trainFilter = parameters[TRAIN_FILTER]
-        ? parameters[TRAIN_FILTER].split(',')
-        : null;
-      const operatorFilter = parameters[OPERATOR_FILTER]
-        ? parameters[OPERATOR_FILTER].split(',')
-        : null;
-
-      this.filterFc = TrajservLayer.createFilter(trainFilter, operatorFilter);
+    const parameters = qs.parse(window.location.search);
+    const trainParam = parameters[TRAIN_FILTER];
+    const opParam = parameters[OPERATOR_FILTER];
+    if (trainParam || opParam) {
+      this.filterFc = TrajservLayer.createFilter(
+        trainParam.split(','),
+        opParam.split(','),
+      );
     }
-
-    if (this.filterFc) {
-      this.tracker.setFilter(this.filterFc);
-    }
+    this.tracker.setFilter(this.filterFc);
 
     this.map.on('singleclick', e => {
       if (!this.clickCallbacks.length) {
@@ -206,89 +201,88 @@ class TrajservLayer extends TrackerLayer {
       .then(resp => TrajservLayer.translateTrajStationsResp(resp));
   }
 
-  fetchTrajectories() {
-    if (this.abortController) {
-      this.abortController.abort();
+  getUrlParams(extraParams = {}) {
+    const ext = this.map.getView().calculateExtent();
+    const bbox = buffer(ext, getWidth(ext) / 10).join(',');
+    const now = this.currTime;
+
+    let diff = true;
+
+    if (
+      this.later &&
+      now.getTime() > this.later.getTime() - 3000 * this.speed
+    ) {
+      diff = false;
     }
 
-    this.abortController = new AbortController();
-    const { signal } = this.abortController;
-    const trackerUrl = `${this.url}/trajectories?${this.getUrlParams({
-      attr_det: 1,
-    })}`;
-    return fetch(trackerUrl, { signal }).then(data => data.json());
+    if (!this.later || !diff) {
+      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
+      const later = new Date(now.getTime() + intervalMilliscds);
+      this.later = later;
+    }
+
+    const params = {
+      ...extraParams,
+      bbox,
+      btime: TrackerLayer.getTimeString(now),
+      etime: TrackerLayer.getTimeString(this.later),
+      date: TrackerLayer.getDateString(now),
+      rid: 1,
+      a: 1,
+      cd: 1,
+      nm: 1,
+      fl: 1,
+      s: this.map.getView().getZoom() < 10 ? 1 : 0,
+      z: this.map.getView().getZoom(),
+      key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
+      // toff: this.currTime.getTime() / 1000,
+    };
+
+    // Allow to load only differences between the last request,
+    // but currently the Tracker render method doesn't manage to render only diff.
+    /* if (diff) {
+      // Not working
+      params.diff = this.lastRequestTime;
+    } */
+
+    return Object.keys(params)
+      .map(k => `${k}=${params[k]}`)
+      .join('&');
   }
 
   updateTrajectories() {
-    this.fetchTrajectories().then(data => {
+    this.fetchTrajectories(
+      `${this.url}/trajectory_collection?${this.getUrlParams({
+        attr_det: 1,
+      })}`,
+    ).then(data => {
       // For debug purpose , display the trajectory
       // this.olLayer.getSource().clear();
-
-      this.lastRequestTime = data.t;
-      this.currentOffset = data.o || 0;
       const trajectories = [];
-
-      for (let i = 0; i < data.a.length; i += 1) {
-        const coords = [];
-        const timeIntervals = [];
+      for (let i = 0; i < data.features.length; i += 1) {
+        const traj = data.features[i];
         const {
-          i: id,
-          p: paths,
-          t: type,
-          n: name,
-          c: color,
-          ag: operator,
-        } = data.a[i];
+          ID: id,
+          ProductIdentifier: type,
+          PublishedLineName: name,
+          Operator: operator,
+          TimeIntervals: timeIntervals,
+          Color: color,
+          TextColor: textColor,
+          Delay: delay,
+        } = traj.properties;
 
-        for (let j = 0; j < paths.length; j += 1) {
-          const path = paths[j];
-          const startTime = (path[0].a || data.t) * 1000;
-          const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
-
-          for (let k = 0; k < path.length; k += 1) {
-            // d: delay. When the train is stopped at a station.
-            const { x, y, a: timeAtPixelInScds, d: delay } = path[k];
-            coords.push([x, y]);
-
-            // If a pixel is defined with a time we add it to timeIntervals.
-            if (timeAtPixelInScds) {
-              const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
-              const timeFrac = Math.max(
-                (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
-                0,
-              );
-
-              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
-              if (delay) {
-                const afterStopTimeInMilliscds =
-                  (timeAtPixelInScds + delay) * 1000;
-                timeIntervals.push([
-                  afterStopTimeInMilliscds,
-                  (afterStopTimeInMilliscds - startTime) /
-                    (endTime - startTime),
-                  null,
-                  k,
-                ]);
-              }
-            }
-          }
-        }
-
-        if (coords.length) {
-          const geometry = new LineString(coords);
-          // For debug purpose , display the trajectory
-          // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
-          trajectories.push({
-            id,
-            type,
-            name,
-            color: color && `#${color}`,
-            geom: geometry,
-            timeOffset: this.currentOffset,
-            time_intervals: timeIntervals,
-            operator: operator.n,
-          });
-        }
+        trajectories.push({
+          id,
+          type,
+          name,
+          color: color && `#${color}`,
+          textColor: textColor && `#${textColor}`,
+          delay,
+          operator,
+          timeIntervals,
+          geometry: new LineString(traj.geometry.coordinates),
+        });
       }
       this.tracker.setTrajectories(trajectories);
     });
