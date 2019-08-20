@@ -15,7 +15,6 @@ class TrajservLayerOld extends TrajservLayer {
         attr_det: 1,
       })}`,
     ).then(data => {
-
       this.lastRequestTime = data.t;
       this.currentOffset = data.o || 0;
       const trajectories = [];
