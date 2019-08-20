@@ -192,6 +192,13 @@ class TrackerLayer extends Layer {
     }
   }
 
+  /**
+   * Change the visibility of the layer
+   * @param {boolean} visible defines the visibility of the layer
+   * @param {boolean} stopPropagationDown
+   * @param {boolean} stopPropagationUp
+   * @param {boolean} stopPropagationSiblings
+   */
   setVisible(
     visible,
     stopPropagationDown = false,
