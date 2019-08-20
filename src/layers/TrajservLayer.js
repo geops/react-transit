@@ -214,6 +214,11 @@ class TrajservLayer extends TrackerLayer {
       .then(resp => TrajservLayer.translateTrajStationsResp(resp));
   }
 
+  /**
+   * Returns the URL Parameters
+   * @param {Object} extraParams
+   * @returns {Object}
+   */
   getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
     const bbox = buffer(ext, getWidth(ext) / 10).join(',');
