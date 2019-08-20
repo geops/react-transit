@@ -1,5 +1,7 @@
 import LineString from 'ol/geom/LineString';
+import { buffer, getWidth } from 'ol/extent';
 import TrajservLayer from './TrajservLayer';
+import TrackerLayer from './TrackerLayer';
 
 /**
  * Responsible for loading tracker data from Trajserv.
@@ -7,6 +9,67 @@ import TrajservLayer from './TrajservLayer';
 class TrajservLayerOld extends TrajservLayer {
   constructor(options = {}) {
     super({ ...options });
+  }
+
+  /**
+   * Returns the URL Parameters
+   * @param {Object} extraParams
+   * @returns {Object}
+   */
+  getUrlParams(extraParams = {}) {
+    const ext = this.map.getView().calculateExtent();
+    const bufferExt = buffer(ext, getWidth(ext) / 10);
+    const bbox = bufferExt.join(',');
+    const now = this.currTime;
+
+    let diff = true;
+
+    if (
+      this.later &&
+      now.getTime() > this.later.getTime() - 3000 * this.speed
+    ) {
+      diff = false;
+    }
+
+    if (!this.later || !diff) {
+      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
+      const later = new Date(now.getTime() + intervalMilliscds);
+      this.later = later;
+    }
+
+    const params = {
+      ...extraParams,
+      bbox,
+      swy: bufferExt[0],
+      swx: bufferExt[1],
+      nex: bufferExt[3],
+      ney: bufferExt[2],
+      orx: ext[0],
+      ory: ext[3],
+      btime: TrackerLayer.getTimeString(now),
+      etime: TrackerLayer.getTimeString(this.later),
+      date: TrackerLayer.getDateString(now),
+      rid: 1,
+      a: 1,
+      cd: 1,
+      nm: 1,
+      fl: 1,
+      s: this.map.getView().getZoom() < 10 ? 1 : 0,
+      z: this.map.getView().getZoom(),
+      key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
+      // toff: this.currTime.getTime() / 1000,
+    };
+
+    // Allow to load only differences between the last request,
+    // but currently the Tracker render method doesn't manage to render only diff.
+    /* if (diff) {
+      // Not working
+      params.diff = this.lastRequestTime;
+    } */
+
+    return Object.keys(params)
+      .map(k => `${k}=${params[k]}`)
+      .join('&');
   }
 
   updateTrajectories() {
@@ -31,6 +94,7 @@ class TrajservLayerOld extends TrajservLayer {
           c: color,
           d: textColor,
           ag: operator,
+          r: realTimeAvailable,
         } = data.a[i];
 
         for (let j = 0; j < paths.length; j += 1) {
@@ -39,7 +103,6 @@ class TrajservLayerOld extends TrajservLayer {
           const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
 
           for (let k = 0; k < path.length; k += 1) {
-            // d: delay. When the train is stopped at a station.
             const {
               x,
               y,
@@ -47,7 +110,12 @@ class TrajservLayerOld extends TrajservLayer {
               d: delayAtStation,
               ad: arrivalDelay,
             } = path[k];
-            coords.push([x, y]);
+            if (/backend1/.test(this.url)) {
+              const coord = this.map.getCoordinateFromPixel([x, y]);
+              coords.push(coord);
+            } else {
+              coords.push([x, y]);
+            }
 
             // If a pixel is defined with a time we add it to timeIntervals.
             if (timeAtPixelInScds) {
@@ -57,21 +125,19 @@ class TrajservLayerOld extends TrajservLayer {
                 0,
               );
 
-              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
+              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, k]);
               if (delayAtStation) {
+                // We add a time interval when the train is stopped at a station.
                 const afterStopTimeInMilliscds =
                   (timeAtPixelInScds + delayAtStation) * 1000;
                 timeIntervals.push([
                   afterStopTimeInMilliscds,
                   (afterStopTimeInMilliscds - startTime) /
                     (endTime - startTime),
-                  null,
                   k,
                 ]);
               }
-              // r: makes a difference for the delay, if r is undefined delay is not display, if r exists and different from 0 delay style is displayed
-              // if (r && !delay && arrivalDelay >= 0) {
-              if (arrivalDelay && arrivalDelay >= 0) {
+              if (realTimeAvailable && arrivalDelay && arrivalDelay >= 0) {
                 delay = arrivalDelay;
               }
             }
@@ -80,8 +146,6 @@ class TrajservLayerOld extends TrajservLayer {
 
         if (coords.length) {
           const geometry = new LineString(coords);
-          // For debug purpose , display the trajectory
-          // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
           trajectories.push({
             id,
             type,
@@ -91,7 +155,7 @@ class TrajservLayerOld extends TrajservLayer {
             delay,
             timeOffset: this.currentOffset,
             timeIntervals,
-            operator: operator.n,
+            operator: operator && operator.n,
             geometry,
           });
         }

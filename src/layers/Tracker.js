@@ -155,35 +155,26 @@ export default class Tracker {
 
       let coord = null;
       if (timeIntervals && timeIntervals.length) {
-        let now = currTime - (timeOffset || 0);
-
-        // the time interval will never start in the future
-        if (timeIntervals && timeIntervals[0][0] > now) {
-          [[now]] = timeIntervals;
-        }
-
-        // find adjacent times in the interval list
-        let j = 0;
-        let start = 0;
-        let end = 0;
+        const now = currTime - (timeOffset || 0);
+        let start;
+        let end;
         let startFrac = 0;
         let endFrac = 0;
         let numCoordStart = 0;
         let numCoordEnd = timeIntervals.length - 1;
-        for (j = 0; j < timeIntervals.length - 1; j += 1) {
-          [start, startFrac, , numCoordStart] = timeIntervals[j];
-          [end, endFrac, , numCoordEnd] = timeIntervals[j + 1];
+
+        // Search th time interval.
+        for (let j = 0; j < timeIntervals.length - 1; j += 1) {
+          [start, startFrac, numCoordStart] = timeIntervals[j];
+          [end, endFrac, numCoordEnd] = timeIntervals[j + 1];
 
           if (start <= now && now <= end) {
             break;
-          } else {
-            start = null;
-            end = null;
           }
         }
 
         if (start && end) {
-          // interpolate position based on the temporal fraction
+          // interpolate position inside the time interval.
           const timeFrac = Math.min((now - start) / (end - start), 1);
           const geomFrac = this.interpolate ? timeFrac : 0;
 

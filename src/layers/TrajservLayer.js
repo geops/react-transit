@@ -294,17 +294,34 @@ class TrajservLayer extends TrackerLayer {
         // this.olLayer.getSource().clear();
         const trajectories = [];
         for (let i = 0; i < data.features.length; i += 1) {
+          const timeIntervals = [];
           const traj = data.features[i];
+          const geometry = new LineString(traj.geometry.coordinates);
           const {
             ID: id,
             ProductIdentifier: type,
             PublishedLineName: name,
             Operator: operator,
-            TimeIntervals: timeIntervals,
+            TimeIntervals: intervals,
             Color: color,
             TextColor: textColor,
             Delay: delay,
           } = traj.properties;
+
+          // We have to find the index of the corresponding coordinate, for each timeInterval.
+          for (let k = 0; k < intervals.length; k += 1) {
+            const [timeAtCoord, timeFrac] = intervals[k];
+            const coord = geometry.getCoordinateAt(timeFrac);
+            const idx = geometry.getCoordinates().findIndex(c => {
+              // We use toFixed(4) because the results of getCoordinateAt can be 10 or more digits
+              // but the geometry's coordinates are never so precise.
+              return (
+                parseFloat(coord[0].toFixed(4)) === c[0] &&
+                parseFloat(coord[1].toFixed(4)) === c[1]
+              );
+            });
+            timeIntervals.push([timeAtCoord, timeFrac, idx]);
+          }
 
           trajectories.push({
             id,
@@ -315,7 +332,7 @@ class TrajservLayer extends TrackerLayer {
             delay,
             operator,
             timeIntervals,
-            geometry: new LineString(traj.geometry.coordinates),
+            geometry,
           });
         }
         this.tracker.setTrajectories(trajectories);
