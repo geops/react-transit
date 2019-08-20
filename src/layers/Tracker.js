@@ -47,7 +47,7 @@ export default class Tracker {
 
   /**
    * Define the trajectories
-   * @param {array<ol.feature>} trajectories
+   * @param {array<ol.feature>} trajectories {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature.html ol/Feature}
    */
   setTrajectories(trajectories) {
     this.trajectories = trajectories;
@@ -55,7 +55,7 @@ export default class Tracker {
 
   /**
    * Return the trajectories
-   * @returns {array<trajectory>} trajectories
+   * @returns {ol.feature[]} trajectories {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature.html ol/Feature}
    */
   getTrajectories() {
     return this.trajectories;
