@@ -158,7 +158,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Returns the trajectory which are at the given coordinates.
+   * Returns the vehicle which are at the given coordinates.
    * Returns null when no vehicle is located at the given coordinates.
    * @param {ol.coordinate} coordinate {@link https://openlayers.org/en/latest/apidoc/module-ol_coordinate.html ol/coordinate}
    * @returns {ol.feature | null} {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature-Feature.html ol/feature}
