@@ -149,7 +149,7 @@ class TrackerLayer extends Layer {
 
   /**
    * fetch Trajectories at given URL
-   * @param {string} url 
+   * @param {string} url
    */
   fetchTrajectories(url) {
     if (this.abortController) {

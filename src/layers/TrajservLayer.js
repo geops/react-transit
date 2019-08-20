@@ -121,8 +121,8 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Create a filter based on train and operator
-   * @param {string} train 
-   * @param {string} operator 
+   * @param {string} train
+   * @param {string} operator
    */
   static createFilter(train, operator) {
     const filterList = [];
