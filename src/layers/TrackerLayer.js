@@ -1,9 +1,17 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import { unByKey } from 'ol/Observable';
 import Layer from 'react-spatial/Layer';
-import { buffer, containsCoordinate, getWidth } from 'ol/extent';
+import { buffer, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
-import { getRadius, bgColors, textColors, timeSteps } from '../config/tracker';
+import {
+  getRadius,
+  getBgColor,
+  getDelayColor,
+  getDelayText,
+  getTextColor,
+  timeSteps,
+} from '../config/tracker';
 
 /**
  * Trackerlayer.
@@ -63,6 +71,9 @@ class TrackerLayer extends Layer {
     this.fps = 60;
 
     this.clickCallbacks = [];
+
+    this.delayOutlineColor = options.delayOutlineColor || '#ffffff';
+    this.useDelayStyle = true;
 
     // Add click callback
     if (options.onClick) {
@@ -136,6 +147,16 @@ class TrackerLayer extends Layer {
     this.speed = speed;
   }
 
+
+  fetchTrajectories(url) {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+    return fetch(url, { signal }).then(data => data.json());
+  }
+
   /**
    * Returns the trajectory which are at the given coordinates.
    * Returns null when no vehicle is located at the given coordinates.
@@ -166,39 +187,86 @@ class TrackerLayer extends Layer {
   init(map) {
     super.init(map);
 
-    this.tracker = new Tracker(map, {
-      canvas: this.canvas,
-    });
+    if (this.getVisible()) {
+      this.start(map);
+    }
+  }
 
-    this.map.on('postrender', () => {
-      this.tracker.renderTrajectory(this.currTime);
-    });
+  setVisible(
+    visible,
+    stopPropagationDown = false,
+    stopPropagationUp = false,
+    stopPropagationSiblings = false,
+  ) {
+    super.setVisible(
+      visible,
+      stopPropagationDown,
+      stopPropagationUp,
+      stopPropagationSiblings,
+    );
+    if (this.getVisible()) {
+      this.start(this.map);
+    } else {
+      this.stop();
+    }
+  }
 
-    this.map.on('moveend', () => {
-      const z = this.map.getView().getZoom();
+  onMoveEnd() {
+    const z = this.map.getView().getZoom();
 
-      if (z !== this.currentZoom) {
-        this.currentZoom = z;
-        this.styleCache = {};
-        this.fps = Math.round(
-          Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
-        );
-        this.startUpdateTime();
-      }
-      this.tracker.renderTrajectory(this.currTime);
-      this.updateTrajectories();
-    });
-
-    this.map.on('pointermove', e => {
-      const vehicle = this.getVehicleAtCoordinate(e.coordinate);
-      this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
-      this.hoverVehicleId = vehicle ? vehicle.id : null;
-    });
-
+    if (z !== this.currentZoom) {
+      this.currentZoom = z;
+      this.styleCache = {};
+      this.fps = Math.round(
+        Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
+      );
+      this.startUpdateTime();
+    }
+    this.tracker.renderTrajectory(this.currTime);
     this.updateTrajectories();
+  }
+
+  onPointerMove(e) {
+    const vehicle = this.getVehicleAtCoordinate(e.coordinate);
+    this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
+    this.hoverVehicleId = vehicle ? vehicle.id : null;
+  }
+
+  destroy() {
+    unByKey([this.onMoveEndRef, this.onPointerMoveRef, this.onPostRenderRef]);
+  }
+
+  stop() {
+    if (this.canvas) {
+      this.canvas.style.visibility = 'hidden';
+    }
+    this.destroy();
+  }
+
+  start(map) {
+    this.stop();
+
+    if (!this.canvas) {
+      this.canvas = document.createElement('canvas');
+
+      this.tracker = new Tracker(map, {
+        canvas: this.canvas,
+      });
+
+      this.tracker.setStyle((props, r) => this.style(props, r));
+    }
+    this.canvas.style.visibility = 'visible';
+
+    this.onPostRenderRef = map.on('postrender', () => {
+      this.tracker.renderTrajectory(this.currTime);
+    });
+    this.onMoveEndRef = map.on('moveend', () => this.onMoveEnd());
+    this.onPointerMoveRef = map.on('pointermove', e => this.onPointerMove(e));
+
+    this.tracker.renderTrajectory(this.currTime);
     this.startInterval();
     this.startUpdateTime();
-    this.tracker.setStyle((props, r) => this.style(props, r));
+    this.updateTrajectories();
   }
 
   /**
@@ -206,29 +274,60 @@ class TrackerLayer extends Layer {
    * @param {Object} props Properties
    */
   style(props) {
-    const { type, name, id, color } = props;
+    const { type, name, id, color, textColor, delay } = props;
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.hoverVehicleId === id;
 
     this.styleCache[z] = this.styleCache[z] || {};
     this.styleCache[z][type] = this.styleCache[z][type] || {};
     this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
+    this.styleCache[z][type][name][delay] =
+      this.styleCache[z][type][name][delay] || {};
 
-    if (!this.styleCache[z][type][name][hover]) {
+    if (!this.styleCache[z][type][name][delay][hover]) {
       let radius = getRadius(type, z);
-
       if (hover) {
         radius += 5;
       }
+      const margin = 1;
+      const radiusDelay = radius + 2;
+      const origin = radiusDelay + margin;
 
       const c = document.createElement('canvas');
-      c.width = radius * 2 + 4; // + 4 for border
-      c.height = c.width;
+      c.width = radiusDelay * 2 + margin * 2 + 100;
+      c.height = radiusDelay * 2 + margin * 2;
       const ctx = c.getContext('2d');
 
+      if (this.useDelayStyle) {
+        // Draw delay background
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(origin, origin, radiusDelay, 0, 2 * Math.PI, false);
+        ctx.fillStyle = getDelayColor(delay);
+        ctx.filter = 'blur(1px)';
+        ctx.fill();
+        ctx.restore();
+
+        // Draw delay text
+        ctx.save();
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.font = `bold ${Math.max(
+          14,
+          Math.min(17, radius * 1.2),
+        )}px arial, sans-serif`;
+        ctx.fillStyle = getDelayColor(delay);
+
+        ctx.strokeStyle = this.delayOutlineColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeText(getDelayText(delay), origin * 2, origin);
+        ctx.fillText(getDelayText(delay), origin * 2, origin);
+        ctx.restore();
+      }
+
       ctx.beginPath();
-      ctx.arc(radius + 2, radius + 2, radius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = color || bgColors[type];
+      ctx.arc(origin, origin, radius, 0, 2 * Math.PI, false);
+      ctx.fillStyle = color || getBgColor(type);
       ctx.fill();
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#003300';
@@ -238,20 +337,19 @@ class TrackerLayer extends Layer {
         const fontSize = Math.max(radius, 10);
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
-        ctx.fillStyle = textColors[type];
+        ctx.fillStyle = textColor || getTextColor(type);
         ctx.font = `${fontSize}px Arial`;
 
         const textSize = ctx.measureText(name);
 
         if (textSize.width < c.width - 6 && fontSize < c.height - 6) {
-          ctx.fillText(name, radius + 2, radius + 2);
+          ctx.fillText(name, origin, origin);
         }
       }
-
-      this.styleCache[z][type][name][hover] = c;
+      this.styleCache[z][type][name][delay][hover] = c;
     }
 
-    return this.styleCache[z][type][name][hover];
+    return this.styleCache[z][type][name][delay][hover];
   }
 
   /**
@@ -266,63 +364,6 @@ class TrackerLayer extends Layer {
     } else {
       throw new Error('callback must be of type function.');
     }
-  }
-
-  /**
-   * Returns the URL Parameters
-   * @param {Object} extraParams
-   * @returns {Objecz}
-   */
-  getUrlParams(extraParams = {}) {
-    const ext = this.map.getView().calculateExtent();
-    const bbox = buffer(ext, getWidth(ext) / 10).join(',');
-    const now = this.currTime;
-
-    let diff = true;
-
-    if (
-      this.later &&
-      now.getTime() > this.later.getTime() - 3000 * this.speed
-    ) {
-      diff = false;
-    }
-
-    if (!this.later || !diff) {
-      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
-      const later = new Date(now.getTime() + intervalMilliscds);
-      this.later = later;
-    }
-
-    const btime = TrackerLayer.getTimeString(now);
-
-    const params = {
-      ...extraParams,
-      bbox,
-      btime,
-      etime: TrackerLayer.getTimeString(this.later),
-      date: TrackerLayer.getDateString(now),
-      rid: 1,
-      a: 1,
-      cd: 1,
-      nm: 1,
-      fl: 1,
-      s: this.map.getView().getZoom() < 10 ? 1 : 0,
-      z: this.map.getView().getZoom(),
-      key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
-
-      // toff: this.currTime.getTime() / 1000,
-    };
-
-    // Allow to load only differences between the last request,
-    // but currently the Tracker render method doesn't manage to render only diff.
-    /* if (diff) {
-      // Not working
-      params.diff = this.lastRequestTime;
-    } */
-
-    return Object.keys(params)
-      .map(k => `${k}=${params[k]}`)
-      .join('&');
   }
 }
 

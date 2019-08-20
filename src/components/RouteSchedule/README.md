@@ -35,7 +35,7 @@ class BasicMapExample extends React.Component {
             lineInfos: trajectory,
           });
         },
-      }),
+      }), 
     ];
   }
 
