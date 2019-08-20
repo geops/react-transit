@@ -12,7 +12,7 @@
     "react-dom": "^16.8.6",
     "react-icons": "^3.7.0",
     "react-scripts": "3.0.1",
-    "react-spatial": "../react-spatial/build",
+    "react-spatial": "^0.1.0-beta.4",
     "react-styleguidist": "^9.0.2"
   },
   "scripts": {
