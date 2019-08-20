@@ -48,7 +48,6 @@ class TrajservLayerOld extends TrajservLayer {
               d: delayAtStation,
               ad: arrivalDelay,
             } = path[k];
-            // coords.push(this.map.getCoordinateFromPixel([x, y]));
             coords.push([x, y]);
 
             // If a pixel is defined with a time we add it to timeIntervals.
