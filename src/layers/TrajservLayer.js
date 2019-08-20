@@ -1,4 +1,5 @@
 import LineString from 'ol/geom/LineString';
+import { unByKey } from 'ol/Observable';
 import qs from 'query-string';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
@@ -170,7 +171,7 @@ class TrajservLayer extends TrackerLayer {
       this.tracker.setFilter(this.filterFc);
     }
 
-    this.map.on('singleclick', e => {
+    this.onSingleClickRef = this.map.on('singleclick', e => {
       if (!this.clickCallbacks.length) {
         return;
       }
@@ -190,6 +191,11 @@ class TrajservLayer extends TrackerLayer {
         }
       }
     });
+  }
+
+  destroy() {
+    super.destroy();
+    unByKey(this.onSingleClickRef);
   }
 
   fetchTrajectory(trajId) {
@@ -220,78 +226,80 @@ class TrajservLayer extends TrackerLayer {
   }
 
   updateTrajectories() {
-    this.fetchTrajectories().then(data => {
-      // For debug purpose , display the trajectory
-      // this.olLayer.getSource().clear();
+    if (this.getVisible()) {
+      this.fetchTrajectories().then(data => {
+        // For debug purpose , display the trajectory
+        // this.olLayer.getSource().clear();
 
-      this.lastRequestTime = data.t;
-      this.currentOffset = data.o || 0;
-      const trajectories = [];
+        this.lastRequestTime = data.t;
+        this.currentOffset = data.o || 0;
+        const trajectories = [];
 
-      for (let i = 0; i < data.a.length; i += 1) {
-        const coords = [];
-        const timeIntervals = [];
-        const {
-          i: id,
-          p: paths,
-          t: type,
-          n: name,
-          c: color,
-          ag: operator,
-        } = data.a[i];
+        for (let i = 0; i < data.a.length; i += 1) {
+          const coords = [];
+          const timeIntervals = [];
+          const {
+            i: id,
+            p: paths,
+            t: type,
+            n: name,
+            c: color,
+            ag: operator,
+          } = data.a[i];
 
-        for (let j = 0; j < paths.length; j += 1) {
-          const path = paths[j];
-          const startTime = (path[0].a || data.t) * 1000;
-          const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
+          for (let j = 0; j < paths.length; j += 1) {
+            const path = paths[j];
+            const startTime = (path[0].a || data.t) * 1000;
+            const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
 
-          for (let k = 0; k < path.length; k += 1) {
-            // d: delay. When the train is stopped at a station.
-            const { x, y, a: timeAtPixelInScds, d: delay } = path[k];
-            coords.push([x, y]);
+            for (let k = 0; k < path.length; k += 1) {
+              // d: delay. When the train is stopped at a station.
+              const { x, y, a: timeAtPixelInScds, d: delay } = path[k];
+              coords.push([x, y]);
 
-            // If a pixel is defined with a time we add it to timeIntervals.
-            if (timeAtPixelInScds) {
-              const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
-              const timeFrac = Math.max(
-                (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
-                0,
-              );
+              // If a pixel is defined with a time we add it to timeIntervals.
+              if (timeAtPixelInScds) {
+                const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
+                const timeFrac = Math.max(
+                  (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
+                  0,
+                );
 
-              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
-              if (delay) {
-                const afterStopTimeInMilliscds =
-                  (timeAtPixelInScds + delay) * 1000;
-                timeIntervals.push([
-                  afterStopTimeInMilliscds,
-                  (afterStopTimeInMilliscds - startTime) /
-                    (endTime - startTime),
-                  null,
-                  k,
-                ]);
+                timeIntervals.push([timeAtPixelInMilliscds, timeFrac, null, k]);
+                if (delay) {
+                  const afterStopTimeInMilliscds =
+                    (timeAtPixelInScds + delay) * 1000;
+                  timeIntervals.push([
+                    afterStopTimeInMilliscds,
+                    (afterStopTimeInMilliscds - startTime) /
+                      (endTime - startTime),
+                    null,
+                    k,
+                  ]);
+                }
               }
             }
           }
-        }
 
-        if (coords.length) {
-          const geometry = new LineString(coords);
-          // For debug purpose , display the trajectory
-          // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
-          trajectories.push({
-            id,
-            type,
-            name,
-            color: color && `#${color}`,
-            geom: geometry,
-            timeOffset: this.currentOffset,
-            time_intervals: timeIntervals,
-            operator: operator.n,
-          });
+          if (coords.length) {
+            const geometry = new LineString(coords);
+            // For debug purpose , display the trajectory
+            // this.olLayer.getSource().addFeatures([new Feature(geometry)]);
+            trajectories.push({
+              id,
+              type,
+              name,
+              color: color && `#${color}`,
+              geom: geometry,
+              timeOffset: this.currentOffset,
+              time_intervals: timeIntervals,
+              operator: operator.n,
+            });
+          }
         }
-      }
-      this.tracker.setTrajectories(trajectories);
-    });
+        this.tracker.setTrajectories(trajectories);
+      });
+    }
   }
 }
 
