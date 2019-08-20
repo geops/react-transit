@@ -212,7 +212,6 @@ export default class Tracker {
           continue;
         }
         const vehicleImg = this.style(traj, res);
-        console.log(vehicleImg.height);
         this.canvasContext.drawImage(
           vehicleImg,
           px[0] - vehicleImg.height / 2,
