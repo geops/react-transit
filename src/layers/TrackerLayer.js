@@ -239,10 +239,16 @@ class TrackerLayer extends Layer {
     this.hoverVehicleId = vehicle ? vehicle.id : null;
   }
 
+  /**
+   * destroy current layer.
+   */
   destroy() {
     unByKey([this.onMoveEndRef, this.onPointerMoveRef, this.onPostRenderRef]);
   }
 
+  /**
+   * Stop current layer.
+   */
   stop() {
     if (this.canvas) {
       this.canvas.style.visibility = 'hidden';
@@ -250,6 +256,10 @@ class TrackerLayer extends Layer {
     this.destroy();
   }
 
+  /**
+   * 
+   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
+   */
   start(map) {
     this.stop();
 
