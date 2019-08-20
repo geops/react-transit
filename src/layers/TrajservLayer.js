@@ -11,6 +11,7 @@ const OPERATOR_FILTER = 'operator_filter';
  * Responsible for loading tracker data from Trajserv.
  * @class
  * @param {Object} options
+ * @extends TrackerLayer
  * @inheritDoc
  */
 class TrajservLayer extends TrackerLayer {
@@ -156,7 +157,7 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Initialize the layer and listen to feature clicks.
-   * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   * @param {ol.map} map ol.map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/map}
    */
   init(map) {
     super.init(map);

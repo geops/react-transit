@@ -3,7 +3,7 @@ import { LineString } from 'ol/geom';
 /**
  * Tracker for OpenLayers.
  * @class
- * @param {ol.map} map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+ * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/map}
  * @param {Object} options
  */
 export default class Tracker {
@@ -63,7 +63,7 @@ export default class Tracker {
   /**
    * Add a feature to the tracker.
    * @param {Number} id The feature id
-   * @param {ol.Feature} traj The tracker feature.
+   * @param {ol.Feature} traj The tracker feature. {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature.html ol/Feature},
    * @param {Boolean} addOnTop If true, the trajectory is added on top of
    *   the trajectory object. This affects the draw order. If addOnTop is
    *   true, the trajectory is drawn first and appears on bottom.

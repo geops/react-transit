@@ -8,7 +8,7 @@ import { getRadius, bgColors, textColors, timeSteps } from '../config/tracker';
 /**
  * Trackerlayer.
  * Responsible for loading tracker data.
- * extents Layer from /react-spatial/layer (https://react-spatial.geops.de/docjs.html)
+ * Extends {@link https://react-spatial.geops.de/docjs.html#layer geops-spatial/Layer}
  * @class
  * @inheritDoc
  * @param {Object} options
@@ -102,7 +102,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Get the current time
+   * Get the current time.
    * @returns {Date}
    */
   getCurrTime() {
@@ -110,7 +110,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * define the current time
+   * Define the current time.
    * @param {dateString | value} time
    */
   setCurrTime(time) {
@@ -121,7 +121,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * get the Speed
+   * Get the Speed.
    * @returns {number}
    */
   getSpeed() {
@@ -129,7 +129,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * define speed
+   * Define speed.
    * @param {number} speed
    */
   setSpeed(speed) {
@@ -137,10 +137,10 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Returns the trajectory which are at the given coordinates
-   * Returns null when no vehicle is located at the given coordinates
-   * @param {ol.coordinate} coordinate
-   * @returns {ol.feature | null}
+   * Returns the trajectory which are at the given coordinates.
+   * Returns null when no vehicle is located at the given coordinates.
+   * @param {ol.coordinate} coordinate {@link https://openlayers.org/en/latest/apidoc/module-ol_coordinate.html ol/coordinate}
+   * @returns {ol.feature | null} {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature-Feature.html ol/feature}
    */
   getVehicleAtCoordinate(coordinate) {
     const res = this.map.getView().getResolution();
@@ -161,7 +161,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Initialize the layer and listen to feature clicks.
-   * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/map}
    */
   init(map) {
     super.init(map);
@@ -202,7 +202,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Define the style of the layer
+   * Define the style of the layer.
    * @param {Object} props Properties
    */
   style(props) {
@@ -257,7 +257,7 @@ class TrackerLayer extends Layer {
   /**
    * Listens to click events on the layer.
    * @param {function} callback Callback function, called with the clicked
-   *   features (https://openlayers.org/en/latest/apidoc/module-ol_Feature.html),
+   *   feature {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature.html ol/Feature},
    *   the layer instance and the click event.
    */
   onClick(callback) {
