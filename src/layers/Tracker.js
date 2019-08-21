@@ -146,68 +146,50 @@ export default class Tracker {
       const traj = this.trajectories[i];
 
       // We simplify the traj object
-      const { id, geometry, timeIntervals, timeOffset } = traj;
+      const { geometry, timeIntervals, timeOffset } = traj;
 
       if (this.filter && !this.filter(traj)) {
         // eslint-disable-next-line no-continue
         continue;
       }
 
+      const coords = geometry.getCoordinates();
       let coord = null;
-      if (timeIntervals && timeIntervals.length) {
+      const nbCoords = coords.length;
+
+      if (timeIntervals && timeIntervals.length > 1) {
         const now = currTime - (timeOffset || 0);
         let start;
         let end;
-        let startFrac = 0;
-        let endFrac = 0;
-        let numCoordStart = 0;
-        let numCoordEnd = timeIntervals.length - 1;
+        let numCoordStart;
+        let numCoordEnd;
 
         // Search th time interval.
         for (let j = 0; j < timeIntervals.length - 1; j += 1) {
-          [start, startFrac, numCoordStart] = timeIntervals[j];
-          [end, endFrac, numCoordEnd] = timeIntervals[j + 1];
+          [start, numCoordStart] = timeIntervals[j];
+          [end, numCoordEnd] = timeIntervals[j + 1];
 
           if (start <= now && now <= end) {
             break;
+          } else {
+            start = null;
+            end = null;
           }
         }
 
         if (start && end) {
           // interpolate position inside the time interval.
-          const timeFrac = Math.min((now - start) / (end - start), 1);
-          const geomFrac = this.interpolate ? timeFrac : 0;
-
-          if (startFrac > 0 || endFrac < 1) {
-            const coords = geometry.getCoordinates();
-            const intervalGeom = new LineString(
+          const geomFrac = this.interpolate
+            ? Math.min((now - start) / (end - start), 1)
+            : 0;
+          let intervalGeom = geometry;
+          if (nbCoords > 2) {
+            intervalGeom = new LineString(
               coords.slice(numCoordStart, numCoordEnd + 1),
             );
-            coord = intervalGeom.getCoordinateAt(geomFrac);
-          } else {
-            coord = geometry.getCoordinateAt(geomFrac);
           }
+          coord = intervalGeom.getCoordinateAt(geomFrac);
         }
-      } else if (geometry) {
-        // if there is no time intervals but a geometry that means the bus is stopped at a station
-        // Example in json:
-        /*
-          {
-            "i": 9551952,
-            "t": 0,
-            "c": "ff8a00",
-            "n": "11",
-            "p": [
-              [
-                {
-                  "x": 779,
-                  "y": 239
-                }
-              ]
-            ]
-          },
-          */
-        coord = geometry.getFirstCoordinate();
       }
 
       if (coord) {
@@ -224,8 +206,6 @@ export default class Tracker {
           px[0] - vehicleImg.height / 2,
           px[1] - vehicleImg.height / 2,
         );
-      } else {
-        this.removeTrajectory(id);
       }
     }
   }

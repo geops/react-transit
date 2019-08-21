@@ -238,6 +238,7 @@ class TrajservLayer extends TrackerLayer {
   getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
     const bbox = buffer(ext, getWidth(ext) / 10).join(',');
+    const intervalMs = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
     const now = this.currTime;
 
     let diff = true;
@@ -248,10 +249,12 @@ class TrajservLayer extends TrackerLayer {
     ) {
       diff = false;
     }
-
-    if (!this.later || !diff) {
-      const intervalMilliscds = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
-      const later = new Date(now.getTime() + intervalMilliscds);
+    if (
+      !this.later ||
+      !diff ||
+      this.later.getTime() - now.getTime() > intervalMs
+    ) {
+      const later = new Date(now.getTime() + intervalMs);
       this.later = later;
     }
 
@@ -294,13 +297,12 @@ class TrajservLayer extends TrackerLayer {
           attr_det: 1,
         })}`,
       ).then(data => {
-        // For debug purpose , display the trajectory
-        // this.olLayer.getSource().clear();
         const trajectories = [];
         for (let i = 0; i < data.features.length; i += 1) {
           const timeIntervals = [];
           const traj = data.features[i];
           const geometry = new LineString(traj.geometry.coordinates);
+
           const {
             ID: id,
             ProductIdentifier: type,
@@ -311,7 +313,6 @@ class TrajservLayer extends TrackerLayer {
             TextColor: textColor,
             Delay: delay,
           } = traj.properties;
-
           // We have to find the index of the corresponding coordinate, for each timeInterval.
           for (let k = 0; k < intervals.length; k += 1) {
             const [timeAtCoord, timeFrac] = intervals[k];
@@ -324,9 +325,8 @@ class TrajservLayer extends TrackerLayer {
                 parseFloat(coord[1].toFixed(4)) === c[1]
               );
             });
-            timeIntervals.push([timeAtCoord, timeFrac, idx]);
+            timeIntervals.push([timeAtCoord, idx]);
           }
-
           trajectories.push({
             id,
             type,
