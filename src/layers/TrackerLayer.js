@@ -353,6 +353,9 @@ class TrackerLayer extends Layer {
       if (!this.useDelayStyle) {
         ctx.fillStyle = color || getBgColor(type);
         ctx.fill();
+      } else if (this.useDelayStyle && delay === null) {
+        ctx.fillStyle = '#a0a0a0';
+        ctx.fill();
       }
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#003300';
