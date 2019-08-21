@@ -183,6 +183,10 @@ class TrajservLayer extends TrackerLayer {
     if (this.tracker && this.filterFc) {
       this.tracker.setFilter(this.filterFc);
     }
+  }
+
+  start() {
+    super.start(this.map);
 
     // Sort the trajectories.
     if (this.tracker && this.sortFc) {
