@@ -140,6 +140,9 @@ export const getDelayColor = delayInMs => {
   if (delayInMs >= 180000) {
     return '#f7bf00'; // yellow { r: 247, g: 191, b: 0, s: '247,191,0' };
   }
+  if (delayInMs === null) {
+    return '#a0a0a0';
+  }
   return '#00a00c'; // green { r: 0, g: 160, b: 12, s: '0,160,12' };
 };
 

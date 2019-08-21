@@ -73,7 +73,7 @@ class TrackerLayer extends Layer {
 
     this.clickCallbacks = [];
 
-    this.delayOutlineColor = options.delayOutlineColor || '#ffffff';
+    this.delayOutlineColor = options.delayOutlineColor || '#000000';
     this.useDelayStyle = options.useDelayStyle || false;
 
     // Add click callback
@@ -353,12 +353,13 @@ class TrackerLayer extends Layer {
       if (!this.useDelayStyle) {
         ctx.fillStyle = color || getBgColor(type);
         ctx.fill();
-      } else if (this.useDelayStyle && delay === null) {
-        ctx.fillStyle = '#a0a0a0';
+      } else {
+        ctx.fillStyle = getDelayColor(delay);
         ctx.fill();
       }
+
       ctx.lineWidth = 1;
-      ctx.strokeStyle = '#003300';
+      ctx.strokeStyle = '#000000';
       ctx.stroke();
 
       const markerSize = radius * 2;
