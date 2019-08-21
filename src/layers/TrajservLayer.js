@@ -181,6 +181,10 @@ class TrajservLayer extends TrackerLayer {
     if (this.tracker && this.filterFc) {
       this.tracker.setFilter(this.filterFc);
     }
+  }
+
+  start() {
+    super.start(this.map);
 
     this.onSingleClickRef = this.map.on('singleclick', e => {
       if (!this.clickCallbacks.length) {
