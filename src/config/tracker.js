@@ -1,14 +1,14 @@
 const trackerRaduisMapping = {
-  0: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 6, 6, 7, 9, 11],
-  1: [1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 11, 11],
-  2: [1, 1, 1, 1, 1, 2, 3, 4, 4, 5, 5, 5, 7, 8, 11, 12, 12],
-  3: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 4, 6, 7, 8],
-  4: [1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 5, 5, 7, 8, 10, 11, 11],
-  5: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 9, 11],
-  6: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 9, 11],
-  7: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 9, 11],
-  8: [1, 1, 1, 1, 1, 2, 3, 3, 3, 4, 4, 5, 6, 7, 10, 11, 11],
-  9: [1, 1, 1, 1, 1, 2, 3, 4, 4, 5, 5, 5, 7, 8, 11, 12, 12], // Rail
+  0: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  1: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  2: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 9, 12.5, 14, 15, 15, 15, 15],
+  3: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+  4: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  5: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  6: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  7: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  8: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+  9: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 9, 12.5, 14, 15, 15, 15, 15],
 };
 
 export const types = [
@@ -110,11 +110,36 @@ export const getTextColor = (type = 0) => {
   }
 };
 
+export const getTextSize = (ctx, markerSize, text, fontSize) => {
+  ctx.font = `bold ${fontSize}px Arial`;
+  let newText = ctx.measureText(text);
+
+  const maxiter = 15;
+  let i = 0;
+
+  while (newText.width > markerSize - 6 && i < maxiter) {
+    // eslint-disable-next-line no-param-reassign
+    fontSize -= 0.5;
+    ctx.font = `bold ${fontSize}px arial, sans-serif`;
+    newText = ctx.measureText(text);
+    i += 1;
+  }
+  return fontSize;
+};
+
 export const getDelayColor = delayInMs => {
-  if (delayInMs >= 3600000) return '#ed004c'; // pink { r: 237, g: 0, b: 76, s: '237,0,76' };
-  if (delayInMs >= 500000) return '#e80000'; // red { r: 232, g: 0, b: 0, s: '232,0,0' };
-  if (delayInMs >= 300000) return '#ff4a00'; // orange { r: 255, g: 74, b: 0, s: '255,74,0' };
-  if (delayInMs >= 180000) return '#f7bf00'; // yellow { r: 247, g: 191, b: 0, s: '247,191,0' };
+  if (delayInMs >= 3600000) {
+    return '#ed004c'; // pink { r: 237, g: 0, b: 76, s: '237,0,76' };
+  }
+  if (delayInMs >= 500000) {
+    return '#e80000'; // red { r: 232, g: 0, b: 0, s: '232,0,0' };
+  }
+  if (delayInMs >= 300000) {
+    return '#ff4a00'; // orange { r: 255, g: 74, b: 0, s: '255,74,0' };
+  }
+  if (delayInMs >= 180000) {
+    return '#f7bf00'; // yellow { r: 247, g: 191, b: 0, s: '247,191,0' };
+  }
   return '#00a00c'; // green { r: 0, g: 160, b: 12, s: '0,160,12' };
 };
 

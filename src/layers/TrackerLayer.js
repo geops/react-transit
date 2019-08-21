@@ -10,6 +10,7 @@ import {
   getDelayColor,
   getDelayText,
   getTextColor,
+  getTextSize,
   timeSteps,
 } from '../config/tracker';
 
@@ -73,7 +74,7 @@ class TrackerLayer extends Layer {
     this.clickCallbacks = [];
 
     this.delayOutlineColor = options.delayOutlineColor || '#ffffff';
-    this.useDelayStyle = true;
+    this.useDelayStyle = options.useDelayStyle || false;
 
     // Add click callback
     if (options.onClick) {
@@ -318,7 +319,7 @@ class TrackerLayer extends Layer {
       c.height = radiusDelay * 2 + margin * 2;
       const ctx = c.getContext('2d');
 
-      if (this.useDelayStyle) {
+      if (delay !== null) {
         // Draw delay background
         ctx.save();
         ctx.beginPath();
@@ -327,7 +328,9 @@ class TrackerLayer extends Layer {
         ctx.filter = 'blur(1px)';
         ctx.fill();
         ctx.restore();
+      }
 
+      if (hover) {
         // Draw delay text
         ctx.save();
         ctx.textAlign = 'left';
@@ -347,24 +350,29 @@ class TrackerLayer extends Layer {
 
       ctx.beginPath();
       ctx.arc(origin, origin, radius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = color || getBgColor(type);
-      ctx.fill();
+      if (!this.useDelayStyle) {
+        ctx.fillStyle = color || getBgColor(type);
+        ctx.fill();
+      }
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#003300';
       ctx.stroke();
 
-      if (z > 12) {
+      const markerSize = radius * 2;
+      if (radius > 10) {
+        const shortname =
+          type === 'Rail' && name.length > 3 ? name.substring(0, 2) : name;
         const fontSize = Math.max(radius, 10);
+        const textSize = getTextSize(ctx, markerSize, shortname, fontSize);
+
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
-        ctx.fillStyle = textColor || getTextColor(type);
-        ctx.font = `${fontSize}px Arial`;
+        ctx.fillStyle = !this.useDelayStyle
+          ? textColor || getTextColor(type)
+          : '#000000';
+        ctx.font = `bold ${textSize}px Arial`;
 
-        const textSize = ctx.measureText(name);
-
-        if (textSize.width < c.width - 6 && fontSize < c.height - 6) {
-          ctx.fillText(name, origin, origin);
-        }
+        ctx.fillText(shortname, origin, origin);
       }
       this.styleCache[z][type][name][delay][hover] = c;
     }
