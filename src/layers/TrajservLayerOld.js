@@ -133,7 +133,7 @@ class TrajservLayerOld extends TrajservLayer {
           }
         }
 
-        if (coords.length) {
+        if (coords.length >= 1) {
           const geometry = new LineString(coords);
           trajectories.push({
             id,

@@ -70,6 +70,9 @@ class TrackerLayer extends Layer {
 
     this.fps = 60;
 
+    // Function to sort the list of trajectories.
+    this.sort = options.sort || null;
+
     this.clickCallbacks = [];
 
     this.delayOutlineColor = options.delayOutlineColor || '#ffffff';

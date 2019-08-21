@@ -50,6 +50,10 @@ export default class Tracker {
    * @param {array<ol.feature>} trajectories
    */
   setTrajectories(trajectories) {
+    if (this.sort) {
+      trajectories.sort(this.sort);
+    }
+
     this.trajectories = trajectories;
   }
 
@@ -124,6 +128,14 @@ export default class Tracker {
    */
   setFilter(filter) {
     this.filter = filter;
+  }
+
+  /**
+   * Set the sort for tracker features.
+   * @param {Function} sort Sort function.
+   */
+  setSort(sort) {
+    this.sort = sort;
   }
 
   /**
