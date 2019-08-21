@@ -71,12 +71,10 @@ class TrackerLayer extends Layer {
 
     this.fps = 60;
 
-    // Function to sort the list of trajectories.
-    this.sort = options.sort || null;
-
     this.clickCallbacks = [];
 
     this.delayOutlineColor = options.delayOutlineColor || '#000000';
+
     this.useDelayStyle = options.useDelayStyle || false;
 
     // Add click callback
@@ -243,7 +241,8 @@ class TrackerLayer extends Layer {
   onPointerMove(e) {
     const vehicle = this.getVehicleAtCoordinate(e.coordinate);
     this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
-    this.hoverVehicleId = vehicle ? vehicle.id : null;
+    this.hoverVehicleId = vehicle && vehicle.id;
+    this.tracker.setHoverVehicleId(this.hoverVehicleId);
   }
 
   /**
@@ -317,10 +316,10 @@ class TrackerLayer extends Layer {
       const radiusDelay = radius + 2;
       const origin = radiusDelay + margin;
 
-      const c = document.createElement('canvas');
-      c.width = radiusDelay * 2 + margin * 2 + 100;
-      c.height = radiusDelay * 2 + margin * 2;
-      const ctx = c.getContext('2d');
+      const canvas = document.createElement('canvas');
+      canvas.width = radiusDelay * 2 + margin * 2 + 100;
+      canvas.height = radiusDelay * 2 + margin * 2;
+      const ctx = canvas.getContext('2d');
 
       if (delay !== null) {
         // Draw delay background
@@ -381,7 +380,7 @@ class TrackerLayer extends Layer {
 
         ctx.fillText(shortname, origin, origin);
       }
-      this.styleCache[z][type][name][delay][hover] = c;
+      this.styleCache[z][type][name][delay][hover] = canvas;
     }
 
     return this.styleCache[z][type][name][delay][hover];

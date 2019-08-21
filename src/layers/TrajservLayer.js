@@ -183,10 +183,6 @@ class TrajservLayer extends TrackerLayer {
     if (this.tracker && this.filterFc) {
       this.tracker.setFilter(this.filterFc);
     }
-  }
-
-  start() {
-    super.start(this.map);
 
     // Sort the trajectories.
     if (this.tracker && this.sortFc) {
@@ -198,6 +194,10 @@ class TrajservLayer extends TrackerLayer {
         return a.delay < b.delay ? 1 : -1;
       });
     }
+  }
+
+  start() {
+    super.start(this.map);
 
     this.onSingleClickRef = this.map.on('singleclick', e => {
       if (!this.clickCallbacks.length) {

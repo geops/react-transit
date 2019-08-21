@@ -10,8 +10,7 @@ export default class Tracker {
   constructor(map, options) {
     const opts = options || {};
 
-    this.interpolate =
-      typeof opts.interpolate === 'undefined' ? true : opts.interpolate;
+    this.interpolate = !!opts.interpolate;
 
     this.map = map;
     this.trajectories = [];
@@ -114,7 +113,7 @@ export default class Tracker {
   }
 
   /**
-   * Clear the tracker layer.
+   * Clear the canvas.
    */
   clear() {
     if (this.canvas) {
@@ -139,6 +138,14 @@ export default class Tracker {
   }
 
   /**
+   * Set the id of the trajectory whixh is hovered .
+   * @param {string} id Id of a vehicle.
+   */
+  setHoverVehicleId(id) {
+    this.hoverVehicleId = id;
+  }
+
+  /**
    * Set the tracker style.
    * @param {Function} s OpenLayers style function.
    */
@@ -153,6 +160,8 @@ export default class Tracker {
   renderTrajectory(currTime = Date.now()) {
     this.clear();
     const res = this.map.getView().getResolution();
+    let hoverVehicleImg;
+    let hoverVehiclePx;
 
     for (let i = this.trajectories.length - 1; i >= 0; i -= 1) {
       const traj = this.trajectories[i];
@@ -212,13 +221,27 @@ export default class Tracker {
           // eslint-disable-next-line no-continue
           continue;
         }
+
         const vehicleImg = this.style(traj, res);
-        this.canvasContext.drawImage(
-          vehicleImg,
-          px[0] - vehicleImg.height / 2,
-          px[1] - vehicleImg.height / 2,
-        );
+        if (this.hoverVehicleId !== traj.id) {
+          this.canvasContext.drawImage(
+            vehicleImg,
+            px[0] - vehicleImg.height / 2,
+            px[1] - vehicleImg.height / 2,
+          );
+        } else {
+          // Store the canvas to draw it at the end
+          hoverVehicleImg = vehicleImg;
+          hoverVehiclePx = px;
+        }
       }
+    }
+    if (hoverVehicleImg) {
+      this.canvasContext.drawImage(
+        hoverVehicleImg,
+        hoverVehiclePx[0] - hoverVehicleImg.height / 2,
+        hoverVehiclePx[1] - hoverVehicleImg.height / 2,
+      );
     }
   }
 
