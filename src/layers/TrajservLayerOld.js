@@ -85,7 +85,7 @@ class TrajservLayerOld extends TrajservLayer {
       for (let i = 0; i < data.a.length; i += 1) {
         const coords = [];
         const timeIntervals = [];
-        let delay = 0;
+        let delay = null;
         const {
           i: id,
           p: paths,
@@ -99,8 +99,6 @@ class TrajservLayerOld extends TrajservLayer {
 
         for (let j = 0; j < paths.length; j += 1) {
           const path = paths[j];
-          const startTime = (path[0].a || data.t) * 1000;
-          const endTime = (path[path.length - 1].a || data.t + 20) * 1000;
 
           for (let k = 0; k < path.length; k += 1) {
             const {
@@ -120,22 +118,13 @@ class TrajservLayerOld extends TrajservLayer {
             // If a pixel is defined with a time we add it to timeIntervals.
             if (timeAtPixelInScds) {
               const timeAtPixelInMilliscds = timeAtPixelInScds * 1000;
-              const timeFrac = Math.max(
-                (timeAtPixelInMilliscds - startTime) / (endTime - startTime),
-                0,
-              );
 
-              timeIntervals.push([timeAtPixelInMilliscds, timeFrac, k]);
+              timeIntervals.push([timeAtPixelInMilliscds, k]);
               if (delayAtStation) {
                 // We add a time interval when the train is stopped at a station.
                 const afterStopTimeInMilliscds =
                   (timeAtPixelInScds + delayAtStation) * 1000;
-                timeIntervals.push([
-                  afterStopTimeInMilliscds,
-                  (afterStopTimeInMilliscds - startTime) /
-                    (endTime - startTime),
-                  k,
-                ]);
+                timeIntervals.push([afterStopTimeInMilliscds, k]);
               }
               if (realTimeAvailable && arrivalDelay && arrivalDelay >= 0) {
                 delay = arrivalDelay;
