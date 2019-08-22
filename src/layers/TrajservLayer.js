@@ -53,7 +53,7 @@ class TrajservLayer extends TrackerLayer {
         dd: departureDelay,
         dot: noDropOff,
         put: noPickUp,
-        c: skipped,
+        c: cancelled,
         wa: wheelchairAccessible,
       } = resp.sts[i];
 
@@ -69,7 +69,7 @@ class TrajservLayer extends TrackerLayer {
         departureDelay,
         noDropOff,
         noPickUp,
-        skipped,
+        cancelled,
         wheelchairAccessible,
       });
     }

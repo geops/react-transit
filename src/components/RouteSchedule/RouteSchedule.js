@@ -214,7 +214,15 @@ const renderStations = (lineInfos, onStationClick) => (
           </span>
         </div>
         {renderStationImg(idx, lineInfos.stations.length)}
-        <div>{stop.stationName}</div>
+        <div
+          className={
+            idx === lineInfos.stations.length &&
+            stop.cancelled &&
+            'rt-route-cancelled'
+          }
+        >
+          {stop.stationName}
+        </div>
       </div>
     ))}
   </div>
