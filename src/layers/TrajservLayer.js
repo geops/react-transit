@@ -133,14 +133,15 @@ class TrajservLayer extends TrackerLayer {
 
     if (train) {
       const trainList = typeof train === 'string' ? [train] : train;
-      const trainFilter = t => trainList.indexOf(t.name) !== -1;
+      const trainFilter = t =>
+        trainList.some(tr => new RegExp(tr, 'i').test(t.name));
       filterList.push(trainFilter);
     }
 
     if (operator) {
       const operatorList = typeof operator === 'string' ? [operator] : operator;
       const operatorFilter = t =>
-        operatorList.filter(op => t.operator.includes(op)).length;
+        operatorList.some(op => new RegExp(op, 'i').test(t.operator));
       filterList.push(operatorFilter);
     }
 
