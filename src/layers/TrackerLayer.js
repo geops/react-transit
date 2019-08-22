@@ -308,7 +308,7 @@ class TrackerLayer extends Layer {
    * @param {Object} props Properties
    */
   style(props) {
-    const { type, name, id, color, textColor, delay } = props;
+    const { type, name, id, color, textColor, delay, cancelled } = props;
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.hoverVehicleId === id;
 
@@ -337,7 +337,7 @@ class TrackerLayer extends Layer {
         ctx.save();
         ctx.beginPath();
         ctx.arc(origin, origin, radiusDelay, 0, 2 * Math.PI, false);
-        ctx.fillStyle = getDelayColor(delay);
+        ctx.fillStyle = getDelayColor(delay, cancelled);
         ctx.filter = 'blur(1px)';
         ctx.fill();
         ctx.restore();
@@ -352,12 +352,12 @@ class TrackerLayer extends Layer {
           14,
           Math.min(17, radius * 1.2),
         )}px arial, sans-serif`;
-        ctx.fillStyle = getDelayColor(delay);
+        ctx.fillStyle = getDelayColor(delay, cancelled);
 
         ctx.strokeStyle = this.delayOutlineColor;
         ctx.lineWidth = 1.5;
-        ctx.strokeText(getDelayText(delay), origin * 2, origin);
-        ctx.fillText(getDelayText(delay), origin * 2, origin);
+        ctx.strokeText(getDelayText(delay, cancelled), origin * 2, origin);
+        ctx.fillText(getDelayText(delay, cancelled), origin * 2, origin);
         ctx.restore();
       }
 
@@ -367,7 +367,7 @@ class TrackerLayer extends Layer {
         ctx.fillStyle = color || getBgColor(type);
         ctx.fill();
       } else {
-        ctx.fillStyle = getDelayColor(delay);
+        ctx.fillStyle = getDelayColor(delay, cancelled);
         ctx.fill();
       }
 

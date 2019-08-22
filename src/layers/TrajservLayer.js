@@ -53,7 +53,7 @@ class TrajservLayer extends TrackerLayer {
         dd: departureDelay,
         dot: noDropOff,
         put: noPickUp,
-        c: skipped,
+        c: cancelled,
         wa: wheelchairAccessible,
       } = resp.sts[i];
 
@@ -69,7 +69,7 @@ class TrajservLayer extends TrackerLayer {
         departureDelay,
         noDropOff,
         noPickUp,
-        skipped,
+        cancelled,
         wheelchairAccessible,
       });
     }
@@ -329,6 +329,7 @@ class TrajservLayer extends TrackerLayer {
           Color: color,
           TextColor: textColor,
           Delay: delay,
+          Cancelled: cancelled,
         } = traj.properties;
         // We have to find the index of the corresponding coordinate, for each timeInterval.
         for (let k = 0; k < intervals.length; k += 1) {
@@ -354,6 +355,7 @@ class TrajservLayer extends TrackerLayer {
           operator,
           timeIntervals,
           geometry,
+          cancelled,
         });
       }
 
