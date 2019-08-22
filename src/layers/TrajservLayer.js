@@ -1,10 +1,12 @@
 import { unByKey } from 'ol/Observable';
 import qs from 'query-string';
-import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
+import { transform as transformCoords } from 'ol/proj';
 import { buffer, getWidth } from 'ol/extent';
-import { LineString } from 'ol/geom';
+import { Point, MultiPoint, LineString } from 'ol/geom';
+import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
+import { getBgColor } from '../config/tracker';
 
 const TRAIN_FILTER = 'train_filter';
 const OPERATOR_FILTER = 'operator_filter';
@@ -159,6 +161,8 @@ class TrajservLayer extends TrackerLayer {
     super({ ...options });
 
     this.url = options.url || 'https://api.geops.io/tracker';
+    this.showVehicleTraj =
+      options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.filterFc = TrajservLayer.createFilter(options.train, options.operator);
   }
 
@@ -214,24 +218,102 @@ class TrajservLayer extends TrackerLayer {
 
         if (features.length) {
           const featId = features[0].get('id');
-          this.fetchTrajectory(featId).then(r => {
+          this.journeyId = features[0].get('journeyIdentifier');
+          this.fetchTrajectoryStations(featId).then(r => {
             this.clickCallbacks.forEach(c => c(r, this, e));
           });
         }
+      }
+    });
+
+    this.onMoveEndRef = this.map.on('moveend', () => {
+      if (this.journeyId) {
+        this.highlightTrajectory();
       }
     });
   }
 
   stop() {
     unByKey(this.onSingleClickRef);
+    unByKey(this.onMoveEndRef);
+    this.journeyId = null;
     super.stop();
   }
 
   /**
-   * Fetch specific trajectory by ID
+   * Draw the trajectory as a line with points for each stop.
+   * @param {Array} stationsCoords Array of station coordinates.
+   * @param {Array} lineCoords Array of coordinates of the trajectory (linestring).
+   * @param {string} color The color of the line.
+   */
+  drawTrajectory(stationsCoords, lineCoords, color) {
+    // Don't allow white lines, use red instead.
+    const vehiculeColor = /#ffffff/i.test(color) ? 'ff0000' : color;
+
+    const abovePointFeatures = new Feature({
+      geometry: new MultiPoint(stationsCoords),
+    });
+    abovePointFeatures.setStyle(
+      new Style({
+        zIndex: 4,
+        image: new Circle({
+          radius: 4,
+          fill: new Fill({
+            color: vehiculeColor,
+          }),
+        }),
+      }),
+    );
+
+    const belowPointFeatures = new Feature({
+      geometry: new MultiPoint(stationsCoords),
+    });
+    belowPointFeatures.setStyle(
+      new Style({
+        zIndex: 1,
+        image: new Circle({
+          radius: 5,
+          fill: new Fill({
+            color: '#000000',
+          }),
+        }),
+      }),
+    );
+
+    const lineFeat = new Feature({
+      geometry: new LineString(lineCoords),
+    });
+    lineFeat.setStyle([
+      new Style({
+        zIndex: 3,
+        stroke: new Stroke({
+          color: vehiculeColor,
+          width: 4,
+        }),
+      }),
+      new Style({
+        zIndex: 2,
+        stroke: new Stroke({
+          color: '#000000',
+          width: 6,
+        }),
+      }),
+    ]);
+
+    const vectorSource = this.olLayer.getSource();
+    vectorSource.clear();
+    vectorSource.addFeatures([
+      abovePointFeatures,
+      lineFeat,
+      belowPointFeatures,
+    ]);
+  }
+
+  /**
+   * Fetch stations information with a trajectory ID
    * @param {number} trajId the ID of the trajectory
    */
-  fetchTrajectory(trajId) {
+  fetchTrajectoryStations(trajId) {
     const params = this.getUrlParams({
       id: trajId,
       time: TrackerLayer.getTimeString(new Date()),
@@ -242,7 +324,53 @@ class TrajservLayer extends TrackerLayer {
       .then(res => {
         return res.json();
       })
-      .then(resp => TrajservLayer.translateTrajStationsResp(resp));
+      .then(resp => {
+        const trajStations = TrajservLayer.translateTrajStationsResp(resp);
+
+        this.stationsCoords = [];
+        trajStations.stations.forEach(station => {
+          this.stationsCoords.push(
+            transformCoords(station.coordinates, 'EPSG:4326', 'EPSG:3857'),
+          );
+        });
+
+        this.highlightTrajectory();
+        return trajStations;
+      });
+  }
+
+  highlightTrajectory() {
+    this.fetchTrajectoryById(this.journeyId).then(traj => {
+      const { p, t, c } = traj;
+
+      const lineCoords = [];
+      p[0].forEach(point => {
+        lineCoords.push([point.x, point.y]);
+      });
+      this.drawTrajectory(
+        this.stationsCoords,
+        lineCoords,
+        c ? `#${c}` : getBgColor(t),
+      );
+    });
+  }
+
+  /**
+   * Fetch trajectory information with a trajectory ID
+   * @param {number} journeyId the gtfs ID of the trajectory.
+   */
+  fetchTrajectoryById(journeyId) {
+    const params = this.getUrlParams({
+      id: journeyId,
+      time: TrackerLayer.getTimeString(new Date()),
+    });
+
+    const url = `${this.url}/trajectorybyid?${params}`;
+    return fetch(url)
+      .then(res => {
+        return res.json();
+      })
+      .then(resp => resp);
   }
 
   /**
@@ -323,6 +451,7 @@ class TrajservLayer extends TrackerLayer {
         const {
           ID: id,
           ProductIdentifier: type,
+          JourneyIdentifier: journeyIdentifier,
           PublishedLineName: name,
           Operator: operator,
           TimeIntervals: intervals,
@@ -353,6 +482,7 @@ class TrajservLayer extends TrackerLayer {
           textColor: textColor && `#${textColor}`,
           delay,
           operator,
+          journeyIdentifier,
           timeIntervals,
           geometry,
           cancelled,
