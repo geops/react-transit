@@ -267,7 +267,6 @@ class TrajservLayer extends TrackerLayer {
 
     const belowPointFeatures = new Feature({
       geometry: new MultiPoint(stationsCoords),
-      styleType: 'pointBelow',
     });
     belowPointFeatures.setStyle(
       new Style({
