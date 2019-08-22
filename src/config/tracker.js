@@ -127,7 +127,10 @@ export const getTextSize = (ctx, markerSize, text, fontSize) => {
   return fontSize;
 };
 
-export const getDelayColor = delayInMs => {
+export const getDelayColor = (delayInMs, cancelled) => {
+  if (cancelled) {
+    return '#ff0000';
+  }
   if (delayInMs >= 3600000) {
     return '#ed004c'; // pink { r: 237, g: 0, b: 76, s: '237,0,76' };
   }
@@ -146,7 +149,10 @@ export const getDelayColor = delayInMs => {
   return '#00a00c'; // green { r: 0, g: 160, b: 12, s: '0,160,12' };
 };
 
-export const getDelayText = delayInMs => {
+export const getDelayText = (delayInMs, cancelled) => {
+  if (cancelled) {
+    return String.fromCharCode(10006);
+  }
   if (delayInMs > 3600000) {
     const rounded = Math.round(delayInMs / 3600000);
     return `+${rounded}h`;
