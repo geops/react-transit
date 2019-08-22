@@ -252,7 +252,6 @@ class TrajservLayer extends TrackerLayer {
 
     const abovePointFeatures = new Feature({
       geometry: new MultiPoint(stationsCoords),
-      styleType: 'pointAbove',
     });
     abovePointFeatures.setStyle(
       new Style({
