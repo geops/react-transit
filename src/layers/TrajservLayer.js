@@ -3,7 +3,7 @@ import qs from 'query-string';
 import Feature from 'ol/Feature';
 import { transform as transformCoords } from 'ol/proj';
 import { buffer, getWidth } from 'ol/extent';
-import { Point, LineString } from 'ol/geom';
+import { Point, MultiPoint, LineString } from 'ol/geom';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
 import { getBgColor } from '../config/tracker';
@@ -34,53 +34,6 @@ class TrajservLayer extends TrackerLayer {
       });
     }
     return newDates;
-  }
-
-  /**
-   *  Translate the response date object into a readable object.
-   * @param {ol.feature} feature openlayer ol.feature.
-   * @param {string} color color hex string.
-   * @returns {array<Date>}
-   */
-  static getTrajectoryStyle(feature, color) {
-    if (feature.get('styleType') === 'pointBelow') {
-      return new Style({
-        zIndex: 1,
-        image: new Circle({
-          radius: 8,
-          fill: new Fill({
-            color: '#000000',
-          }),
-        }),
-      });
-    }
-    if (feature.get('styleType') === 'pointAbove') {
-      return new Style({
-        zIndex: 4,
-        image: new Circle({
-          radius: 7,
-          fill: new Fill({
-            color,
-          }),
-        }),
-      });
-    }
-    return [
-      new Style({
-        zIndex: 3,
-        stroke: new Stroke({
-          color,
-          width: 8,
-        }),
-      }),
-      new Style({
-        zIndex: 2,
-        stroke: new Stroke({
-          color: '#000000',
-          width: 10,
-        }),
-      }),
-    ];
   }
 
   /**
@@ -295,37 +248,67 @@ class TrajservLayer extends TrackerLayer {
    */
   drawTrajectory(stationsCoords, lineCoords, color) {
     // Don't allow white lines, use red instead.
-    const vehiculeColor =
-      color === '#ffffff' || color === '#FFFFFF' ? 'ff0000' : color;
+    const vehiculeColor = /#ffffff/i.test(color) ? 'ff0000' : color;
 
-    const coords = [];
-    const abovePointFeatures = [];
-    const belowPointFeatures = [];
-
-    stationsCoords.forEach(coord => {
-      abovePointFeatures.push(
-        new Feature({ geometry: new Point(coord), styleType: 'pointAbove' }),
-      );
-      belowPointFeatures.push(
-        new Feature({ geometry: new Point(coord), styleType: 'pointBelow' }),
-      );
+    const abovePointFeatures = new Feature({
+      geometry: new MultiPoint(stationsCoords),
+      styleType: 'pointAbove',
     });
-    if (coords) {
-      const vectorSource = this.olLayer.getSource();
-      vectorSource.clear();
+    abovePointFeatures.setStyle(
+      new Style({
+        zIndex: 4,
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({
+            color: vehiculeColor,
+          }),
+        }),
+      }),
+    );
 
-      this.olLayer.setStyle(f =>
-        TrajservLayer.getTrajectoryStyle(f, vehiculeColor),
-      );
+    const belowPointFeatures = new Feature({
+      geometry: new MultiPoint(stationsCoords),
+      styleType: 'pointBelow',
+    });
+    belowPointFeatures.setStyle(
+      new Style({
+        zIndex: 1,
+        image: new Circle({
+          radius: 8,
+          fill: new Fill({
+            color: '#000000',
+          }),
+        }),
+      }),
+    );
 
-      const lineFeat = new Feature({
-        geometry: new LineString(lineCoords),
-      });
+    const lineFeat = new Feature({
+      geometry: new LineString(lineCoords),
+    });
+    lineFeat.setStyle([
+      new Style({
+        zIndex: 3,
+        stroke: new Stroke({
+          color: vehiculeColor,
+          width: 8,
+        }),
+      }),
+      new Style({
+        zIndex: 2,
+        stroke: new Stroke({
+          color: '#000000',
+          width: 10,
+        }),
+      }),
+    ]);
 
-      this.olLayer
-        .getSource()
-        .addFeatures([...abovePointFeatures, lineFeat, ...belowPointFeatures]);
-    }
+    const vectorSource = this.olLayer.getSource();
+    vectorSource.clear();
+    vectorSource.addFeatures([
+      abovePointFeatures,
+      lineFeat,
+      belowPointFeatures,
+    ]);
   }
 
   /**
