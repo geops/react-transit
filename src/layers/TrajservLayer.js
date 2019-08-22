@@ -172,14 +172,27 @@ class TrajservLayer extends TrackerLayer {
     const parameters = qs.parse(window.location.search);
     const trainParam = parameters[TRAIN_FILTER];
     const opParam = parameters[OPERATOR_FILTER];
+
     if (trainParam || opParam) {
       this.filterFc = TrajservLayer.createFilter(
         trainParam ? trainParam.split(',') : undefined,
         opParam ? opParam.split(',') : undefined,
       );
     }
+
     if (this.tracker && this.filterFc) {
       this.tracker.setFilter(this.filterFc);
+    }
+
+    // Sort the trajectories.
+    if (this.tracker && this.sortFc) {
+      this.tracker.setSort(this.sortFc);
+    } else if (this.tracker && this.useDelayStyle) {
+      // Automatic sorting depending on delay, higher delay on top.
+      this.tracker.setSort((a, b) => {
+        if (a.delay === null) return 1;
+        return a.delay < b.delay ? 1 : -1;
+      });
     }
   }
 
@@ -343,6 +356,7 @@ class TrajservLayer extends TrackerLayer {
             geometry,
           });
         }
+
         this.tracker.setTrajectories(trajectories);
       });
     }
