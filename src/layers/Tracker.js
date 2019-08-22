@@ -1,4 +1,5 @@
 import { LineString } from 'ol/geom';
+import { unByKey } from 'ol/Observable';
 
 /**
  * Tracker for OpenLayers.
@@ -13,20 +14,9 @@ export default class Tracker {
       ...options,
     };
 
-    this.interpolate = !!opts.interpolate;
-
     this.map = map;
     this.trajectories = [];
-    this.rotationCache = {};
-    this.renderFps = 60;
-
-    this.map.once('rendercomplete', () => {
-      [this.canvas.width, this.canvas.height] = this.map.getSize();
-    });
-
-    this.map.on('change:size', () => {
-      [this.canvas.width, this.canvas.height] = this.map.getSize();
-    });
+    this.interpolate = !!opts.interpolate;
 
     // we draw directly on the canvas since openlayers is too slow
     this.canvas = opts.canvas || document.createElement('canvas');
@@ -39,12 +29,26 @@ export default class Tracker {
       'pointer-events: none',
       'visibility: visible',
     ].join(';');
-
     this.canvasContext = this.canvas.getContext('2d');
 
-    this.map.once('postrender', () => {
+    this.renderCompleteRef = this.map.once('rendercomplete', () => {
+      [this.canvas.width, this.canvas.height] = this.map.getSize();
       this.map.getTarget().appendChild(this.canvas);
     });
+
+    this.changeSizeRef = this.map.on('change:size', () => {
+      [this.canvas.width, this.canvas.height] = this.map.getSize();
+    });
+  }
+
+  /**
+   * Set visibility of the canvas.
+   * @param {boolean} visible
+   */
+  setVisible(visible) {
+    if (this.canvas) {
+      this.canvas.style.visibility = visible ? 'visible' : 'hidden';
+    }
   }
 
   /**
@@ -119,7 +123,7 @@ export default class Tracker {
    * Clear the canvas.
    */
   clear() {
-    if (this.canvas) {
+    if (this.canvasContext) {
       this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
   }
@@ -253,7 +257,6 @@ export default class Tracker {
    */
   destroy() {
     this.clear();
-    this.map.removeLayer(this.layer);
-    window.clearTimeout(this.renderTimeout);
+    unByKey([this.renderCompleteRef, this.changeSizeRef]);
   }
 }
