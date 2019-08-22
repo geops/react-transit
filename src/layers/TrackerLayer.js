@@ -1,7 +1,7 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { unByKey } from 'ol/Observable';
-import Layer from 'react-spatial/Layer';
+import Layer from 'react-spatial/layers/Layer';
 import { buffer, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
 import {
@@ -17,7 +17,7 @@ import {
 /**
  * Trackerlayer.
  * Responsible for loading tracker data.
- * extents Layer from {@link https://react-spatial.geops.de/docjs.html react-spatial/Layer}
+ * extents Layer from {@link https://react-spatial.geops.de/docjs.html react-spatial/layers/Layer}
  * @class
  * @inheritDoc
  * @param {Object} [options]
