@@ -14,6 +14,9 @@ class BasicMapExample extends React.Component {
   constructor(props) {
     super(props);
 
+    this.trackerLayer = new TrajservLayer({
+      onClick: f => console.log(f),
+    }),
     this.layers = [
       new Layer({
         name: 'Layer',
@@ -21,15 +24,16 @@ class BasicMapExample extends React.Component {
           source: new OSMSource(),
         }),
       }),
-      new TrajservLayer({
-        onClick: f => console.log(f),
-      }),
+      this.trackerLayer,
     ];
   }
 
   render() {
     return (
+      <>
       <BasicMap center={[951560, 6002550]} zoom={14} layers={this.layers} />
+      <button onClick={ ()=>{this.trackerLayer.setVisible(!this.trackerLayer.getVisible())}}>Toggle</button>
+      </>
     );
   }
 }

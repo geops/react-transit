@@ -222,12 +222,9 @@ class TrajservLayer extends TrackerLayer {
     });
   }
 
-  /**
-   * Destroy the layer.
-   */
-  destroy() {
-    super.destroy();
+  stop() {
     unByKey(this.onSingleClickRef);
+    super.stop();
   }
 
   /**
@@ -309,58 +306,59 @@ class TrajservLayer extends TrackerLayer {
    * Update the trajectories
    */
   updateTrajectories() {
-    if (this.getVisible()) {
-      this.fetchTrajectories(
-        `${this.url}/trajectory_collection?${this.getUrlParams({
-          attr_det: 1,
-        })}`,
-      ).then(data => {
-        const trajectories = [];
-        for (let i = 0; i < data.features.length; i += 1) {
-          const timeIntervals = [];
-          const traj = data.features[i];
-          const geometry = new LineString(traj.geometry.coordinates);
+    this.fetchTrajectories(
+      `${this.url}/trajectory_collection?${this.getUrlParams({
+        attr_det: 1,
+      })}`,
+    ).then(data => {
+      if (!data) {
+        return;
+      }
+      const trajectories = [];
+      for (let i = 0; i < data.features.length; i += 1) {
+        const timeIntervals = [];
+        const traj = data.features[i];
+        const geometry = new LineString(traj.geometry.coordinates);
 
-          const {
-            ID: id,
-            ProductIdentifier: type,
-            PublishedLineName: name,
-            Operator: operator,
-            TimeIntervals: intervals,
-            Color: color,
-            TextColor: textColor,
-            Delay: delay,
-          } = traj.properties;
-          // We have to find the index of the corresponding coordinate, for each timeInterval.
-          for (let k = 0; k < intervals.length; k += 1) {
-            const [timeAtCoord, timeFrac] = intervals[k];
-            const coord = geometry.getCoordinateAt(timeFrac);
-            const idx = geometry.getCoordinates().findIndex(c => {
-              // We use toFixed(4) because the results of getCoordinateAt can be 10 or more digits
-              // but the geometry's coordinates are never so precise.
-              return (
-                parseFloat(coord[0].toFixed(4)) === c[0] &&
-                parseFloat(coord[1].toFixed(4)) === c[1]
-              );
-            });
-            timeIntervals.push([timeAtCoord, idx]);
-          }
-          trajectories.push({
-            id,
-            type,
-            name,
-            color: color && `#${color}`,
-            textColor: textColor && `#${textColor}`,
-            delay,
-            operator,
-            timeIntervals,
-            geometry,
+        const {
+          ID: id,
+          ProductIdentifier: type,
+          PublishedLineName: name,
+          Operator: operator,
+          TimeIntervals: intervals,
+          Color: color,
+          TextColor: textColor,
+          Delay: delay,
+        } = traj.properties;
+        // We have to find the index of the corresponding coordinate, for each timeInterval.
+        for (let k = 0; k < intervals.length; k += 1) {
+          const [timeAtCoord, timeFrac] = intervals[k];
+          const coord = geometry.getCoordinateAt(timeFrac);
+          const idx = geometry.getCoordinates().findIndex(c => {
+            // We use toFixed(4) because the results of getCoordinateAt can be 10 or more digits
+            // but the geometry's coordinates are never so precise.
+            return (
+              parseFloat(coord[0].toFixed(4)) === c[0] &&
+              parseFloat(coord[1].toFixed(4)) === c[1]
+            );
           });
+          timeIntervals.push([timeAtCoord, idx]);
         }
+        trajectories.push({
+          id,
+          type,
+          name,
+          color: color && `#${color}`,
+          textColor: textColor && `#${textColor}`,
+          delay,
+          operator,
+          timeIntervals,
+          geometry,
+        });
+      }
 
-        this.tracker.setTrajectories(trajectories);
-      });
-    }
+      this.tracker.setTrajectories(trajectories);
+    });
   }
 }
 
