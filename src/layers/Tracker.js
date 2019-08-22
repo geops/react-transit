@@ -8,7 +8,10 @@ import { LineString } from 'ol/geom';
  */
 export default class Tracker {
   constructor(map, options) {
-    const opts = options || {};
+    const opts = {
+      interpolate: true,
+      ...options,
+    };
 
     this.interpolate = !!opts.interpolate;
 
@@ -201,8 +204,8 @@ export default class Tracker {
         if (start && end) {
           // interpolate position inside the time interval.
           const geomFrac = this.interpolate
-            ? 0
-            : Math.min((now - start) / (end - start), 1);
+            ? Math.min((now - start) / (end - start), 1)
+            : 0;
           let intervalGeom = geometry;
           if (nbCoords > 2) {
             intervalGeom = new LineString(
