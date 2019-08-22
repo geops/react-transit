@@ -201,8 +201,8 @@ export default class Tracker {
         if (start && end) {
           // interpolate position inside the time interval.
           const geomFrac = this.interpolate
-            ? Math.min((now - start) / (end - start), 1)
-            : 0;
+            ? 0
+            : Math.min((now - start) / (end - start), 1);
           let intervalGeom = geometry;
           if (nbCoords > 2) {
             intervalGeom = new LineString(
