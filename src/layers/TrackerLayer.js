@@ -113,13 +113,8 @@ class TrackerLayer extends Layer {
   start(map) {
     this.stop();
     this.tracker.setVisible(true);
-
     this.onMoveEndRef = map.on('moveend', () => this.onMoveEnd());
     this.onPointerMoveRef = map.on('pointermove', e => this.onPointerMove(e));
-    this.onPostRenderRef = map.on('postrender', () => {
-      this.tracker.renderTrajectory(this.currTime);
-    });
-
     this.tracker.renderTrajectory(this.currTime);
     this.startUpdateTrajectories();
     this.startUpdateTime();
@@ -134,7 +129,7 @@ class TrackerLayer extends Layer {
       this.tracker.clear();
       this.tracker.setVisible(false);
     }
-    unByKey([this.onMoveEndRef, this.onPointerMoveRef, this.onPostRenderRef]);
+    unByKey([this.onMoveEndRef, this.onPointerMoveRef]);
     this.stopUpdateTrajectories();
     this.stopUpdateTime();
     this.abortFetchTrajectories();
