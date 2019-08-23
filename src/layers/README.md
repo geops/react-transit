@@ -10,33 +10,18 @@ import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
 import TrajservLayer from 'react-transit/layers/TrajservLayer';
 
-class BasicMapExample extends React.Component {
-  constructor(props) {
-    super(props);
 
-    this.trackerLayer = new TrajservLayer({
-      onClick: f => console.log(f),
+const layers = [
+  new Layer({
+    name: 'Layer',
+    olLayer: new TileLayer({
+      source: new OSMSource(),
     }),
-    this.layers = [
-      new Layer({
-        name: 'Layer',
-        olLayer: new TileLayer({
-          source: new OSMSource(),
-        }),
-      }),
-      this.trackerLayer,
-    ];
-  }
+  }),
+  new TrajservLayer({
+    onClick: f => console.log(f),
+  }),
+];
 
-  render() {
-    return (
-      <>
-      <BasicMap center={[951560, 6002550]} zoom={14} layers={this.layers} />
-      <button onClick={ ()=>{this.trackerLayer.setVisible(!this.trackerLayer.getVisible())}}>Toggle</button>
-      </>
-    );
-  }
-}
-
-<BasicMapExample />;
+<BasicMap center={[951560, 6002550]} zoom={14} layers={layers} />;
 ```

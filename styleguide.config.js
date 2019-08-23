@@ -16,7 +16,7 @@ module.exports = {
     'abortcontroller-polyfill/dist/abortcontroller-polyfill-only',
   ],
   ribbon: {
-    url: 'https://github.com/geops/republic-transport',
+    url: 'https://github.com/geops/react-transit',
     text: 'Fork me on GitHub',
   },
   moduleAliases: {
@@ -36,6 +36,17 @@ module.exports = {
       exampleMode: 'collapse',
       usageMode: 'collapse',
     },
+    {
+      name: 'Layers',
+      sections: [
+        {
+          name: 'Tracker layer',
+          content: 'src/layers/README.md',
+          exampleMode: 'collapse',
+          usageMode: 'collapse',
+        },
+      ]
+    }
   ],
   webpackConfig: {
     module: {
