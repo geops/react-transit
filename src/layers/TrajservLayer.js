@@ -259,7 +259,7 @@ class TrajservLayer extends TrackerLayer {
         image: new Circle({
           radius: 4,
           fill: new Fill({
-            color: vehiculeColor,
+            color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
           }),
         }),
       }),
@@ -287,7 +287,7 @@ class TrajservLayer extends TrackerLayer {
       new Style({
         zIndex: 3,
         stroke: new Stroke({
-          color: vehiculeColor,
+          color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
           width: 4,
         }),
       }),

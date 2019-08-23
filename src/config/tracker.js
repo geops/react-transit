@@ -144,7 +144,7 @@ export const getDelayColor = (delayInMs, cancelled) => {
     return '#f7bf00'; // yellow { r: 247, g: 191, b: 0, s: '247,191,0' };
   }
   if (delayInMs === null) {
-    return '#a0a0a0';
+    return '#a0a0a0'; // grey { r: 160, g: 160, b: 160, s: '160,160,160' };
   }
   return '#00a00c'; // green { r: 0, g: 160, b: 12, s: '0,160,12' };
 };
