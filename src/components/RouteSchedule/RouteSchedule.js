@@ -39,18 +39,18 @@ const getDelayString = t => {
     return '0';
   }
   if (s === 0 && h === 0) {
-    return `${pad(m)}m`;
+    return `${m}m`;
   }
   if (s === 0) {
-    return `${pad(h)}h${pad(m)}m`;
+    return `${h}h${m}m`;
   }
   if (m === 0 && h === 0) {
-    return `${pad(s)}s`;
+    return `${s}s`;
   }
   if (h === 0) {
-    return `${pad(m)}m${pad(s)}s`;
+    return `${m}m${s}s`;
   }
-  return `${pad(h)}h${pad(m)}m${pad(s)}s`;
+  return `${h}h${m}m${s}s`;
 };
 
 /**
@@ -186,7 +186,7 @@ const renderStations = (lineInfos, onStationClick) => (
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
       >
         <div className="rt-route-delay">
-          {stop.arrivalDelay ? (
+          {typeof stop.arrivalDelay === 'undefined' || idx === 0 ? null : (
             <span
               className={`rt-route-delay-arrival${` ${getDelayColor(
                 stop.arrivalDelay,
@@ -194,8 +194,9 @@ const renderStations = (lineInfos, onStationClick) => (
             >
               {`+${getDelayString(stop.arrivalDelay)}`}
             </span>
-          ) : null}
-          {stop.departureDelay ? (
+          )}
+          {typeof stop.departureDelay === 'undefined' ||
+          idx === lineInfos.stations.length - 1 ? null : (
             <span
               className={`rt-route-delay-arrival${` ${getDelayColor(
                 stop.departureDelay,
@@ -203,7 +204,7 @@ const renderStations = (lineInfos, onStationClick) => (
             >
               {`+${getDelayString(stop.departureDelay)}`}
             </span>
-          ) : null}
+          )}
         </div>
         <div className="rt-route-times">
           <span className="rt-route-time-arrival">

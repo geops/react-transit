@@ -47,6 +47,11 @@
       cursor: pointer;
       border-radius: 4px;
 
+      &:first-child,
+      &:last-child {
+        font-weight: bold;
+      }
+
       &:hover {
         color: white;
         background-color: $primary-blue;
