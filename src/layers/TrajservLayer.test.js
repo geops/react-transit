@@ -1,10 +1,7 @@
 import 'jest-canvas-mock';
-// import Map from 'ol/Map';
-// import View from 'ol/View';
 import TrajservLayer from './TrajservLayer';
 
 let layer;
-// let map;
 let onClick;
 
 describe('VectorLayer', () => {
@@ -13,7 +10,6 @@ describe('VectorLayer', () => {
     layer = new TrajservLayer({
       onClick,
     });
-    // map = new Map({ view: new View({ resution: 5 }) });
   });
 
   test('should be instanced.', () => {
@@ -26,11 +22,4 @@ describe('VectorLayer', () => {
     layer.init();
     expect(spy).toHaveBeenCalledTimes(1);
   });
-
-  /* test('should add the layer on initialization.', () => {
-    const spy = jest.spyOn(map, 'addLayer');
-    layer.init(map);
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith(layer.olLayer);
-  }); */
 });
