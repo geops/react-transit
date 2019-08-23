@@ -255,7 +255,7 @@ class TrajservLayer extends TrackerLayer {
    */
   drawTrajectory(stationsCoords, lineCoords, color) {
     // Don't allow white lines, use red instead.
-    const vehiculeColor = /#ffffff/i.test(color) ? 'ff0000' : color;
+    const vehiculeColor = /#ffffff/i.test(color) ? '#ff0000' : color;
 
     const abovePointFeatures = new Feature({
       geometry: new MultiPoint(stationsCoords),
@@ -266,7 +266,7 @@ class TrajservLayer extends TrackerLayer {
         image: new Circle({
           radius: 4,
           fill: new Fill({
-            color: vehiculeColor,
+            color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
           }),
         }),
       }),
@@ -294,7 +294,7 @@ class TrajservLayer extends TrackerLayer {
       new Style({
         zIndex: 3,
         stroke: new Stroke({
-          color: vehiculeColor,
+          color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
           width: 4,
         }),
       }),

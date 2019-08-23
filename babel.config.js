@@ -1,11 +1,8 @@
 module.exports = {
-  presets: ['@babel/preset-env', '@babel/preset-react'],
   env: {
     test: {
-      plugins: [
-        '@babel/plugin-syntax-dynamic-import',
-        '@babel/plugin-transform-runtime',
-      ],
+      plugins: ['@babel/plugin-transform-runtime'], // for async/await
     },
   },
+  presets: ['@babel/preset-env', '@babel/preset-react'],
 };
