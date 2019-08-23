@@ -181,12 +181,18 @@ const renderStations = (lineInfos, onStationClick) => (
         key={stop.stationId}
         role="button"
         className="rt-route-station"
+        style={{
+          fontWeight:
+            idx === 0 || idx === lineInfos.stations.length - 1
+              ? ' bold'
+              : 'normal',
+        }}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
       >
         <div className="rt-route-delay">
-          {typeof stop.arrivalDelay !== 'undefined' ? (
+          {typeof stop.arrivalDelay === 'undefined' || idx === 0 ? null : (
             <span
               className={`rt-route-delay-arrival${` ${getDelayColor(
                 stop.arrivalDelay,
@@ -194,8 +200,9 @@ const renderStations = (lineInfos, onStationClick) => (
             >
               {`+${getDelayString(stop.arrivalDelay)}`}
             </span>
-          ) : null}
-          {typeof stop.departureDelay !== 'undefined' ? (
+          )}
+          {typeof stop.departureDelay === 'undefined' ||
+          idx === lineInfos.stations.length - 1 ? null : (
             <span
               className={`rt-route-delay-arrival${` ${getDelayColor(
                 stop.departureDelay,
@@ -203,7 +210,7 @@ const renderStations = (lineInfos, onStationClick) => (
             >
               {`+${getDelayString(stop.departureDelay)}`}
             </span>
-          ) : null}
+          )}
         </div>
         <div className="rt-route-times">
           <span className="rt-route-time-arrival">

@@ -31,6 +31,15 @@ const lineInfos = {
       departureDelay: 120000, // +2m
       departureTime: 609000000,
     },
+    {
+      stationId: '3',
+      stationName: 'third stop',
+      coordinates: [8.54119, 50],
+      arrivalDelay: 240000, // +4m
+      arrivalTime: 609000000,
+      departureDelay: 0, // +0
+      departureTime: 609000000,
+    },
   ],
   vehiculeType: 0,
 };
@@ -46,4 +55,9 @@ describe('RouteSchedule', () => {
   // to test: time formating
   // to test: delay formating
   // to test: delay color
+  // to test: no arrival delay on first station
+  // to test: no arrival date on first station
+  // to test: no departure delay on last station
+  // to test: no departure date on last station
+  // to test: font bold on first and last station
 });
