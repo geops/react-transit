@@ -27,8 +27,7 @@ function  TrackerControlExample()  {
   return (
     <>
       <BasicMap center={[951560, 6002550]} zoom={14} layers={layers}/>
-      <TrackerControl onChange={speed => trackerLayer.setSpeed(speed)}>
-      </TrackerControl>
+      <TrackerControl trackerLayer={trackerLayer} />
     </>
   );
 }

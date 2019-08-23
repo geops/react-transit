@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { FaPlay, FaForward, FaBackward } from 'react-icons/fa';
+import Button from 'react-spatial/components/Button';
+import { IoIosSpeedometer } from 'react-icons/io';
+import { FaPlay, FaForward, FaBackward, FaRegDotCircle } from 'react-icons/fa';
+
+import TrackerLayer from '../../layers/TrackerLayer';
 
 const increaseSpeed = speed => {
   let delta = 0.1;
@@ -29,51 +33,110 @@ const decreaseSpeed = speed => {
   return nextSpeed;
 };
 
-const defaultRenderButton = (icon, onClick) => {
+const defaultRenderButton = (icon, onClick, title) => {
   return (
-    <button type="button" onClick={onClick}>
+    <Button onClick={onClick} className="rt-control-button" title={title}>
       {icon}
-    </button>
+    </Button>
   );
 };
 
 function TrackerControl({
+  className,
+  iconDateReset,
   iconSpeedDown,
   iconSpeedReset,
   iconSpeedUp,
+  iconSpeed,
   renderButton,
-  onChange,
+  trackerLayer,
 }) {
   const [speed, setSpeed] = useState(1);
 
+  const onSpeedChange = newSpeed => {
+    trackerLayer.setSpeed(newSpeed);
+  };
+
+  const resetDate = () => {
+    trackerLayer.setCurrTime(new Date());
+  };
+
   useEffect(() => {
-    onChange(speed);
-  }, [speed, onChange]);
+    onSpeedChange(speed);
+  }, [speed, onSpeedChange]);
 
   return (
-    <>
-      {renderButton(iconSpeedDown, () => setSpeed(decreaseSpeed(speed)))}
-      {renderButton(iconSpeedReset, () => setSpeed(1))}
-      {renderButton(iconSpeedUp, () => setSpeed(increaseSpeed(speed)))}
-      <span>{`${speed < 1 ? speed.toFixed(1) : speed}x`}</span>
-    </>
+    <div className={className}>
+      {renderButton(iconDateReset, () => resetDate(), 'reset date')}
+      {renderButton(
+        iconSpeedDown,
+        () => setSpeed(decreaseSpeed(speed)),
+        'speed down',
+      )}
+      {renderButton(iconSpeedReset, () => setSpeed(1), 'speed reset')}
+      {renderButton(
+        iconSpeedUp,
+        () => setSpeed(increaseSpeed(speed)),
+        'speed up',
+      )}
+      <div className="rt-tracker-speed">
+        {iconSpeed}
+        {`${speed < 1 ? speed.toFixed(1) : speed}`}
+      </div>
+    </div>
   );
 }
 
 TrackerControl.propTypes = {
+  /**
+   * CSS class of the tracker control.
+   */
+  className: PropTypes.string,
+
+  /**
+   * Icon of the date reset button.
+   */
+  iconDateReset: PropTypes.element,
+
+  /**
+   * Icon of the speed down button.
+   */
   iconSpeedDown: PropTypes.element,
+
+  /**
+   * Icon of the speed up button.
+   */
   iconSpeedUp: PropTypes.element,
+
+  /**
+   * Icon of the speed reset button.
+   */
   iconSpeedReset: PropTypes.element,
+
+  /**
+   * Icon speed.
+   */
+  iconSpeed: PropTypes.element,
+
+  /**
+   * Render function for buttons.
+   */
   renderButton: PropTypes.func,
-  onChange: PropTypes.func,
+
+  /**
+   * Trackerlayer.
+   */
+  trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
 };
 
 TrackerControl.defaultProps = {
+  className: 'rt-tracker-control',
+  iconDateReset: <FaRegDotCircle />,
   iconSpeedDown: <FaBackward />,
   iconSpeedReset: <FaPlay />,
   iconSpeedUp: <FaForward />,
+  iconSpeed: <IoIosSpeedometer />,
   renderButton: defaultRenderButton,
-  onChange: () => {},
 };
 
 export default TrackerControl;
