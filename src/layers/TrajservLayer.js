@@ -248,7 +248,7 @@ class TrajservLayer extends TrackerLayer {
    */
   drawTrajectory(stationsCoords, lineCoords, color) {
     // Don't allow white lines, use red instead.
-    const vehiculeColor = /#ffffff/i.test(color) ? 'ff0000' : color;
+    const vehiculeColor = /#ffffff/i.test(color) ? '#ff0000' : color;
 
     const abovePointFeatures = new Feature({
       geometry: new MultiPoint(stationsCoords),
