@@ -8268,7 +8268,7 @@ obuf@^1.0.0, obuf@^1.1.2:
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
-ol@^6.0.0-beta.11:
+ol@^6.0.0-beta.11, ol@^6.0.0-beta.13:
   version "6.0.0-beta.15"
   resolved "https://registry.yarnpkg.com/ol/-/ol-6.0.0-beta.15.tgz#f648566784749f8a3c12717ba4d28e0ee652e8ac"
   integrity sha512-J0gZ5pYGrER2WJSuIBh6QDNMn15xPRmpJJACnsgexSbaapOBOWEbv8z+yaYkTtWq+I1/quzBs9e4cLUB7R/I3w==
@@ -9502,11 +9502,12 @@ react-simple-code-editor@^0.9.7:
   resolved "https://registry.yarnpkg.com/react-simple-code-editor/-/react-simple-code-editor-0.9.14.tgz#5b8fdc36a975cbf02fdafa2597398d8e212afebc"
   integrity sha512-doNaIIt4w7QIiB6ysWHMtYL4M3xOGPvZJH8vGq3W/hGk43pn25RDA27IS8GkbfhA1eLX72CWDhuC7KmDKax13g==
 
-react-spatial@^0.1.0-beta.2:
+react-spatial@../react-spatial/build:
   version "0.1.0-beta.6"
-  resolved "https://registry.yarnpkg.com/react-spatial/-/react-spatial-0.1.0-beta.6.tgz#255a051580c617d98003d6d4baf17f6e21baa109"
-  integrity sha512-G2SrjQfyoWpefHOAKGgCfX/l1BgTV5KK6lQcsIQ3503d3bMyK49qRdcJBjvRuYSPGeKRB0Q18GoHzyKUWoExEA==
   dependencies:
+    mapbox-gl "^1.2.0"
+    ol "^6.0.0-beta.11"
+    ole "^0.0.4-beta.10"
     query-string "^6.4.2"
     react-draggable "^3.3.1"
     react-icons "^3.4.0"

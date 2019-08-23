@@ -20,15 +20,18 @@ export default class Tracker {
 
     // we draw directly on the canvas since openlayers is too slow
     this.canvas = opts.canvas || document.createElement('canvas');
-    this.canvas.style = [
-      'position: absolute',
-      'top: 0',
-      'bottom: 0',
-      'right: 0',
-      'left: 0',
-      'pointer-events: none',
-      'visibility: visible',
-    ].join(';');
+    this.canvas.setAttribute(
+      'style',
+      [
+        'position: absolute',
+        'top: 0',
+        'bottom: 0',
+        'right: 0',
+        'left: 0',
+        'pointer-events: none',
+        'visibility: visible',
+      ].join(';'),
+    );
     this.canvasContext = this.canvas.getContext('2d');
 
     this.renderCompleteRef = this.map.once('rendercomplete', () => {

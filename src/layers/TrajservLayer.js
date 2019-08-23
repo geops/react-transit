@@ -173,6 +173,10 @@ class TrajservLayer extends TrackerLayer {
   init(map) {
     super.init(map);
 
+    if (!this.map) {
+      return;
+    }
+
     // Setting filters from the permalink.
     const parameters = qs.parse(window.location.search);
     const trainParam = parameters[TRAIN_FILTER];
@@ -202,6 +206,9 @@ class TrajservLayer extends TrackerLayer {
   }
 
   start() {
+    if (!this.map) {
+      return;
+    }
     super.start(this.map);
 
     this.onSingleClickRef = this.map.on('singleclick', e => {
@@ -366,11 +373,9 @@ class TrajservLayer extends TrackerLayer {
     });
 
     const url = `${this.url}/trajectorybyid?${params}`;
-    return fetch(url)
-      .then(res => {
-        return res.json();
-      })
-      .then(resp => resp);
+    return fetch(url).then(res => {
+      return res.json();
+    });
   }
 
   /**
@@ -488,7 +493,6 @@ class TrajservLayer extends TrackerLayer {
           cancelled,
         });
       }
-
       this.tracker.setTrajectories(trajectories);
     });
   }

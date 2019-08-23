@@ -89,6 +89,10 @@ class TrackerLayer extends Layer {
    */
   init(map) {
     super.init(map);
+    if (!this.map) {
+      return;
+    }
+
     this.tracker = new Tracker(this.map);
     this.tracker.setStyle((props, r) => this.style(props, r));
 
@@ -154,6 +158,7 @@ class TrackerLayer extends Layer {
       stopPropagationUp,
       stopPropagationSiblings,
     );
+
     if (this.getVisible()) {
       this.start(this.map);
     } else {
@@ -184,11 +189,10 @@ class TrackerLayer extends Layer {
   startUpdateTime() {
     this.stopUpdateTime();
     this.updateTime = setInterval(() => {
-      this.currTime.setMilliseconds(
-        this.currTime.getMilliseconds() +
-          (new Date() - this.lastUpdateTime) * this.speed,
-      );
-      this.setCurrTime(this.currTime);
+      const newTime =
+        this.currTime.getTime() +
+        (new Date() - this.lastUpdateTime) * this.speed;
+      this.setCurrTime(newTime);
     }, 1000 / this.fps);
   }
 
