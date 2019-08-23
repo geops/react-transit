@@ -17,7 +17,7 @@ const lineInfos = {
       stationId: '1',
       stationName: 'first stop',
       coordinates: [8.51772, 47.3586],
-      arrivalDelay: 60000,
+      arrivalDelay: 60000, // +1m
       arrivalTime: 603000000,
       departureDelay: 60000,
       departureTime: 603000000,
@@ -26,9 +26,9 @@ const lineInfos = {
       stationId: '2',
       stationName: 'second stop',
       coordinates: [8.54119, 47.36646],
-      arrivalDelay: 120000,
+      arrivalDelay: 0, // +0
       arrivalTime: 609000000,
-      departureDelay: 120000,
+      departureDelay: 120000, // +2m
       departureTime: 609000000,
     },
   ],
