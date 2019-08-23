@@ -39,11 +39,6 @@ exports[`RouteSchedule matches snapshots. 1`] = `
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
-      style={
-        Object {
-          "fontWeight": " bold",
-        }
-      }
       tabIndex={0}
     >
       <div
@@ -85,11 +80,6 @@ exports[`RouteSchedule matches snapshots. 1`] = `
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
-      style={
-        Object {
-          "fontWeight": "normal",
-        }
-      }
       tabIndex={0}
     >
       <div
@@ -136,11 +126,6 @@ exports[`RouteSchedule matches snapshots. 1`] = `
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
-      style={
-        Object {
-          "fontWeight": " bold",
-        }
-      }
       tabIndex={0}
     >
       <div

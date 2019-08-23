@@ -181,12 +181,6 @@ const renderStations = (lineInfos, onStationClick) => (
         key={stop.stationId}
         role="button"
         className="rt-route-station"
-        style={{
-          fontWeight:
-            idx === 0 || idx === lineInfos.stations.length - 1
-              ? ' bold'
-              : 'normal',
-        }}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
