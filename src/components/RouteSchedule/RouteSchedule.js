@@ -185,31 +185,27 @@ const defaultProps = {
   stations: null,
   onStationClick: () => {},
 };
-
-const renderHeader = lineInfos => (
-  <div className="rt-route-header">
-    <span
-      style={{
-        backgroundColor:
-          lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
-        color: lineInfos.color || 'black',
-      }}
-      className="rt-route-icon"
-    >
-      {lineInfos.shortName}
-    </span>
-    <div className="rt-route-title">
-      <span className="rt-route-name">{lineInfos.destination}</span>
-      <span>
-        {`${lineInfos.longName} ${
-          lineInfos.routeIdentifier.split('.')
-            ? `(${lineInfos.routeIdentifier.split('.')[0]})`
-            : ''
-        }`}
+const renderHeader = lineInfos => {
+  const routeId = lineInfos.routeIdentifier.split('.')[0];
+  return (
+    <div className="rt-route-header">
+      <span
+        style={{
+          backgroundColor:
+            lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
+          color: lineInfos.color || 'black',
+        }}
+        className="rt-route-icon"
+      >
+        {lineInfos.shortName}
       </span>
+      <div className="rt-route-title">
+        <span className="rt-route-name">{lineInfos.destination}</span>
+        <span>{`${lineInfos.longName} ${routeId ? `(${routeId})` : ''}`}</span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const renderStations = (lineInfos, onStationClick, trackerLayer) => (
   <div className="rt-route-body">
