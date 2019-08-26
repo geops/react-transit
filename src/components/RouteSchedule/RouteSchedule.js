@@ -5,6 +5,8 @@ import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
 import { bgColors } from '../../config/tracker';
 
+import TrackerLayer from '../../layers/TrackerLayer';
+
 /**
  * Returns a paded number (with leading 0 for integer < 10).
  * @param {Number} number number.
@@ -75,6 +77,14 @@ const getDelayColor = time => {
 };
 
 /**
+ * Returns if the station has already been passed by the vehicule.
+ * @param {Object} stop Station information.
+ */
+const isPassed = (stop, time) => {
+  return stop.departureDate * 1000 + stop.departureDelay <= time;
+};
+
+/**
  * Returns an image for first, middle or last stations.
  * @param {Number} index index of the station in the list.
  * @param {Number} length Length of the stations list.
@@ -126,10 +136,31 @@ const propTypes = {
     operatorUrl: PropTypes.string,
     realTime: PropTypes.number,
     shortName: PropTypes.string,
-    stations: PropTypes.array,
+    stations: PropTypes.arrayOf(
+      PropTypes.shape({
+        arrivalDate: PropTypes.number, // time in milliseconds.
+        arrivalDelay: PropTypes.number, // time in milliseconds.
+        arrivaleTime: PropTypes.number, // time in milliseconds.
+        cancelled: PropTypes.number,
+        coordinates: PropTypes.arrayOf(PropTypes.number),
+        departureDate: PropTypes.number, // time in milliseconds.
+        departureDelay: PropTypes.number, // time in milliseconds.
+        departureTime: PropTypes.number, // time in milliseconds.
+        noDropOff: PropTypes.number,
+        noPickUp: PropTypes.number,
+        stationId: PropTypes.string,
+        stationName: PropTypes.string,
+        wheelchairAccessible: PropTypes.number,
+      }),
+    ),
     vehiculeType: PropTypes.number,
     wheelchairAccessible: PropTypes.number,
   }),
+
+  /**
+   * Trackerlayer.
+   */
+  trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
 
   /**
    * Render Header of the route scheduler.
@@ -154,7 +185,6 @@ const defaultProps = {
   stations: null,
   onStationClick: () => {},
 };
-
 const renderHeader = lineInfos => (
   <div className="rt-route-header">
     <span
@@ -169,18 +199,22 @@ const renderHeader = lineInfos => (
     </span>
     <div className="rt-route-title">
       <span className="rt-route-name">{lineInfos.destination}</span>
-      <span>{lineInfos.longName}</span>
+      <span>
+        {`${lineInfos.longName} (${lineInfos.routeIdentifier.split('.')[0]})`}
+      </span>
     </div>
   </div>
 );
 
-const renderStations = (lineInfos, onStationClick) => (
+const renderStations = (lineInfos, onStationClick, trackerLayer) => (
   <div className="rt-route-body">
     {lineInfos.stations.map((stop, idx) => (
       <div
         key={stop.stationId}
         role="button"
-        className="rt-route-station"
+        className={`rt-route-station${
+          isPassed(stop, trackerLayer.getCurrTime()) ? ' rt-passed' : ''
+        }`}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
@@ -238,11 +272,12 @@ function RouteSchedule({
   header,
   stations,
   onStationClick,
+  trackerLayer,
 }) {
   return lineInfos ? (
     <div className={className}>
       {header || renderHeader(lineInfos)}
-      {stations || renderStations(lineInfos, onStationClick)}
+      {stations || renderStations(lineInfos, onStationClick, trackerLayer)}
     </div>
   ) : null;
 }
