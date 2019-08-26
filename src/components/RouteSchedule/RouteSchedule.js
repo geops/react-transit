@@ -200,7 +200,13 @@ const renderHeader = lineInfos => (
     </span>
     <div className="rt-route-title">
       <span className="rt-route-name">{lineInfos.destination}</span>
-      <span>{lineInfos.longName}</span>
+      <span>
+        {`${lineInfos.longName} ${
+          lineInfos.routeIdentifier.split('.')
+            ? `(${lineInfos.routeIdentifier.split('.')[0]})`
+            : ''
+        }`}
+      </span>
     </div>
   </div>
 );

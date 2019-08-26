@@ -11,6 +11,7 @@ const lineInfos = {
   backgroundColor: 'ff8a00',
   destination: 'Station name',
   id: 9959310,
+  routeIdentifier: '03634.003849.004:9',
   longName: 'T 3',
   shortName: '3',
   stations: [

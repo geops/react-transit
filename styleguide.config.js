@@ -45,8 +45,8 @@ module.exports = {
           exampleMode: 'collapse',
           usageMode: 'collapse',
         },
-      ]
-    }
+      ],
+    },
   ],
   webpackConfig: {
     module: {

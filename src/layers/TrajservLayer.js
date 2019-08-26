@@ -8,7 +8,8 @@ import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
 import { getBgColor } from '../config/tracker';
 
-const TRAIN_FILTER = 'train_filter';
+const LINE_FILTER = 'line_filter';
+const ROUTE_FILTER = 'route_filter';
 const OPERATOR_FILTER = 'operator_filter';
 
 /**
@@ -92,6 +93,7 @@ class TrajservLayer extends TrackerLayer {
       ba: bicyclesAllowed,
       rt: realTime,
       fid: feedsId,
+      rid: routeIdentifier,
     } = resp;
 
     const backgroundColor = resp.c && `#${resp.c}`;
@@ -103,6 +105,7 @@ class TrajservLayer extends TrackerLayer {
       backgroundColor,
       color,
       vehiculeType,
+      routeIdentifier,
       longName,
       shortName,
       stations,
@@ -123,21 +126,33 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Create a filter based on train and operator
-   * @param {string} train
+   * @param {string} line
+   * @param {string} route
    * @param {string} operator
    */
-  static createFilter(train, operator) {
+  static createFilter(line, route, operator) {
     const filterList = [];
 
-    if (!train && !operator) {
+    if (!line && !route && !operator) {
       return null;
     }
 
-    if (train) {
-      const trainList = typeof train === 'string' ? [train] : train;
-      const trainFilter = t =>
-        trainList.some(tr => new RegExp(tr, 'i').test(t.name));
-      filterList.push(trainFilter);
+    if (line) {
+      const lineList = typeof line === 'string' ? [line] : line;
+      const lineFilter = t => {
+        return lineList.some(tr => new RegExp(tr, 'i').test(t.name));
+      };
+      filterList.push(lineFilter);
+    }
+
+    if (route) {
+      const routeList = typeof route === 'string' ? [route] : route;
+      const routeFilter = t => {
+        const routeSplittedId = t.routeIdentifier.split('.');
+        const routeId = routeSplittedId.length ? routeSplittedId[0] : null;
+        return routeList.some(tr => new RegExp(tr, 'i').test(routeId));
+      };
+      filterList.push(routeFilter);
     }
 
     if (operator) {
@@ -163,7 +178,11 @@ class TrajservLayer extends TrackerLayer {
     this.url = options.url || 'https://api.geops.io/tracker';
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
-    this.filterFc = TrajservLayer.createFilter(options.train, options.operator);
+    this.filterFc = TrajservLayer.createFilter(
+      options.line,
+      options.route,
+      options.operator,
+    );
   }
 
   /**
@@ -179,12 +198,14 @@ class TrajservLayer extends TrackerLayer {
 
     // Setting filters from the permalink.
     const parameters = qs.parse(window.location.search);
-    const trainParam = parameters[TRAIN_FILTER];
+    const lineParam = parameters[LINE_FILTER];
+    const routeParam = parameters[ROUTE_FILTER];
     const opParam = parameters[OPERATOR_FILTER];
 
-    if (trainParam || opParam) {
+    if (lineParam || routeParam || opParam) {
       this.filterFc = TrajservLayer.createFilter(
-        trainParam ? trainParam.split(',') : undefined,
+        lineParam ? lineParam.split(',') : undefined,
+        routeParam ? routeParam.split(',') : undefined,
         opParam ? opParam.split(',') : undefined,
       );
     }
@@ -458,6 +479,7 @@ class TrajservLayer extends TrackerLayer {
           ProductIdentifier: type,
           JourneyIdentifier: journeyIdentifier,
           PublishedLineName: name,
+          RouteIdentifier: routeIdentifier,
           Operator: operator,
           TimeIntervals: intervals,
           Color: color,
@@ -488,6 +510,7 @@ class TrajservLayer extends TrackerLayer {
           delay,
           operator,
           journeyIdentifier,
+          routeIdentifier,
           timeIntervals,
           geometry,
           cancelled,
