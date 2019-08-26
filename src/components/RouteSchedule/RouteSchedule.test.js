@@ -2,6 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import TrajservLayer from '../../layers/TrajservLayer';
 import RouteSchedule from '.';
 
 configure({ adapter: new Adapter() });
@@ -46,7 +47,10 @@ const lineInfos = {
 
 describe('RouteSchedule', () => {
   test('matches snapshots.', () => {
-    const component = renderer.create(<RouteSchedule lineInfos={lineInfos} />);
+    const trackerLayer = new TrajservLayer();
+    const component = renderer.create(
+      <RouteSchedule lineInfos={lineInfos} trackerLayer={trackerLayer} />,
+    );
     const tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   });

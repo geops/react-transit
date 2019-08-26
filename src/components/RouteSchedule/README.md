@@ -37,7 +37,7 @@ function RouteScheduleExample() {
   return (
     <div className="rt-route-schedule-example">
       <BasicMap center={center} zoom={zoom} layers={layers} />
-      <RouteSchedule lineInfos={lineInfos} />
+      <RouteSchedule lineInfos={lineInfos} trackerLayer={trackerLayer} />
     </div>
   );
 }

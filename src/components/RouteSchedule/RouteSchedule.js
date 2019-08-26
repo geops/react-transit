@@ -5,6 +5,8 @@ import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
 import { bgColors } from '../../config/tracker';
 
+import TrackerLayer from '../../layers/TrackerLayer';
+
 /**
  * Returns a paded number (with leading 0 for integer < 10).
  * @param {Number} number number.
@@ -78,8 +80,8 @@ const getDelayColor = time => {
  * Returns if the station has already been passed by the vehicule.
  * @param {Object} stop Station information.
  */
-const isPassed = stop => {
-  return stop.departureDate * 1000 + stop.departureDelay <= new Date();
+const isPassed = (stop, time) => {
+  return stop.departureDate * 1000 + stop.departureDelay <= time;
 };
 
 /**
@@ -156,6 +158,11 @@ const propTypes = {
   }),
 
   /**
+   * Trackerlayer.
+   */
+  trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
+
+  /**
    * Render Header of the route scheduler.
    */
   header: PropTypes.func,
@@ -198,13 +205,15 @@ const renderHeader = lineInfos => (
   </div>
 );
 
-const renderStations = (lineInfos, onStationClick) => (
+const renderStations = (lineInfos, onStationClick, trackerLayer) => (
   <div className="rt-route-body">
     {lineInfos.stations.map((stop, idx) => (
       <div
         key={stop.stationId}
         role="button"
-        className={`rt-route-station${isPassed(stop) ? ' passed' : ''}`}
+        className={`rt-route-station${
+          isPassed(stop, trackerLayer.getCurrTime()) ? ' passed' : ''
+        }`}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
@@ -262,11 +271,12 @@ function RouteSchedule({
   header,
   stations,
   onStationClick,
+  trackerLayer,
 }) {
   return lineInfos ? (
     <div className={className}>
       {header || renderHeader(lineInfos)}
-      {stations || renderStations(lineInfos, onStationClick)}
+      {stations || renderStations(lineInfos, onStationClick, trackerLayer)}
     </div>
   ) : null;
 }
