@@ -75,6 +75,14 @@ const getDelayColor = time => {
 };
 
 /**
+ * Returns if the station has already been passed by the vehicule.
+ * @param {Object} stop Station information.
+ */
+const isPassed = stop => {
+  return stop.departureDate * 1000 + stop.departureDelay <= new Date();
+};
+
+/**
  * Returns an image for first, middle or last stations.
  * @param {Number} index index of the station in the list.
  * @param {Number} length Length of the stations list.
@@ -126,7 +134,23 @@ const propTypes = {
     operatorUrl: PropTypes.string,
     realTime: PropTypes.number,
     shortName: PropTypes.string,
-    stations: PropTypes.array,
+    stations: PropTypes.arrayOf(
+      PropTypes.shape({
+        arrivalDate: PropTypes.number, // time in milliseconds.
+        arrivalDelay: PropTypes.number, // time in milliseconds.
+        arrivaleTime: PropTypes.number, // time in milliseconds.
+        cancelled: PropTypes.number,
+        coordinates: PropTypes.arrayOf(PropTypes.number),
+        departureDate: PropTypes.number, // time in milliseconds.
+        departureDelay: PropTypes.number, // time in milliseconds.
+        departureTime: PropTypes.number, // time in milliseconds.
+        noDropOff: PropTypes.number,
+        noPickUp: PropTypes.number,
+        stationId: PropTypes.string,
+        stationName: PropTypes.string,
+        wheelchairAccessible: PropTypes.number,
+      }),
+    ),
     vehiculeType: PropTypes.number,
     wheelchairAccessible: PropTypes.number,
   }),
@@ -180,7 +204,7 @@ const renderStations = (lineInfos, onStationClick) => (
       <div
         key={stop.stationId}
         role="button"
-        className="rt-route-station"
+        className={`rt-route-station${isPassed(stop) ? ' passed' : ''}`}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}

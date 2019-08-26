@@ -91,6 +91,16 @@
       }
     }
 
+    .rt-route-station.passed {
+      opacity: 0.7;
+
+      .rt-route-delay {
+        span {
+          display: none;
+        }
+      }
+    }
+
     .rt-route-station:first-child {
       .rt-route-time-arrival {
         display: none;
