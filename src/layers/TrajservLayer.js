@@ -147,8 +147,7 @@ class TrajservLayer extends TrackerLayer {
     }
 
     if (line && !regexLine) {
-      const lineFiltersList =
-        typeof lineOption === 'string' ? line.split(',') : line;
+      const lineFiltersList = typeof line === 'string' ? line.split(',') : line;
       const lineList = lineFiltersList.map(l =>
         l.replace(/\s+/g, '').toUpperCase(),
       );
