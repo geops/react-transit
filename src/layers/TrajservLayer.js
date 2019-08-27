@@ -8,9 +8,9 @@ import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
 import { getBgColor } from '../config/tracker';
 
-const LINE_FILTER = 'line_filter';
-const ROUTE_FILTER = 'route_filter';
-const OPERATOR_FILTER = 'operator_filter';
+const LINE_FILTER = 'PublishedLineName';
+const ROUTE_FILTER = 'TripNumber';
+const OPERATOR_FILTER = 'Operator';
 
 /**
  * Responsible for loading tracker data from Trajserv.
@@ -130,29 +130,42 @@ class TrajservLayer extends TrackerLayer {
    * @param {string} route
    * @param {string} operator
    */
-  static createFilter(line, route, operator) {
+  static createFilter(line, trip, operator, regexLine) {
     const filterList = [];
 
-    if (!line && !route && !operator) {
+    if (!line && !trip && !operator && !regexLine) {
       return null;
     }
 
-    if (line) {
-      const lineList = typeof line === 'string' ? [line] : line;
-      const lineFilter = t => {
-        return lineList.some(tr => new RegExp(tr, 'i').test(t.name));
+    if (regexLine) {
+      // regexLine has higher prio over line filter
+      const regexLineList =
+        typeof regexLine === 'string' ? [regexLine] : regexLine;
+      const lineFilter = t =>
+        regexLineList.some(tr => new RegExp(tr, 'i').test(t.name));
+      filterList.push(lineFilter);
+    }
+
+    if (line && !regexLine) {
+      const lineFiltersList =
+        typeof lineOption === 'string' ? line.split(',') : line;
+      const lineList = lineFiltersList.map(l =>
+        l.replace(/\s+/g, '').toUpperCase(),
+      );
+      const lineFilter = l => {
+        return lineList.some(filter => filter === l.name.toUpperCase());
       };
       filterList.push(lineFilter);
     }
 
-    if (route) {
-      const routeList = typeof route === 'string' ? [route] : route;
-      const routeFilter = t => {
-        const routeSplittedId = t.routeIdentifier.split('.');
-        const routeId = routeSplittedId.length ? routeSplittedId[0] : null;
-        return routeList.some(tr => new RegExp(tr, 'i').test(routeId));
+    if (trip) {
+      const tripFilters = typeof trip === 'string' ? trip.split(',') : trip;
+      const tripList = tripFilters.map(rt => parseInt(rt, 10));
+      const tripFilter = t => {
+        const tripId = parseInt(t.routeIdentifier.split('.')[0], 10);
+        return tripList.some(tr => tr === tripId);
       };
-      filterList.push(routeFilter);
+      filterList.push(tripFilter);
     }
 
     if (operator) {
@@ -179,9 +192,10 @@ class TrajservLayer extends TrackerLayer {
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.filterFc = TrajservLayer.createFilter(
-      options.line,
-      options.route,
-      options.operator,
+      options.PublishedLineName,
+      options.TripNumber,
+      options.Operator,
+      options.regexPublishedLineName,
     );
   }
 

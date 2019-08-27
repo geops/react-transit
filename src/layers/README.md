@@ -4,11 +4,11 @@ This demonstrates the use of TrajservLayer.
 
 Filter possibility (case insensitive):
 
-| Options  | Description            | Examples                                                                  |
-|----------|------------------------|---------------------------------------------------------------------------|
-| operator | filter by operator     | string: 'sbb', list: '(vbz\|zsg)'                                         |
-| line     | filter by line number  | string: 'ICE',  list: '(s9\|s15\|s10)'                                    |
-| route    | filter by route number | ferry in zurich: '01012', list of funiculars in Zurich: '(00191\|00040)'  |
+| Options           | Description            | Examples                                                               |
+|-------------------|------------------------|------------------------------------------------------------------------|
+| Operator          | filter by operator     | string: 'sbb', list (regex): '(vbz\|zsg)'                              |
+| PublishedLineName | filter by line name    | string: 'ICE',  list: 'S9,S15,S10'                                     |
+| TripNumber        | filter by trip number  | bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'  |
 
 
 ```jsx
