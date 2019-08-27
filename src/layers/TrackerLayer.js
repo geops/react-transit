@@ -127,6 +127,7 @@ class TrackerLayer extends Layer {
         this.tracker.renderTrajectory(this.currTime);
       }
     });
+    this.tracker.renderTrajectory(this.currTime);
     this.startUpdateTrajectories();
     this.startUpdateTime();
   }
