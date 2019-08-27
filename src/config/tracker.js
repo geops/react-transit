@@ -68,10 +68,10 @@ export const timeSteps = [
   90,
   60,
   50,
-  40,
-  30,
-  20,
-  20,
+  50,
+  50,
+  50,
+  50,
 ];
 
 export const getRadius = (type = 0, zoom) => {

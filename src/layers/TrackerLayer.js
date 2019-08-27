@@ -71,8 +71,6 @@ class TrackerLayer extends Layer {
 
     this.speed = 1;
 
-    this.fps = 60;
-
     this.clickCallbacks = [];
 
     this.delayOutlineColor = options.delayOutlineColor || '#000000';
@@ -99,7 +97,7 @@ class TrackerLayer extends Layer {
     this.tracker.setStyle((props, r) => this.style(props, r));
 
     if (this.getVisible()) {
-      this.start(map);
+      this.start();
     }
   }
 
@@ -116,15 +114,22 @@ class TrackerLayer extends Layer {
    * Trackerlayer is started
    * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
    */
-  start(map) {
+  start() {
     this.stop();
     this.tracker.setVisible(true);
-    this.onMoveEndRef = map.on('moveend', () => this.onMoveEnd());
-    this.onPointerMoveRef = map.on('pointermove', e => this.onPointerMove(e));
+    this.onMoveStartRef = this.map.on('movestart', () => this.onMoveStart());
+    this.onMoveEndRef = this.map.on('moveend', () => this.onMoveEnd());
+    this.onPointerMoveRef = this.map.on('pointermove', e =>
+      this.onPointerMove(e),
+    );
+    this.onPostRenderRef = this.map.on('postrender', () => {
+      if (this.isMapMoving) {
+        this.tracker.renderTrajectory(this.currTime);
+      }
+    });
     this.tracker.renderTrajectory(this.currTime);
     this.startUpdateTrajectories();
     this.startUpdateTime();
-    this.updateTrajectories();
   }
 
   /**
@@ -135,7 +140,12 @@ class TrackerLayer extends Layer {
       this.tracker.clear();
       this.tracker.setVisible(false);
     }
-    unByKey([this.onMoveEndRef, this.onPointerMoveRef]);
+    unByKey([
+      this.onMoveStartRef,
+      this.onMoveEndRef,
+      this.onPointerMoveRef,
+      this.onPostRenderRef,
+    ]);
     this.stopUpdateTrajectories();
     this.stopUpdateTime();
     this.abortFetchTrajectories();
@@ -162,7 +172,7 @@ class TrackerLayer extends Layer {
     );
 
     if (this.getVisible()) {
-      this.start(this.map);
+      this.start();
     } else {
       this.stop();
     }
@@ -182,7 +192,7 @@ class TrackerLayer extends Layer {
    * Stop the update of trajectories.
    */
   stopUpdateTrajectories() {
-    window.clearInterval(this.updateInterval);
+    clearInterval(this.updateInterval);
   }
 
   /**
@@ -195,14 +205,14 @@ class TrackerLayer extends Layer {
         this.currTime.getTime() +
         (new Date() - this.lastUpdateTime) * this.speed;
       this.setCurrTime(newTime);
-    }, 1000 / this.fps);
+    }, this.getRefreshTimeInMs());
   }
 
   /**
    * Stop to update time
    */
   stopUpdateTime() {
-    window.clearInterval(this.updateTime);
+    clearInterval(this.updateTime);
   }
 
   /**
@@ -221,7 +231,9 @@ class TrackerLayer extends Layer {
     const newTime = new Date(time);
     this.currTime = newTime;
     this.lastUpdateTime = new Date();
-    this.tracker.renderTrajectory(this.currTime);
+    if (!this.isMapMoving) {
+      this.tracker.renderTrajectory(this.currTime);
+    }
   }
 
   /**
@@ -238,6 +250,7 @@ class TrackerLayer extends Layer {
    */
   setSpeed(speed) {
     this.speed = speed;
+    this.start();
   }
 
   /**
@@ -285,17 +298,26 @@ class TrackerLayer extends Layer {
     return null;
   }
 
+  getRefreshTimeInMs() {
+    const z = this.map.getView().getZoom();
+    const roundedZoom = Math.round(z);
+    const timeStep = timeSteps[roundedZoom] || 25;
+    const nextTick = Math.max(25, timeStep / this.speed);
+    return nextTick;
+  }
+
+  onMoveStart() {
+    this.isMapMoving = true;
+  }
+
   onMoveEnd() {
+    this.isMapMoving = false;
     const z = this.map.getView().getZoom();
 
     if (z !== this.currentZoom) {
       this.currentZoom = z;
-      this.fps = Math.round(
-        Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
-      );
       this.startUpdateTime();
     }
-    this.tracker.renderTrajectory(this.currTime);
     this.updateTrajectories();
   }
 
