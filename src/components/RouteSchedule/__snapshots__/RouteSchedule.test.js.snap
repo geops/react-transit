@@ -27,7 +27,8 @@ exports[`RouteSchedule matches snapshots. 1`] = `
         Station name
       </span>
       <span>
-        T 3 (03634)
+        T 3
+         (3634)
       </span>
     </div>
   </div>

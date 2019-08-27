@@ -185,6 +185,16 @@ const defaultProps = {
   stations: null,
   onStationClick: () => {},
 };
+
+const renderRouteIdentifier = (id, longName) => {
+  // first part of the id, without leading zeros.
+  const routeIdentifier = parseInt(id.split('.')[0], 10);
+  if (!longName.includes(routeIdentifier)) {
+    return ` (${routeIdentifier})`;
+  }
+  return null;
+};
+
 const renderHeader = lineInfos => (
   <div className="rt-route-header">
     <span
@@ -200,7 +210,8 @@ const renderHeader = lineInfos => (
     <div className="rt-route-title">
       <span className="rt-route-name">{lineInfos.destination}</span>
       <span>
-        {`${lineInfos.longName} (${lineInfos.routeIdentifier.split('.')[0]})`}
+        {lineInfos.longName}
+        {renderRouteIdentifier(lineInfos.routeIdentifier, lineInfos.longName)}
       </span>
     </div>
   </div>
