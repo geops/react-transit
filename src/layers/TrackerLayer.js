@@ -71,8 +71,6 @@ class TrackerLayer extends Layer {
 
     this.speed = 1;
 
-    this.fps = 60;
-
     this.clickCallbacks = [];
 
     this.delayOutlineColor = options.delayOutlineColor || '#000000';
@@ -195,7 +193,7 @@ class TrackerLayer extends Layer {
         this.currTime.getTime() +
         (new Date() - this.lastUpdateTime) * this.speed;
       this.setCurrTime(newTime);
-    }, 1000 / this.fps);
+    }, this.getRefreshTimeInMs());
   }
 
   /**
@@ -238,6 +236,7 @@ class TrackerLayer extends Layer {
    */
   setSpeed(speed) {
     this.speed = speed;
+    this.start();
   }
 
   /**
@@ -285,14 +284,19 @@ class TrackerLayer extends Layer {
     return null;
   }
 
+  getRefreshTimeInMs() {
+    const z = this.map.getView().getZoom();
+    const roundedZoom = Math.round(z);
+    const timeStep = timeSteps[roundedZoom] || 25;
+    const nextTick = Math.max(25, timeStep / this.speed);
+    return nextTick;
+  }
+
   onMoveEnd() {
     const z = this.map.getView().getZoom();
 
     if (z !== this.currentZoom) {
       this.currentZoom = z;
-      this.fps = Math.round(
-        Math.min(20000, Math.max(1000 / 60, timeSteps[z] / this.speed)),
-      );
       this.startUpdateTime();
     }
     this.tracker.renderTrajectory(this.currTime);
