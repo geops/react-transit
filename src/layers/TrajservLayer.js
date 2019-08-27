@@ -245,17 +245,21 @@ class TrajservLayer extends TrackerLayer {
         features.push(new Feature({ geometry: geom, ...vehicle }));
 
         if (features.length) {
-          const featId = features[0].get('id');
+          this.selectedVehicleId = features[0].get('id');
           this.journeyId = features[0].get('journeyIdentifier');
-          this.fetchTrajectoryStations(featId).then(r => {
+          this.fetchTrajectoryStations(this.selectedVehicleId).then(r => {
             this.clickCallbacks.forEach(c => c(r, this, e));
           });
         }
+      } else {
+        this.selectedVehicleId = null;
+        this.olLayer.getSource().clear();
+        this.clickCallbacks.forEach(c => c(null, this, e));
       }
     });
 
     this.onMoveEndRef = this.map.on('moveend', () => {
-      if (this.journeyId) {
+      if (this.selectedVehicleId && this.journeyId) {
         this.highlightTrajectory();
       }
     });

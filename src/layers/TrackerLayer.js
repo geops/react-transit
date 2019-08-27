@@ -61,6 +61,8 @@ class TrackerLayer extends Layer {
 
     this.hoverVehicleId = null;
 
+    this.selectedVehicleId = null;
+
     this.currTime = new Date();
 
     this.lastUpdateTime = new Date();
@@ -315,16 +317,19 @@ class TrackerLayer extends Layer {
     const { type, name, id, color, textColor, delay, cancelled } = props;
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.hoverVehicleId === id;
+    const selected = this.selectedVehicleId === id;
 
     this.styleCache[z] = this.styleCache[z] || {};
     this.styleCache[z][type] = this.styleCache[z][type] || {};
     this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
     this.styleCache[z][type][name][delay] =
       this.styleCache[z][type][name][delay] || {};
+    this.styleCache[z][type][name][delay][hover] =
+      this.styleCache[z][type][name][delay][hover] || {};
 
-    if (!this.styleCache[z][type][name][delay][hover]) {
+    if (!this.styleCache[z][type][name][delay][hover][selected]) {
       let radius = getRadius(type, z);
-      if (hover) {
+      if (hover || selected) {
         radius += 5;
       }
       const margin = 1;
@@ -395,10 +400,10 @@ class TrackerLayer extends Layer {
 
         ctx.fillText(shortname, origin, origin);
       }
-      this.styleCache[z][type][name][delay][hover] = canvas;
+      this.styleCache[z][type][name][delay][hover][selected] = canvas;
     }
 
-    return this.styleCache[z][type][name][delay][hover];
+    return this.styleCache[z][type][name][delay][hover][selected];
   }
 
   /**
