@@ -97,7 +97,7 @@ class TrackerLayer extends Layer {
     this.tracker.setStyle((props, r) => this.style(props, r));
 
     if (this.getVisible()) {
-      this.start(map);
+      this.start();
     }
   }
 
@@ -114,15 +114,21 @@ class TrackerLayer extends Layer {
    * Trackerlayer is started
    * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
    */
-  start(map) {
+  start() {
     this.stop();
     this.tracker.setVisible(true);
-    this.onMoveEndRef = map.on('moveend', () => this.onMoveEnd());
-    this.onPointerMoveRef = map.on('pointermove', e => this.onPointerMove(e));
-    this.tracker.renderTrajectory(this.currTime);
+    this.onMoveStartRef = this.map.on('movestart', () => this.onMoveStart());
+    this.onMoveEndRef = this.map.on('moveend', () => this.onMoveEnd());
+    this.onPointerMoveRef = this.map.on('pointermove', e =>
+      this.onPointerMove(e),
+    );
+    this.onPostRenderRef = this.map.on('postrender', () => {
+      if (this.isMapMoving) {
+        this.tracker.renderTrajectory(this.currTime);
+      }
+    });
     this.startUpdateTrajectories();
     this.startUpdateTime();
-    this.updateTrajectories();
   }
 
   /**
@@ -133,7 +139,12 @@ class TrackerLayer extends Layer {
       this.tracker.clear();
       this.tracker.setVisible(false);
     }
-    unByKey([this.onMoveEndRef, this.onPointerMoveRef]);
+    unByKey([
+      this.onMoveStartRef,
+      this.onMoveEndRef,
+      this.onPointerMoveRef,
+      this.onPostRenderRef,
+    ]);
     this.stopUpdateTrajectories();
     this.stopUpdateTime();
     this.abortFetchTrajectories();
@@ -160,7 +171,7 @@ class TrackerLayer extends Layer {
     );
 
     if (this.getVisible()) {
-      this.start(this.map);
+      this.start();
     } else {
       this.stop();
     }
@@ -180,7 +191,7 @@ class TrackerLayer extends Layer {
    * Stop the update of trajectories.
    */
   stopUpdateTrajectories() {
-    window.clearInterval(this.updateInterval);
+    clearInterval(this.updateInterval);
   }
 
   /**
@@ -200,7 +211,7 @@ class TrackerLayer extends Layer {
    * Stop to update time
    */
   stopUpdateTime() {
-    window.clearInterval(this.updateTime);
+    clearInterval(this.updateTime);
   }
 
   /**
@@ -219,7 +230,9 @@ class TrackerLayer extends Layer {
     const newTime = new Date(time);
     this.currTime = newTime;
     this.lastUpdateTime = new Date();
-    this.tracker.renderTrajectory(this.currTime);
+    if (!this.isMapMoving) {
+      this.tracker.renderTrajectory(this.currTime);
+    }
   }
 
   /**
@@ -292,14 +305,18 @@ class TrackerLayer extends Layer {
     return nextTick;
   }
 
+  onMoveStart() {
+    this.isMapMoving = true;
+  }
+
   onMoveEnd() {
+    this.isMapMoving = false;
     const z = this.map.getView().getZoom();
 
     if (z !== this.currentZoom) {
       this.currentZoom = z;
       this.startUpdateTime();
     }
-    this.tracker.renderTrajectory(this.currTime);
     this.updateTrajectories();
   }
 
