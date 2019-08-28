@@ -6,9 +6,9 @@ Filter possibility (case insensitive):
 
 | Options           | Description            | Examples                                                               |
 |-------------------|------------------------|------------------------------------------------------------------------|
-| Operator          | filter by operator     | string: 'sbb', list (regex): '(vbz\|zsg)'                              |
-| PublishedLineName | filter by line name    | string: 'ICE',  list: 'S9,S15,S10'                                     |
-| TripNumber        | filter by trip number  | bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'  |
+| operator          | filter by operator     | string: 'sbb', list (regex): '(vbz\|zsg)'                              |
+| publishedLineName | filter by line name    | string: 'ICE',  list: 'S9,S15,S10'                                     |
+| tripNumber        | filter by trip number  | bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'  |
 
 
 ```jsx
