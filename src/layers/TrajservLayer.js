@@ -191,9 +191,9 @@ class TrajservLayer extends TrackerLayer {
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.filterFc = TrajservLayer.createFilter(
-      options.PublishedLineName,
-      options.TripNumber,
-      options.Operator,
+      options.publishedLineName,
+      options.tripNumber,
+      options.operator,
       options.regexPublishedLineName,
     );
   }
