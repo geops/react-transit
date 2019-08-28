@@ -8,9 +8,9 @@ import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
 import { getBgColor } from '../config/tracker';
 
-const LINE_FILTER = 'PublishedLineName';
-const ROUTE_FILTER = 'TripNumber';
-const OPERATOR_FILTER = 'Operator';
+const LINE_FILTER = 'publishedlinename';
+const ROUTE_FILTER = 'tripnumber';
+const OPERATOR_FILTER = 'operator';
 
 /**
  * Responsible for loading tracker data from Trajserv.
@@ -210,7 +210,7 @@ class TrajservLayer extends TrackerLayer {
     }
 
     // Setting filters from the permalink.
-    const parameters = qs.parse(window.location.search);
+    const parameters = qs.parse(window.location.search.toLowerCase());
     const lineParam = parameters[LINE_FILTER];
     const routeParam = parameters[ROUTE_FILTER];
     const opParam = parameters[OPERATOR_FILTER];
