@@ -5,6 +5,7 @@ import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
 import { bgColors } from '../../config/tracker';
 
+import FilterButton from '../FilterButton';
 import TrackerLayer from '../../layers/TrackerLayer';
 
 /**
@@ -176,6 +177,11 @@ const propTypes = {
    * Function triggered on station's click event.
    */
   onStationClick: PropTypes.func,
+
+  /**
+   * Title of the tracker filter button
+   */
+  titleFilter: PropTypes.string,
 };
 
 const defaultProps = {
@@ -184,6 +190,7 @@ const defaultProps = {
   header: null,
   stations: null,
   onStationClick: () => {},
+  titleFilter: undefined,
 };
 
 const renderRouteIdentifier = (id, longName) => {
@@ -195,7 +202,7 @@ const renderRouteIdentifier = (id, longName) => {
   return null;
 };
 
-const renderHeader = lineInfos => (
+const renderHeader = (lineInfos, trackerLayer, titleFilter) => (
   <div className="rt-route-header">
     <span
       style={{
@@ -214,6 +221,11 @@ const renderHeader = lineInfos => (
         {renderRouteIdentifier(lineInfos.routeIdentifier, lineInfos.longName)}
       </span>
     </div>
+    <FilterButton
+      title={titleFilter}
+      routeIdentifier={lineInfos.routeIdentifier}
+      trackerLayer={trackerLayer}
+    />
   </div>
 );
 
@@ -283,11 +295,12 @@ function RouteSchedule({
   header,
   stations,
   onStationClick,
+  titleFilter,
   trackerLayer,
 }) {
   return lineInfos ? (
     <div className={className}>
-      {header || renderHeader(lineInfos)}
+      {header || renderHeader(lineInfos, trackerLayer, titleFilter)}
       {stations || renderStations(lineInfos, onStationClick, trackerLayer)}
     </div>
   ) : null;
