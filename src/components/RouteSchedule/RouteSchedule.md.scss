@@ -3,11 +3,12 @@
   position: relative;
 
   .rt-route-wrapper {
-    width: 100%;
-  }
+    position: absolute;
+    top: 0;
 
-  .rt-route-body {
-    max-height: 200px;
-    overflow-y: auto;
+    .rt-route-body {
+      max-height: 210px;
+      overflow-y: auto;
+    }
   }
 }

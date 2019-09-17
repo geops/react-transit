@@ -36,17 +36,6 @@ module.exports = {
       exampleMode: 'collapse',
       usageMode: 'collapse',
     },
-    {
-      name: 'Layers',
-      sections: [
-        {
-          name: 'Tracker layer',
-          content: 'src/layers/README.md',
-          exampleMode: 'collapse',
-          usageMode: 'collapse',
-        },
-      ],
-    },
   ],
   webpackConfig: {
     module: {

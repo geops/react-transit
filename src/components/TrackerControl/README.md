@@ -1,6 +1,6 @@
 #
 
-This demonstrates the use of RouteSchedule.
+This demonstrates the use of TrackerControl.
 
 ```jsx
 import React from 'react';
@@ -10,7 +10,7 @@ import Layer from 'react-spatial/layers/Layer';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
 import TrajservLayer from 'react-transit/layers/TrajservLayer';
-import RouteSchedule from 'react-transit/components/RouteSchedule';
+import TrackerControl from 'react-transit/components/TrackerControl';
 
 const trackerLayer = new TrajservLayer();
 const layers = [
