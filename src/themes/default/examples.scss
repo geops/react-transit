@@ -3,3 +3,17 @@
 */
 @import './index.scss';
 @import '../../components/RouteSchedule/RouteSchedule.md.scss';
+
+.tm-map {
+  height: 300px;
+}
+
+.tm-footer {
+  position: absolute;
+  height: 40px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  background-color: lightgray;
+}

@@ -4,7 +4,6 @@ This demonstrates the use of RouteSchedule.
 
 ```jsx
 import React, { useState } from 'react';
-import Dialog from 'react-spatial/components/Dialog';
 import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import TileLayer from 'ol/layer/Tile';

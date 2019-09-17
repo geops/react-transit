@@ -55,7 +55,7 @@ export default class Tracker {
   }
 
   /**
-   * Define the trajectories
+   * Define the trajectories.
    * @param {array<ol.feature>} trajectories
    */
   setTrajectories(trajectories) {
@@ -67,7 +67,7 @@ export default class Tracker {
   }
 
   /**
-   * Return the trajectories
+   * Return the trajectories.
    * @returns {array<trajectory>} trajectories
    */
   getTrajectories() {
@@ -95,6 +95,7 @@ export default class Tracker {
   /**
    * Remove a trajectory with a given id.
    * @param {Number} id The trajectory id
+   * @private
    */
   removeTrajectory(id) {
     for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
@@ -106,9 +107,10 @@ export default class Tracker {
   }
 
   /**
-   * Remove a trajectory by attribute
+   * Remove a trajectory by attribute.
    * @param {string} attributeName Name of the attribute.
    * @param {*} value Attribute value.
+   * @private
    */
   removeTrajectoryByAttribute(attributeName, value) {
     for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
@@ -124,6 +126,7 @@ export default class Tracker {
 
   /**
    * Clear the canvas.
+   * @private
    */
   clear() {
     if (this.canvasContext) {
@@ -148,8 +151,9 @@ export default class Tracker {
   }
 
   /**
-   * Set the id of the trajectory whixh is hovered .
+   * Set the id of the trajectory which is hovered.
    * @param {string} id Id of a vehicle.
+   * @private
    */
   setHoverVehicleId(id) {
     this.hoverVehicleId = id;
@@ -164,8 +168,8 @@ export default class Tracker {
   }
 
   /**
-   *
    * @param {Date} currTime
+   * @private
    */
   renderTrajectory(currTime = Date.now()) {
     this.clear();
@@ -257,6 +261,7 @@ export default class Tracker {
 
   /**
    * Kill the tracker.
+   * @private
    */
   destroy() {
     this.clear();

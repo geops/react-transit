@@ -22,6 +22,7 @@ class TrajservLayer extends TrackerLayer {
   /**
    *  Translate the response date object into a readable object.
    * @returns {array<Date>}
+   * @private
    */
   static translateDates(dates) {
     const newDates = [];
@@ -40,6 +41,7 @@ class TrajservLayer extends TrackerLayer {
   /**
    *  Translate the response into a readable object.
    * @returns {Object} returns a readable object
+   * @private
    */
   static translateTrajStationsResp(resp) {
     const stations = [];
@@ -129,6 +131,7 @@ class TrajservLayer extends TrackerLayer {
    * @param {string} line
    * @param {string} route
    * @param {string} operator
+   * @private
    */
   static createFilter(line, trip, operator, regexLine) {
     const filterList = [];
@@ -201,6 +204,7 @@ class TrajservLayer extends TrackerLayer {
   /**
    * Initialize the layer and listen to feature clicks.
    * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map)
+   * @private
    */
   init(map) {
     super.init(map);
@@ -290,6 +294,7 @@ class TrajservLayer extends TrackerLayer {
    * @param {Array} stationsCoords Array of station coordinates.
    * @param {Array} lineCoords Array of coordinates of the trajectory (linestring).
    * @param {string} color The color of the line.
+   * @private
    */
   drawTrajectory(stationsCoords, lineCoords, color) {
     // Don't allow white lines, use red instead.
@@ -357,6 +362,7 @@ class TrajservLayer extends TrackerLayer {
   /**
    * Fetch stations information with a trajectory ID
    * @param {number} trajId the ID of the trajectory
+   * @private
    */
   fetchTrajectoryStations(trajId) {
     const params = this.getUrlParams({
@@ -403,6 +409,7 @@ class TrajservLayer extends TrackerLayer {
   /**
    * Fetch trajectory information with a trajectory ID
    * @param {number} journeyId the gtfs ID of the trajectory.
+   * @private
    */
   fetchTrajectoryById(journeyId) {
     const params = this.getUrlParams({
@@ -420,6 +427,7 @@ class TrajservLayer extends TrackerLayer {
    * Returns the URL Parameters
    * @param {Object} extraParams
    * @returns {Object}
+   * @private
    */
   getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
@@ -475,6 +483,7 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Update the trajectories
+   * @private
    */
   updateTrajectories() {
     this.fetchTrajectories(

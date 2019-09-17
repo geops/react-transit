@@ -15,12 +15,14 @@ import {
 } from '../config/tracker';
 
 /**
- * Trackerlayer.
  * Responsible for loading tracker data.
- * extents Layer from {@link https://react-spatial.geops.de/docjs.html react-spatial/layers/Layer}
+ * Extented from Layer {@link https://react-spatial.geops.de/docjs.html react-spatial/layers/Layer}
  * @class
  * @inheritDoc
- * @param {Object} [options]
+ * @param {Object} options
+ * @param {boolean} options.useDelayStyle Set the delay style.
+ * @param {string} options.delayOutlineColor Set the delay outline color.
+ * @param {string} options.onClick Callback function on feature click.
  */
 class TrackerLayer extends Layer {
   static getDateString(now) {
@@ -86,6 +88,7 @@ class TrackerLayer extends Layer {
   /**
    * Initialize the layer and listen to feature clicks.
    * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   * @private
    */
   init(map) {
     super.init(map);
@@ -113,6 +116,7 @@ class TrackerLayer extends Layer {
   /**
    * Trackerlayer is started
    * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
+   * @private
    */
   start() {
     this.stop();
@@ -134,6 +138,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Stop current layer,.
+   * @private
    */
   stop() {
     if (this.tracker) {
@@ -152,7 +157,7 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Set visible
+   * Set visibility.
    * @param {boolean} visible
    * @param {boolean} stopPropagationDown Stops propagation down.
    * @param {boolean} stopPropagationUp Stops propagation up.
@@ -180,6 +185,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Start the update of trajectories.
+   * @private
    */
   startUpdateTrajectories() {
     this.stopUpdateTrajectories();
@@ -190,6 +196,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Stop the update of trajectories.
+   * @private
    */
   stopUpdateTrajectories() {
     clearInterval(this.updateInterval);
@@ -197,6 +204,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Start to update the current time depending on the speed.
+   * @private
    */
   startUpdateTime() {
     this.stopUpdateTime();
@@ -209,14 +217,15 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Stop to update time
+   * Stop to update time.
+   * @private
    */
   stopUpdateTime() {
     clearInterval(this.updateTime);
   }
 
   /**
-   * Get the current time
+   * Get the current time.
    * @returns {Date}
    */
   getCurrTime() {
@@ -256,6 +265,7 @@ class TrackerLayer extends Layer {
   /**
    * Fetch trajectories at given URL.
    * @param {string} url
+   * @private
    */
   fetchTrajectories(url) {
     this.abortFetchTrajectories();
@@ -276,10 +286,11 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Returns the vehicle which are at the given coordinates
-   * Returns null when no vehicle is located at the given coordinates
+   * Returns the vehicle which are at the given coordinates.
+   * Returns null when no vehicle is located at the given coordinates.
    * @param {ol.coordinate} coordinate
    * @returns {ol.feature | null}
+   * @private
    */
   getVehicleAtCoordinate(coordinate) {
     const res = this.map.getView().getResolution();
@@ -332,8 +343,9 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Define the style of the layer
+   * Define the style of the layer.
    * @param {Object} props Properties
+   * @private
    */
   style(props) {
     const { type, name, id, color, textColor, delay, cancelled } = props;
