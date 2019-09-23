@@ -239,17 +239,19 @@ const renderHeader = (
         {renderRouteIdentifier(lineInfos.routeIdentifier, lineInfos.longName)}
       </span>
     </div>
-    <FilterButton
-      title={titleFilter}
-      routeIdentifier={lineInfos.routeIdentifier}
-      trackerLayer={trackerLayer}
-    />
-    <FollowButton
-      setCenter={setCenter}
-      title={titleFollow}
-      routeIdentifier={lineInfos.routeIdentifier}
-      trackerLayer={trackerLayer}
-    />
+    <div className="rt-route-filters">
+      <FilterButton
+        title={titleFilter}
+        routeIdentifier={lineInfos.routeIdentifier}
+        trackerLayer={trackerLayer}
+      />
+      <FollowButton
+        setCenter={setCenter}
+        title={titleFollow}
+        routeIdentifier={lineInfos.routeIdentifier}
+        trackerLayer={trackerLayer}
+      />
+    </div>
   </div>
 );
 

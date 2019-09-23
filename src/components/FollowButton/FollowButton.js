@@ -8,7 +8,7 @@ import TrackerLayer from '../../layers/TrackerLayer';
 
 const propTypes = {
   /**
-   * CSS class of the filter button.
+   * CSS class of the follow button.
    */
   className: PropTypes.string,
 
@@ -34,12 +34,12 @@ const propTypes = {
 };
 
 const defaultProps = {
-  className: 'rt-control-button rt-route-filter',
-  title: 'Filter',
+  className: 'rt-control-button rt-route-follow',
+  title: 'Follow',
 };
 
 /**
- * Displaying all stops of a line, and their informations.
+ * Button enables the follow of a selected train.
  */
 class FollowButton extends PureComponent {
   constructor(props) {

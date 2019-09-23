@@ -3,24 +3,18 @@ import renderer from 'react-test-renderer';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import TrajservLayer from '../../layers/TrajservLayer';
-import FollowButton from '.';
+import FilterButton from '.';
 
 configure({ adapter: new Adapter() });
-
-const funcs = {
-  onClick: () => {},
-};
-
 const trackerLayer = new TrajservLayer();
 
 test('FollowButton should match snapshot.', () => {
   const component = renderer.create(
-    <FollowButton
-      className="rt-follow-button"
-      title="Follow up"
+    <FilterButton
+      className="rt-filter-button"
+      title="Filter up"
       routeIdentifier="test"
       trackerLayer={trackerLayer}
-      setCenter={() => funcs.onClick()}
     />,
   );
   const tree = component.toJSON();
@@ -29,26 +23,24 @@ test('FollowButton should match snapshot.', () => {
 
 test('FollowButton should toggle.', () => {
   const bt = shallow(
-    <FollowButton
-      className="rt-follow-button"
-      title="Follow up"
+    <FilterButton
+      className="rt-filter-button"
       routeIdentifier="test"
       trackerLayer={trackerLayer}
-      setCenter={() => funcs.onClick()}
     />,
   );
 
-  expect(bt.state('centerActived')).toBe(false);
+  expect(bt.state('filterActivated')).toBe(false);
 
-  bt.find('.rt-follow-button')
+  bt.find('.rt-filter-button')
     .first()
     .simulate('click');
 
-  expect(bt.state('centerActived')).toBe(true);
+  expect(bt.state('filterActivated')).toBe(true);
 
-  bt.find('.rt-follow-button')
+  bt.find('.rt-filter-button')
     .first()
     .simulate('click');
 
-  expect(bt.state('centerActived')).toBe(false);
+  expect(bt.state('filterActivated')).toBe(false);
 });

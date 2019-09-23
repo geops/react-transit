@@ -35,7 +35,7 @@ const defaultProps = {
 };
 
 /**
- * Displaying all stops of a line, and their informations.
+ * Button enables the filtering of a selected train.
  */
 class FilterButton extends PureComponent {
   constructor(props) {
@@ -56,10 +56,12 @@ class FilterButton extends PureComponent {
       undefined,
       routeIdentifier.split('.')[0],
     );
-    if (activated) {
-      trackerLayer.tracker.setFilter(filterFc);
-    } else {
-      trackerLayer.tracker.setFilter(null);
+    if (trackerLayer && trackerLayer.tracker) {
+      if (activated) {
+        trackerLayer.tracker.setFilter(filterFc);
+      } else {
+        trackerLayer.tracker.setFilter(null);
+      }
     }
 
     this.setState({
