@@ -6,6 +6,7 @@ import lastStation from '../../images/RouteSchedule/lastStation.png';
 import { bgColors } from '../../config/tracker';
 
 import FilterButton from '../FilterButton';
+import FollowButton from '../FollowButton';
 import TrackerLayer from '../../layers/TrackerLayer';
 
 /**
@@ -182,6 +183,16 @@ const propTypes = {
    * Title of the tracker filter button
    */
   titleFilter: PropTypes.string,
+
+  /**
+   * Title of the tracker follow button
+   */
+  titleFollow: PropTypes.string,
+
+  /**
+   * Function to set the map center, Used to follow a train.
+   */
+  setCenter: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -191,6 +202,7 @@ const defaultProps = {
   stations: null,
   onStationClick: () => {},
   titleFilter: undefined,
+  titleFollow: undefined,
 };
 
 const renderRouteIdentifier = (id, longName) => {
@@ -202,7 +214,13 @@ const renderRouteIdentifier = (id, longName) => {
   return null;
 };
 
-const renderHeader = (lineInfos, trackerLayer, titleFilter) => (
+const renderHeader = (
+  lineInfos,
+  trackerLayer,
+  titleFilter,
+  titleFollow,
+  setCenter,
+) => (
   <div className="rt-route-header">
     <span
       style={{
@@ -223,6 +241,12 @@ const renderHeader = (lineInfos, trackerLayer, titleFilter) => (
     </div>
     <FilterButton
       title={titleFilter}
+      routeIdentifier={lineInfos.routeIdentifier}
+      trackerLayer={trackerLayer}
+    />
+    <FollowButton
+      setCenter={setCenter}
+      title={titleFollow}
       routeIdentifier={lineInfos.routeIdentifier}
       trackerLayer={trackerLayer}
     />
@@ -296,11 +320,20 @@ function RouteSchedule({
   stations,
   onStationClick,
   titleFilter,
+  titleFollow,
   trackerLayer,
+  setCenter,
 }) {
   return lineInfos ? (
     <div className={className}>
-      {header || renderHeader(lineInfos, trackerLayer, titleFilter)}
+      {header ||
+        renderHeader(
+          lineInfos,
+          trackerLayer,
+          titleFilter,
+          titleFollow,
+          setCenter,
+        )}
       {stations || renderStations(lineInfos, onStationClick, trackerLayer)}
     </div>
   ) : null;

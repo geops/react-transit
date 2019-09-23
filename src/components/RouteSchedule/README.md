@@ -13,7 +13,6 @@ import TrajservLayer from 'react-transit/layers/TrajservLayer';
 import RouteSchedule from 'react-transit/components/RouteSchedule';
 
 let firstRender = null;
-const center = [951560, 6002550];
 const zoom = 14;
 const trackerLayer = new TrajservLayer();
 const layers = [
@@ -28,6 +27,7 @@ const layers = [
 
 function RouteScheduleExample() {
   const [lineInfos, setLineInfos] = useState(null);
+  const [center, setCenter] = useState([951560, 6002550]);
 
   if (!firstRender) {
     firstRender = true;
@@ -37,7 +37,11 @@ function RouteScheduleExample() {
   return (
     <div className="rt-route-schedule-example">
       <BasicMap center={center} zoom={zoom} layers={layers} />
-      <RouteSchedule lineInfos={lineInfos} trackerLayer={trackerLayer} />
+      <RouteSchedule
+        setCenter={c => setCenter(c)}
+        lineInfos={lineInfos}
+        trackerLayer={trackerLayer}
+      />
     </div>
   );
 }

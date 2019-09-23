@@ -50,7 +50,11 @@ describe('RouteSchedule', () => {
   test('matches snapshots.', () => {
     const trackerLayer = new TrajservLayer();
     const component = renderer.create(
-      <RouteSchedule lineInfos={lineInfos} trackerLayer={trackerLayer} />,
+      <RouteSchedule
+        lineInfos={lineInfos}
+        trackerLayer={trackerLayer}
+        setCenter={() => {}}
+      />,
     );
     const tree = component.toJSON();
     expect(tree).toMatchSnapshot();
