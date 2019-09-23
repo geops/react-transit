@@ -46,8 +46,9 @@ class FilterButton extends PureComponent {
     };
   }
 
-  toggleFilter(routeIdentifier, trackerLayer) {
+  toggleFilter(routeIdentifier) {
     const { filterActivated } = this.state;
+    const { trackerLayer } = this.props;
 
     const activated = !filterActivated;
 
@@ -67,14 +68,14 @@ class FilterButton extends PureComponent {
   }
 
   render() {
-    const { className, title, routeIdentifier, trackerLayer } = this.props;
+    const { className, title, routeIdentifier } = this.props;
     const { filterActivated } = this.state;
 
     return (
       <Button
         className={className}
         title={title}
-        onClick={() => this.toggleFilter(routeIdentifier, trackerLayer)}
+        onClick={() => this.toggleFilter(routeIdentifier)}
       >
         <img
           src={filterActivated ? filterActive : filterInactive}
