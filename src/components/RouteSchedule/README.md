@@ -39,15 +39,6 @@ function RouteScheduleExample() {
 
   return (
     <div className="rt-route-schedule-example">
-      <BasicMap
-        animationOptions={{
-          center,
-          duration: 60,
-        }}
-        center={initialCenter}
-        zoom={14}
-        layers={layers}
-      />
       <RouteSchedule
         lineInfos={lineInfos}
         trackerLayer={trackerLayer}
@@ -66,6 +57,15 @@ function RouteScheduleExample() {
             />
           </>
         )}
+      />
+      <BasicMap
+        animationOptions={{
+          center,
+          duration: 60,
+        }}
+        center={initialCenter}
+        zoom={14}
+        layers={layers}
       />
     </div>
   );
