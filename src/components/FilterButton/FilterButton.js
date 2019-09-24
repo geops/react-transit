@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import qs from 'query-string';
 import PropTypes from 'prop-types';
 import Button from 'react-spatial/components/Button';
 import filterActive from '../../images/FilterButton/filterActive.png';
@@ -46,6 +47,22 @@ class FilterButton extends PureComponent {
     };
   }
 
+  updatePermalink(isRemoving) {
+    const { routeIdentifier } = this.props;
+
+    const parameters = qs.parse(window.location.search.toLowerCase());
+    if (isRemoving) {
+      delete parameters.tripnumber;
+    } else {
+      parameters.tripnumber = parseInt(routeIdentifier.split('.')[0], 10);
+    }
+
+    const qStr = qs.stringify(parameters, { encode: false });
+    const search = `?${qStr}`;
+    const { hash } = window.location;
+    window.history.replaceState(undefined, undefined, `${search}${hash || ''}`);
+  }
+
   toggleFilter(routeIdentifier) {
     const { filterActivated } = this.state;
     const { trackerLayer } = this.props;
@@ -58,8 +75,10 @@ class FilterButton extends PureComponent {
     );
     if (trackerLayer && trackerLayer.tracker) {
       if (activated) {
+        this.updatePermalink(false);
         trackerLayer.tracker.setFilter(filterFc);
       } else {
+        this.updatePermalink(true);
         trackerLayer.tracker.setFilter(null);
       }
     }
