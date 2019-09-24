@@ -4,16 +4,17 @@ This demonstrates the use of RouteSchedule.
 
 ```jsx
 import React, { useState } from 'react';
-import Dialog from 'react-spatial/components/Dialog';
 import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
 import TrajservLayer from 'react-transit/layers/TrajservLayer';
 import RouteSchedule from 'react-transit/components/RouteSchedule';
+import FilterButton from 'react-transit/components/FilterButton';
+import FollowButton from 'react-transit/components/FollowButton';
 
 let firstRender = null;
-const zoom = 14;
+const initialCenter = [951560, 6002550];
 const trackerLayer = new TrajservLayer({
   key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
 });
@@ -29,7 +30,7 @@ const layers = [
 
 function RouteScheduleExample() {
   const [lineInfos, setLineInfos] = useState(null);
-  const [center, setCenter] = useState([951560, 6002550]);
+  const [center, setCenter] = useState(initialCenter);
 
   if (!firstRender) {
     firstRender = true;
@@ -38,11 +39,35 @@ function RouteScheduleExample() {
 
   return (
     <div className="rt-route-schedule-example">
-      <BasicMap center={center} zoom={zoom} layers={layers} />
+      <BasicMap
+        animationOptions={{
+          center,
+          duration: 60,
+        }}
+        center={initialCenter}
+        zoom={14}
+        layers={layers}
+      />
       <RouteSchedule
-        setCenter={c => setCenter(c)}
         lineInfos={lineInfos}
         trackerLayer={trackerLayer}
+        /*
+        renderHeaderButtons={routeIdentifier => (
+          <>
+            <FilterButton
+              title="Filter"
+              routeIdentifier={routeIdentifier}
+              trackerLayer={trackerLayer}
+            />
+            <FollowButton
+              setCenter={setCenter}
+              title="Follow"
+              routeIdentifier={routeIdentifier}
+              trackerLayer={trackerLayer}
+            />
+          </>
+        )}
+        */
       />
     </div>
   );
