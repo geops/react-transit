@@ -51,7 +51,6 @@ function RouteScheduleExample() {
       <RouteSchedule
         lineInfos={lineInfos}
         trackerLayer={trackerLayer}
-        /*
         renderHeaderButtons={routeIdentifier => (
           <>
             <FilterButton
@@ -67,7 +66,6 @@ function RouteScheduleExample() {
             />
           </>
         )}
-        */
       />
     </div>
   );

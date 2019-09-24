@@ -54,6 +54,7 @@ describe('RouteSchedule', () => {
         lineInfos={lineInfos}
         trackerLayer={trackerLayer}
         setCenter={() => {}}
+        renderHeaderButtons={() => <div>Button</div>}
       />,
     );
     const tree = component.toJSON();

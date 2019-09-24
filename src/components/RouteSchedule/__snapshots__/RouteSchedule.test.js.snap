@@ -33,7 +33,11 @@ exports[`RouteSchedule matches snapshots. 1`] = `
     </div>
     <div
       className="rt-route-buttons"
-    />
+    >
+      <div>
+        Button
+      </div>
+    </div>
   </div>
   <div
     className="rt-route-body"
