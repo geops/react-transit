@@ -41,6 +41,9 @@ const defaultRenderButton = (icon, onClick, title) => {
   );
 };
 
+/**
+ * TrackerControl allows the user to control the speed of a trackerLayer.
+ */
 function TrackerControl({
   className,
   iconDateReset,

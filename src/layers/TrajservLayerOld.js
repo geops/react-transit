@@ -3,19 +3,11 @@ import { buffer, getWidth } from 'ol/extent';
 import TrajservLayer from './TrajservLayer';
 import TrackerLayer from './TrackerLayer';
 
-/**
- * Responsible for loading tracker data from Trajserv.
- */
 class TrajservLayerOld extends TrajservLayer {
   constructor(options = {}) {
     super({ ...options });
   }
 
-  /**
-   * Returns the URL Parameters
-   * @param {Object} extraParams
-   * @returns {Object}
-   */
   getUrlParams(extraParams = {}) {
     const ext = this.map.getView().calculateExtent();
     const bufferExt = buffer(ext, getWidth(ext) / 10);

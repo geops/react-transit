@@ -284,7 +284,7 @@ const renderStations = (lineInfos, onStationClick, trackerLayer) => (
 );
 
 /**
- * Displaying all stops of a line, and their informations.
+ * RouteSchedule displays information, stops and punctuality about the clicked route.
  */
 function RouteSchedule({
   className,
