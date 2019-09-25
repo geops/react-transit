@@ -8,6 +8,7 @@ import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
+import easing from 'ol/easing';
 import TrajservLayer from 'react-transit/layers/TrajservLayer';
 import RouteSchedule from 'react-transit/components/RouteSchedule';
 import FilterButton from 'react-transit/components/FilterButton';
@@ -61,7 +62,8 @@ function RouteScheduleExample() {
       <BasicMap
         animationOptions={{
           center,
-          duration: 60,
+          duration: 500,
+          easing: easing.linear,
         }}
         center={initialCenter}
         zoom={14}
