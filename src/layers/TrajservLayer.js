@@ -276,16 +276,18 @@ class TrajservLayer extends TrackerLayer {
       }
     });
 
-    this.onMoveEndRef = this.map.on('moveend', () => {
-      if (this.selectedVehicleId && this.journeyId) {
-        this.highlightTrajectory();
-      }
-    });
+    this.onResolutionChangeRef = this.map
+      .getView()
+      .on('change:resolution', () => {
+        if (this.selectedVehicleId && this.journeyId) {
+          this.highlightTrajectory();
+        }
+      });
   }
 
   stop() {
     unByKey(this.onSingleClickRef);
-    unByKey(this.onMoveEndRef);
+    unByKey(this.onResolutionChangeRef);
     this.journeyId = null;
     super.stop();
   }
@@ -413,10 +415,13 @@ class TrajservLayer extends TrackerLayer {
    * @private
    */
   fetchTrajectoryById(journeyId) {
-    const params = this.getUrlParams({
-      id: journeyId,
-      time: TrackerLayer.getTimeString(new Date()),
-    });
+    const params = this.getUrlParams(
+      {
+        id: journeyId,
+        time: TrackerLayer.getTimeString(new Date()),
+      },
+      false,
+    );
 
     const url = `${this.url}/trajectorybyid?${params}`;
     return fetch(url).then(res => {
@@ -430,9 +435,7 @@ class TrajservLayer extends TrackerLayer {
    * @returns {Object}
    * @private
    */
-  getUrlParams(extraParams = {}) {
-    const ext = this.map.getView().calculateExtent();
-    const bbox = buffer(ext, getWidth(ext) / 10).join(',');
+  getUrlParams(extraParams = {}, useBbox = true) {
     const intervalMs = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
     const now = this.currTime;
 
@@ -455,7 +458,6 @@ class TrajservLayer extends TrackerLayer {
 
     const params = {
       ...extraParams,
-      bbox,
       btime: TrackerLayer.getTimeString(now),
       etime: TrackerLayer.getTimeString(this.later),
       date: TrackerLayer.getDateString(now),
@@ -469,6 +471,11 @@ class TrajservLayer extends TrackerLayer {
       key: this.key,
       // toff: this.currTime.getTime() / 1000,
     };
+
+    if (useBbox) {
+      const ext = this.map.getView().calculateExtent();
+      params.bbox = buffer(ext, getWidth(ext) / 10).join(',');
+    }
 
     // Allow to load only differences between the last request,
     // but currently the Tracker render method doesn't manage to render only diff.
