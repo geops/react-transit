@@ -43,7 +43,7 @@ const lineInfos = {
       departureTime: 609000000,
     },
   ],
-  vehiculeType: 0,
+  vehicleType: 0,
 };
 
 describe('RouteSchedule', () => {

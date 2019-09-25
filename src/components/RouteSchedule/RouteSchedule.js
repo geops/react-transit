@@ -153,7 +153,7 @@ const propTypes = {
         wheelchairAccessible: PropTypes.number,
       }),
     ),
-    vehiculeType: PropTypes.number,
+    vehicleType: PropTypes.number,
     wheelchairAccessible: PropTypes.number,
   }),
 
@@ -206,7 +206,7 @@ const renderHeader = (lineInfos, renderHeaderButtons) => (
     <span
       style={{
         backgroundColor:
-          lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
+          lineInfos.backgroundColor || bgColors[lineInfos.vehicleType],
         color: lineInfos.color || 'black',
       }}
       className="rt-route-icon"
