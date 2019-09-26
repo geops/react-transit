@@ -193,7 +193,7 @@ class TrajservLayer extends TrackerLayer {
     this.url = options.url || 'https://api.geops.io/tracker';
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
-    this.key = options.key;
+    this.apiKey = options.apiKey;
     this.filterFc = TrajservLayer.createFilter(
       options.publishedLineName,
       options.tripNumber,
@@ -466,7 +466,7 @@ class TrajservLayer extends TrackerLayer {
       fl: 1,
       s: this.map.getView().getZoom() < 10 ? 1 : 0,
       z: this.map.getView().getZoom(),
-      key: this.key,
+      key: this.apiKey,
       // toff: this.currTime.getTime() / 1000,
     };
 
