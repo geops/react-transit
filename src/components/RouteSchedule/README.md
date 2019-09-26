@@ -15,7 +15,7 @@ let firstRender = null;
 const center = [951560, 6002550];
 const zoom = 14;
 const trackerLayer = new TrajservLayer({
-  key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
+  apiKey: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
 });
 const layers = [
   new Layer({
