@@ -102,11 +102,18 @@ class TrackerLayer extends Layer {
     if (this.getVisible()) {
       this.start();
     }
+
+    this.visibilityRef = this.on('change:visible', v => {
+      if (v.target.getVisible()) {
+        this.start();
+      }
+    });
   }
 
   terminate() {
     super.terminate();
     this.stop();
+    unByKey(this.visibilityRef);
     if (this.tracker) {
       this.tracker.destroy();
       this.tracker = null;
@@ -189,6 +196,8 @@ class TrackerLayer extends Layer {
    */
   startUpdateTrajectories() {
     this.stopUpdateTrajectories();
+
+    this.updateTrajectories();
     this.updateInterval = window.setInterval(() => {
       this.updateTrajectories();
     }, this.requestIntervalSeconds * 1000);
