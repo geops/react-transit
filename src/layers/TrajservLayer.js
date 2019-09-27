@@ -6,7 +6,14 @@ import { buffer, getWidth } from 'ol/extent';
 import { Point, MultiPoint, LineString } from 'ol/geom';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
-import { getBgColor } from '../config/tracker';
+import {
+  getRadius,
+  getBgColor,
+  getDelayColor,
+  getDelayText,
+  getTextColor,
+  getTextSize,
+} from '../config/tracker';
 
 const LINE_FILTER = 'publishedlinename';
 const ROUTE_FILTER = 'tripnumber';
@@ -497,10 +504,8 @@ class TrajservLayer extends TrackerLayer {
       }
       const trajectories = [];
       for (let i = 0; i < data.features.length; i += 1) {
-        const timeIntervals = [];
         const traj = data.features[i];
         const geometry = new LineString(traj.geometry.coordinates);
-
         const {
           ID: id,
           ProductIdentifier: type,
@@ -508,26 +513,13 @@ class TrajservLayer extends TrackerLayer {
           PublishedLineName: name,
           RouteIdentifier: routeIdentifier,
           Operator: operator,
-          TimeIntervals: intervals,
+          TimeIntervals: timeIntervals,
           Color: color,
           TextColor: textColor,
           Delay: delay,
           Cancelled: cancelled,
         } = traj.properties;
-        // We have to find the index of the corresponding coordinate, for each timeInterval.
-        for (let k = 0; k < intervals.length; k += 1) {
-          const [timeAtCoord, timeFrac] = intervals[k];
-          const coord = geometry.getCoordinateAt(timeFrac);
-          const idx = geometry.getCoordinates().findIndex(c => {
-            // We use toFixed(4) because the results of getCoordinateAt can be 10 or more digits
-            // but the geometry's coordinates are never so precise.
-            return (
-              parseFloat(coord[0].toFixed(4)) === c[0] &&
-              parseFloat(coord[1].toFixed(4)) === c[1]
-            );
-          });
-          timeIntervals.push([timeAtCoord, idx]);
-        }
+
         trajectories.push({
           id,
           type,
@@ -545,6 +537,105 @@ class TrajservLayer extends TrackerLayer {
       }
       this.tracker.setTrajectories(trajectories);
     });
+  }
+
+  /**
+   * Define the style of the vehicle.
+   *
+   * @param {Object} props Properties
+   * @private
+   */
+  style(props) {
+    const { type, name, id, color, textColor, delay, cancelled } = props;
+    const z = Math.min(Math.floor(this.currentZoom || 1), 16);
+    const hover = this.hoverVehicleId === id;
+    const selected = this.selectedVehicleId === id;
+
+    this.styleCache[z] = this.styleCache[z] || {};
+    this.styleCache[z][type] = this.styleCache[z][type] || {};
+    this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
+    this.styleCache[z][type][name][delay] =
+      this.styleCache[z][type][name][delay] || {};
+    this.styleCache[z][type][name][delay][hover] =
+      this.styleCache[z][type][name][delay][hover] || {};
+
+    if (!this.styleCache[z][type][name][delay][hover][selected]) {
+      let radius = getRadius(type, z);
+      if (hover || selected) {
+        radius += 5;
+      }
+      const margin = 1;
+      const radiusDelay = radius + 2;
+      const origin = radiusDelay + margin;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = radiusDelay * 2 + margin * 2 + 100;
+      canvas.height = radiusDelay * 2 + margin * 2;
+      const ctx = canvas.getContext('2d');
+
+      if (delay !== null) {
+        // Draw delay background
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(origin, origin, radiusDelay, 0, 2 * Math.PI, false);
+        ctx.fillStyle = getDelayColor(delay, cancelled);
+        ctx.filter = 'blur(1px)';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (hover) {
+        // Draw delay text
+        ctx.save();
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.font = `bold ${Math.max(
+          14,
+          Math.min(17, radius * 1.2),
+        )}px arial, sans-serif`;
+        ctx.fillStyle = getDelayColor(delay, cancelled);
+
+        ctx.strokeStyle = this.delayOutlineColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeText(getDelayText(delay, cancelled), origin * 2, origin);
+        ctx.fillText(getDelayText(delay, cancelled), origin * 2, origin);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(origin, origin, radius, 0, 2 * Math.PI, false);
+      if (!this.useDelayStyle) {
+        ctx.fillStyle = color || getBgColor(type);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = getDelayColor(delay, cancelled);
+        ctx.fill();
+      }
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#000000';
+      ctx.stroke();
+
+      const markerSize = radius * 2;
+      if (radius > 10) {
+        const shortname =
+          type === 'Rail' && name.length > 3 ? name.substring(0, 2) : name;
+        const fontSize = Math.max(radius, 10);
+        const textSize = getTextSize(ctx, markerSize, shortname, fontSize);
+
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = !this.useDelayStyle
+          ? textColor || getTextColor(type)
+          : '#000000';
+        ctx.font = `bold ${textSize}px Arial`;
+
+        ctx.fillText(shortname, origin, origin);
+      }
+      this.styleCache[z][type][name][delay][hover][selected] = canvas;
+    }
+
+    return this.styleCache[z][type][name][delay][hover][selected];
   }
 }
 
