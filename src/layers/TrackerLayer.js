@@ -4,15 +4,7 @@ import { unByKey } from 'ol/Observable';
 import Layer from 'react-spatial/layers/Layer';
 import { buffer, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
-import {
-  getRadius,
-  getBgColor,
-  getDelayColor,
-  getDelayText,
-  getTextColor,
-  getTextSize,
-  timeSteps,
-} from '../config/tracker';
+import { timeSteps } from '../config/tracker';
 
 /**
  * Responsible for loading tracker data.
@@ -352,101 +344,35 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Define the style of the layer.
+   * Define the style of the vehicle.
+   * Draw a blue circle with the id of the props parameter.
+   *
    * @param {Object} props Properties
    * @private
    */
   style(props) {
-    const { type, name, id, color, textColor, delay, cancelled } = props;
-    const z = Math.min(Math.floor(this.currentZoom || 1), 16);
-    const hover = this.hoverVehicleId === id;
-    const selected = this.selectedVehicleId === id;
-
-    this.styleCache[z] = this.styleCache[z] || {};
-    this.styleCache[z][type] = this.styleCache[z][type] || {};
-    this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
-    this.styleCache[z][type][name][delay] =
-      this.styleCache[z][type][name][delay] || {};
-    this.styleCache[z][type][name][delay][hover] =
-      this.styleCache[z][type][name][delay][hover] || {};
-
-    if (!this.styleCache[z][type][name][delay][hover][selected]) {
-      let radius = getRadius(type, z);
-      if (hover || selected) {
-        radius += 5;
-      }
-      const margin = 1;
-      const radiusDelay = radius + 2;
-      const origin = radiusDelay + margin;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = radiusDelay * 2 + margin * 2 + 100;
-      canvas.height = radiusDelay * 2 + margin * 2;
-      const ctx = canvas.getContext('2d');
-
-      if (delay !== null) {
-        // Draw delay background
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(origin, origin, radiusDelay, 0, 2 * Math.PI, false);
-        ctx.fillStyle = getDelayColor(delay, cancelled);
-        ctx.filter = 'blur(1px)';
-        ctx.fill();
-        ctx.restore();
-      }
-
-      if (hover) {
-        // Draw delay text
-        ctx.save();
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.font = `bold ${Math.max(
-          14,
-          Math.min(17, radius * 1.2),
-        )}px arial, sans-serif`;
-        ctx.fillStyle = getDelayColor(delay, cancelled);
-
-        ctx.strokeStyle = this.delayOutlineColor;
-        ctx.lineWidth = 1.5;
-        ctx.strokeText(getDelayText(delay, cancelled), origin * 2, origin);
-        ctx.fillText(getDelayText(delay, cancelled), origin * 2, origin);
-        ctx.restore();
-      }
-
-      ctx.beginPath();
-      ctx.arc(origin, origin, radius, 0, 2 * Math.PI, false);
-      if (!this.useDelayStyle) {
-        ctx.fillStyle = color || getBgColor(type);
-        ctx.fill();
-      } else {
-        ctx.fillStyle = getDelayColor(delay, cancelled);
-        ctx.fill();
-      }
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-
-      const markerSize = radius * 2;
-      if (radius > 10) {
-        const shortname =
-          type === 'Rail' && name.length > 3 ? name.substring(0, 2) : name;
-        const fontSize = Math.max(radius, 10);
-        const textSize = getTextSize(ctx, markerSize, shortname, fontSize);
-
-        ctx.textBaseline = 'middle';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = !this.useDelayStyle
-          ? textColor || getTextColor(type)
-          : '#000000';
-        ctx.font = `bold ${textSize}px Arial`;
-
-        ctx.fillText(shortname, origin, origin);
-      }
-      this.styleCache[z][type][name][delay][hover][selected] = canvas;
+    const { id: text } = props;
+    if (this.styleCache[text]) {
+      return this.styleCache[text];
     }
-
-    return this.styleCache[z][type][name][delay][hover][selected];
+    const canvas = document.createElement('canvas');
+    canvas.width = 200;
+    canvas.height = 15;
+    const ctx = canvas.getContext('2d');
+    ctx.arc(8, 8, 5, 0, 2 * Math.PI, false);
+    ctx.fillStyle = '#8ED6FF';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
+    ctx.font = 'bold 12px arial';
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, 20, 10);
+    ctx.fillStyle = 'black';
+    ctx.fillText(text, 20, 10);
+    this.styleCache[text] = canvas;
+    return this.styleCache[text];
   }
 
   /**
