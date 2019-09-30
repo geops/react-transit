@@ -394,19 +394,30 @@ class TrajservLayer extends TrackerLayer {
   }
 
   highlightTrajectory() {
-    this.fetchTrajectoryById(this.journeyId).then(traj => {
-      const { p, t, c } = traj;
+    this.abortHighlightTrajectory();
+    this.abortControllerHighlight = new AbortController();
+    const { signal } = this.abortControllerHighlight;
+    this.fetchTrajectoryById(this.journeyId, { signal }).then(traj => {
+      if (traj) {
+        const { p, t, c } = traj;
 
-      const lineCoords = [];
-      p[0].forEach(point => {
-        lineCoords.push([point.x, point.y]);
-      });
-      this.drawTrajectory(
-        this.stationsCoords,
-        lineCoords,
-        c ? `#${c}` : getBgColor(t),
-      );
+        const lineCoords = [];
+        p[0].forEach(point => {
+          lineCoords.push([point.x, point.y]);
+        });
+        this.drawTrajectory(
+          this.stationsCoords,
+          lineCoords,
+          c ? `#${c}` : getBgColor(t),
+        );
+      }
     });
+  }
+
+  abortHighlightTrajectory() {
+    if (this.abortControllerHighlight) {
+      this.abortControllerHighlight.abort();
+    }
   }
 
   /**
@@ -422,11 +433,25 @@ class TrajservLayer extends TrackerLayer {
       },
       false,
     );
-
     const url = `${this.url}/trajectorybyid?${params}`;
-    return fetch(url).then(res => {
-      return res.json();
-    });
+
+    this.abortFetchTrajectoryById();
+    this.abortControllerFetchById = new AbortController();
+    const { signal } = this.abortControllerFetchById;
+    return fetch(url, { signal })
+      .then(res => {
+        return res.json();
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.warn('Fetch trajectory by id request failed: ', err);
+      });
+  }
+
+  abortFetchTrajectoryById() {
+    if (this.abortControllerFetchById) {
+      this.abortControllerFetchById.abort();
+    }
   }
 
   /**

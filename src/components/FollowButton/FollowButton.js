@@ -66,15 +66,22 @@ class FollowButton extends PureComponent {
 
     const activated = !centerActived;
 
-    if (activated) {
-      this.updateInterval = window.setInterval(() => {
-        const [clickedRoute] = trackerLayer.tracker
-          .getTrajectories()
-          .filter(r => r.routeIdentifier === routeIdentifier);
-        if (clickedRoute && clickedRoute.coordinate) {
-          setCenter(clickedRoute.coordinate);
-        }
-      }, 500);
+    if (activated && trackerLayer && trackerLayer.tracker) {
+      const [trajectory] = trackerLayer.tracker
+        .getTrajectories()
+        .filter(r => r.routeIdentifier === routeIdentifier);
+      const firstCoord = trajectory && trajectory.coordinate;
+      if (firstCoord) {
+        setCenter(firstCoord);
+        this.updateInterval = window.setInterval(() => {
+          const [clickedRoute] = trackerLayer.tracker
+            .getTrajectories()
+            .filter(r => r.routeIdentifier === routeIdentifier);
+          if (clickedRoute && clickedRoute.coordinate) {
+            setCenter(clickedRoute.coordinate);
+          }
+        }, 500);
+      }
     } else {
       clearInterval(this.updateInterval);
     }
