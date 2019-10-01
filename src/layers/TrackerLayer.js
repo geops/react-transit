@@ -53,6 +53,9 @@ class TrackerLayer extends Layer {
 
     this.intervalStarted = false;
 
+    this.isHoverActive =
+      options.isHoverActive !== undefined ? options.isHoverActive : true;
+
     this.hoverVehicleId = null;
 
     this.selectedVehicleId = null;
@@ -325,7 +328,7 @@ class TrackerLayer extends Layer {
   }
 
   onPointerMove(e) {
-    if (e.dragging) {
+    if (e.dragging || !this.isHoverActive) {
       return;
     }
     const vehicle = this.getVehicleAtCoordinate(e.coordinate);

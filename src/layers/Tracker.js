@@ -204,6 +204,7 @@ export default class Tracker {
         let end;
         let startFrac;
         let endFrac;
+        let timeFrac;
 
         // Search th time interval.
         for (let j = 0; j < timeIntervals.length - 1; j += 1) {
@@ -221,7 +222,7 @@ export default class Tracker {
 
         if (start && end) {
           // interpolate position inside the time interval.
-          const timeFrac = this.interpolate
+          timeFrac = this.interpolate
             ? Math.min((now - start) / (end - start), 1)
             : 0;
 
@@ -234,7 +235,21 @@ export default class Tracker {
           // We set the rotation and the timeFraction of the trajectory (used by tralis).
           this.trajectories[i].rotation = rotation;
           this.trajectories[i].endFraction = timeFrac;
+
+          // It happens than the now date was some ms before the first timeIntervals we have.
+        } else if (now < timeIntervals[0][0]) {
+          [[, , rotation]] = timeIntervals;
+          timeFrac = 0;
+          coord = geometry.getFirstCoordinate();
+        } else if (now > timeIntervals[timeIntervals.length - 1][0]) {
+          [, , rotation] = timeIntervals[timeIntervals.length - 1];
+          timeFrac = 1;
+          coord = geometry.getLastCoordinate();
         }
+
+        // We set the rotation and the timeFraction of the trajectory (used by tralis).
+        this.trajectories[i].rotation = rotation || 0;
+        this.trajectories[i].endFraction = timeFrac || 0;
       }
 
       if (coord) {
@@ -259,6 +274,8 @@ export default class Tracker {
           hoverVehicleImg = vehicleImg;
           hoverVehiclePx = px;
         }
+      } else {
+        console.log('pas coord', coord);
       }
     }
     if (hoverVehicleImg) {
