@@ -3,7 +3,7 @@
 This demonstrates the use of RouteSchedule.
 
 ```jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import TileLayer from 'ol/layer/Tile';
@@ -17,7 +17,7 @@ import FollowButton from 'react-transit/components/FollowButton';
 let firstRender = null;
 const initialCenter = [951560, 6002550];
 const trackerLayer = new TrajservLayer({
-  key: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
+  apiKey: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
 });
 const layers = [
   new Layer({
@@ -33,10 +33,9 @@ function RouteScheduleExample() {
   const [lineInfos, setLineInfos] = useState(null);
   const [center, setCenter] = useState(initialCenter);
 
-  if (!firstRender) {
-    firstRender = true;
+  useEffect(()=> {
     trackerLayer.onClick(setLineInfos);
-  }
+  }, []);
 
   return (
     <div className="rt-route-schedule-example">

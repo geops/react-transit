@@ -1,4 +1,3 @@
-import { LineString } from 'ol/geom';
 import { unByKey } from 'ol/Observable';
 
 /**
@@ -30,6 +29,7 @@ export default class Tracker {
         'left: 0',
         'pointer-events: none',
         'visibility: visible',
+        'margin-top: inherit', // for scrolling behavior.
       ].join(';'),
     );
     this.canvasContext = this.canvas.getContext('2d');
@@ -84,11 +84,17 @@ export default class Tracker {
    */
   addTrajectory(id, traj, addOnTop) {
     const trajectory = { ...traj, id };
-
+    const idx = this.trajectories.findIndex(t => t.train_id === id);
     if (addOnTop) {
       this.trajectories.unshift(trajectory);
+      if (idx !== -1) {
+        this.tracker.trajectories.splice(idx + 1, 1);
+      }
     } else {
       this.trajectories.push(trajectory);
+      if (idx !== -1) {
+        this.tracker.trajectories.splice(idx, 1);
+      }
     }
   }
 
@@ -120,6 +126,7 @@ export default class Tracker {
         /* eslint-disable */
         console.log(`Deleted trajectory with ${attributeName} = ${value}.`);
         /* eslint-enable */
+        break;
       }
     }
   }
@@ -188,21 +195,21 @@ export default class Tracker {
         continue;
       }
 
-      const coords = geometry.getCoordinates();
       let coord = null;
-      const nbCoords = coords.length;
+      let rotation;
 
       if (timeIntervals && timeIntervals.length > 1) {
         const now = currTime - (timeOffset || 0);
         let start;
         let end;
-        let numCoordStart;
-        let numCoordEnd;
+        let startFrac;
+        let endFrac;
 
         // Search th time interval.
         for (let j = 0; j < timeIntervals.length - 1; j += 1) {
-          [start, numCoordStart] = timeIntervals[j];
-          [end, numCoordEnd] = timeIntervals[j + 1];
+          // Rotation only available in tralis layer.
+          [start, startFrac, rotation] = timeIntervals[j];
+          [end, endFrac] = timeIntervals[j + 1];
 
           if (start <= now && now <= end) {
             break;
@@ -214,20 +221,24 @@ export default class Tracker {
 
         if (start && end) {
           // interpolate position inside the time interval.
-          const geomFrac = this.interpolate
+          const timeFrac = this.interpolate
             ? Math.min((now - start) / (end - start), 1)
             : 0;
-          let intervalGeom = geometry;
-          if (nbCoords > 2) {
-            intervalGeom = new LineString(
-              coords.slice(numCoordStart, numCoordEnd + 1),
-            );
-          }
-          coord = intervalGeom.getCoordinateAt(geomFrac);
+
+          const geomFrac = this.interpolate
+            ? timeFrac * (endFrac - startFrac) + startFrac
+            : 0;
+
+          coord = geometry.getCoordinateAt(geomFrac);
+
+          // We set the rotation and the timeFraction of the trajectory (used by tralis).
+          this.trajectories[i].rotation = rotation;
+          this.trajectories[i].endFraction = timeFrac;
         }
       }
 
       if (coord) {
+        // We set the rotation of the trajectory (used by tralis).
         this.trajectories[i].coordinate = coord;
         const px = this.map.getPixelFromCoordinate(coord);
 
