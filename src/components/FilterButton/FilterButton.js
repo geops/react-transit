@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react';
 import qs from 'query-string';
 import PropTypes from 'prop-types';
 import Button from 'react-spatial/components/Button';
-import filterActive from '../../images/FilterButton/filterActive.png';
-import filterInactive from '../../images/FilterButton/filterInactive.png';
+import FilterActive from '../../images/FilterButton/filterActive.svg';
+import FilterInactive from '../../images/FilterButton/filterInactive.svg';
 
 import TrackerLayer from '../../layers/TrackerLayer';
 import TrajservLayer from '../../layers/TrajservLayer';
@@ -98,10 +98,7 @@ class FilterButton extends PureComponent {
         title={title}
         onClick={() => this.toggleFilter(routeIdentifier)}
       >
-        <img
-          src={filterActivated ? filterActive : filterInactive}
-          alt={filterActivated ? filterActive : filterInactive}
-        />
+        {filterActivated ? <FilterActive /> : <FilterInactive />}
       </Button>
     );
   }
