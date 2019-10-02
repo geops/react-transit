@@ -60,28 +60,29 @@ class FollowButton extends PureComponent {
     clearInterval(this.updateInterval);
   }
 
+  centerOnTrajectory(routeIdentifier) {
+    const { trackerLayer, setCenter } = this.props;
+
+    const [trajectory] = trackerLayer.getVehicle(
+      r => r.routeIdentifier === routeIdentifier,
+    );
+    const firstCoord = trajectory && trajectory.coordinate;
+    if (firstCoord) {
+      setCenter(firstCoord);
+    }
+  }
+
   toggleFollow(routeIdentifier) {
     const { centerActived } = this.state;
-    const { trackerLayer, setCenter } = this.props;
+    const { trackerLayer } = this.props;
 
     const activated = !centerActived;
 
     if (activated && trackerLayer && trackerLayer.tracker) {
-      const [trajectory] = trackerLayer.getVehicle(
-        r => r.routeIdentifier === routeIdentifier,
-      );
-      const firstCoord = trajectory && trajectory.coordinate;
-      if (firstCoord) {
-        setCenter(firstCoord);
-        this.updateInterval = window.setInterval(() => {
-          const [clickedRoute] = trackerLayer.getVehicle(
-            r => r.routeIdentifier === routeIdentifier,
-          );
-          if (clickedRoute && clickedRoute.coordinate) {
-            setCenter(clickedRoute.coordinate);
-          }
-        }, 50);
-      }
+      this.centerOnTrajectory(routeIdentifier);
+      this.updateInterval = window.setInterval(() => {
+        this.centerOnTrajectory(routeIdentifier);
+      }, 50);
     } else {
       clearInterval(this.updateInterval);
     }
