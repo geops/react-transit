@@ -165,6 +165,10 @@ class TrackerLayer extends Layer {
     }
   }
 
+  getVehicle(filterFc) {
+    return this.tracker.getTrajectories().filter(filterFc);
+  }
+
   /**
    * Set visibility.
    * @param {boolean} visible
