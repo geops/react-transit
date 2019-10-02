@@ -80,7 +80,7 @@ class FollowButton extends PureComponent {
           if (clickedRoute && clickedRoute.coordinate) {
             setCenter(clickedRoute.coordinate);
           }
-        }, 500);
+        }, 50);
       }
     } else {
       clearInterval(this.updateInterval);
