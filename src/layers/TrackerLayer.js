@@ -156,6 +156,16 @@ class TrackerLayer extends Layer {
   }
 
   /**
+   * Set the filter for tracker features.
+   * @param {Function} filter Filter function.
+   */
+  setFilter(filter) {
+    if (this.tracker) {
+      this.tracker.setFilter(filter);
+    }
+  }
+
+  /**
    * Set visibility.
    * @param {boolean} visible
    * @param {boolean} stopPropagationDown Stops propagation down.

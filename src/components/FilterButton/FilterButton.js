@@ -76,10 +76,10 @@ class FilterButton extends PureComponent {
     if (trackerLayer && trackerLayer.tracker) {
       if (activated) {
         this.updatePermalink(false);
-        trackerLayer.tracker.setFilter(filterFc);
+        trackerLayer.setFilter(filterFc);
       } else {
         this.updatePermalink(true);
-        trackerLayer.tracker.setFilter(null);
+        trackerLayer.setFilter(null);
       }
     }
 
