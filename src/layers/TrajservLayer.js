@@ -22,8 +22,11 @@ const OPERATOR_FILTER = 'operator';
 /**
  * Responsible for loading tracker data from Trajserv.
  * @class
- * @param {Object} [options]
  * @inheritDoc
+ * @param {Object} options
+ * @param {Array.<string>|string} options.publishedLineName filter by line name, string: 'ICE',  list: 's1,s2,s9,s10,s15'
+ * @param {Array.<string>|string} options.tripNumber filter by trip number, bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'
+ * @param {Array.<string>|string} options.operator filter by operator, string: 'sbb', list: '(vbz\|zsg)'
  */
 class TrajservLayer extends TrackerLayer {
   /**
