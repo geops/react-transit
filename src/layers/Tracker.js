@@ -75,63 +75,6 @@ export default class Tracker {
   }
 
   /**
-   * Add a feature to the tracker.
-   * @param {Number} id The feature id
-   * @param {ol.Feature} traj The tracker feature.
-   * @param {Boolean} addOnTop If true, the trajectory is added on top of
-   *   the trajectory object. This affects the draw order. If addOnTop is
-   *   true, the trajectory is drawn first and appears on bottom.
-   */
-  addTrajectory(id, traj, addOnTop) {
-    const trajectory = { ...traj, id };
-    const idx = this.trajectories.findIndex(t => t.train_id === id);
-    if (addOnTop) {
-      this.trajectories.unshift(trajectory);
-      if (idx !== -1) {
-        this.tracker.trajectories.splice(idx + 1, 1);
-      }
-    } else {
-      this.trajectories.push(trajectory);
-      if (idx !== -1) {
-        this.tracker.trajectories.splice(idx, 1);
-      }
-    }
-  }
-
-  /**
-   * Remove a trajectory with a given id.
-   * @param {Number} id The trajectory id
-   * @private
-   */
-  removeTrajectory(id) {
-    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
-      if (this.trajectories[i].id === id) {
-        this.trajectories.splice(i, 1);
-        break;
-      }
-    }
-  }
-
-  /**
-   * Remove a trajectory by attribute.
-   * @param {string} attributeName Name of the attribute.
-   * @param {*} value Attribute value.
-   * @private
-   */
-  removeTrajectoryByAttribute(attributeName, value) {
-    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
-      if (this.trajectories[i][attributeName] === value) {
-        this.removeTrajectory(this.trajectories[i].id);
-
-        /* eslint-disable */
-        console.log(`Deleted trajectory with ${attributeName} = ${value}.`);
-        /* eslint-enable */
-        break;
-      }
-    }
-  }
-
-  /**
    * Clear the canvas.
    * @private
    */

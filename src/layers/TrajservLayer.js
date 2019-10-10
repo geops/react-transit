@@ -262,7 +262,7 @@ class TrajservLayer extends TrackerLayer {
         return;
       }
 
-      const vehicle = this.getVehicleAtCoordinate(e.coordinate);
+      const [vehicle] = this.getVehiclesAtCoordinate(e.coordinate);
       const features = [];
 
       if (vehicle) {
