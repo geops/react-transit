@@ -10,7 +10,7 @@
   },
   "peerDependencies": {
     "mapbox-gl": "^1.2.0",
-    "ol": "^6.0.0-beta.13",
+    "ol": "^6.0.1",
     "react-spatial": "^0.1.0-beta.2"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "css-loader": "^3.0.0",
     "documentation": "^12.1.1",
     "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.12.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.0.1",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.0.0",
@@ -50,9 +50,9 @@
     "jest-transform-file": "^1.1.1",
     "jsts": "^2.0.3",
     "lint-staged": "^9.2.0",
-    "mapbox-gl": "^1.2.0",
+    "mapbox-gl": "^1.4.1",
     "node-sass": "^4.11.0",
-    "ol": "^6.0.0-beta.13",
+    "ol": "^6.0.1",
     "prettier": "^1.16.1",
     "proj4": "^2.5.0",
     "prop-types": "^15.6.2",
@@ -173,6 +173,9 @@
     "package.json": [
       "fixpack --sortToTop name --sortToTop description --sortToTop version --sortToTop license --sortToTop author --sortToTop main --sortToTop files --sortToTop proxy --sortToTop dependencies --sortToTop peerDependencies --sortToTop devDependencies --sortToTop scripts",
       "git add"
+    ],
+    "(package.json|yarn.lock)": [
+      "yarn test && yarn doc && git add"
     ]
   },
   "prettier": {

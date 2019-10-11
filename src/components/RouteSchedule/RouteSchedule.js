@@ -256,7 +256,6 @@ function RouteSchedule({
   onStationClick,
   trackerLayer,
 }) {
-  document.documentElement.style.setProperty('--mask-height', `25px`);
   return lineInfos ? (
     <div className={className}>
       {(renderHeader || renderDefaultHeader)(lineInfos)}

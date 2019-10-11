@@ -217,8 +217,6 @@ export default class Tracker {
           hoverVehicleImg = vehicleImg;
           hoverVehiclePx = px;
         }
-      } else {
-        console.log('pas coord', coord);
       }
     }
     if (hoverVehicleImg) {
