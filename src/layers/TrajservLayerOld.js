@@ -1,7 +1,7 @@
 import LineString from 'ol/geom/LineString';
 import { buffer, getWidth } from 'ol/extent';
 import TrajservLayer from './TrajservLayer';
-import TrackerLayer from './TrackerLayer';
+import { getDateString, getTimeString } from '../utils/TimeUtils';
 
 class TrajservLayerOld extends TrajservLayer {
   constructor(options = {}) {
@@ -38,9 +38,9 @@ class TrajservLayerOld extends TrajservLayer {
       ney: bufferExt[2],
       orx: ext[0],
       ory: ext[3],
-      btime: TrackerLayer.getTimeString(now),
-      etime: TrackerLayer.getTimeString(this.later),
-      date: TrackerLayer.getDateString(now),
+      btime: getTimeString(now),
+      etime: getTimeString(this.later),
+      date: getDateString(now),
       rid: 1,
       a: 1,
       cd: 1,

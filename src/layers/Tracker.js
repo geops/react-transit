@@ -1,5 +1,9 @@
 import { unByKey } from 'ol/Observable';
 
+// Array of ol events key. We don't use a class property to be sure
+// it's not overrided by a descendant of this class.
+let olEventsKeys = [];
+
 /**
  * Tracker for OpenLayers.
  * @class
@@ -16,8 +20,9 @@ export default class Tracker {
     this.map = map;
     this.trajectories = [];
     this.interpolate = !!opts.interpolate;
+    this.hoverVehicleId = null;
 
-    // we draw directly on the canvas since openlayers is too slow
+    // we draw directly on the canvas since openlayers is too slow.
     this.canvas = opts.canvas || document.createElement('canvas');
     this.canvas.setAttribute(
       'style',
@@ -34,14 +39,16 @@ export default class Tracker {
     );
     this.canvasContext = this.canvas.getContext('2d');
 
-    this.renderCompleteRef = this.map.once('rendercomplete', () => {
-      [this.canvas.width, this.canvas.height] = this.map.getSize();
-      this.map.getTarget().appendChild(this.canvas);
-    });
-
-    this.changeSizeRef = this.map.on('change:size', () => {
-      [this.canvas.width, this.canvas.height] = this.map.getSize();
-    });
+    // Update the size of the canvas accordingly to the map' size.
+    olEventsKeys = [
+      this.map.once('rendercomplete', () => {
+        [this.canvas.width, this.canvas.height] = this.map.getSize();
+        this.map.getTarget().appendChild(this.canvas);
+      }),
+      this.map.on('change:size', () => {
+        [this.canvas.width, this.canvas.height] = this.map.getSize();
+      }),
+    ];
   }
 
   /**
@@ -118,10 +125,11 @@ export default class Tracker {
   }
 
   /**
+   * Draw all the trajectories available to the canvas.
    * @param {Date} currTime
    * @private
    */
-  renderTrajectory(currTime = Date.now()) {
+  renderTrajectories(currTime = Date.now()) {
     this.clear();
     const res = this.map.getView().getResolution();
     let hoverVehicleImg;
@@ -229,11 +237,11 @@ export default class Tracker {
   }
 
   /**
-   * Kill the tracker.
+   * Clean the canvas and the events the tracker.
    * @private
    */
   destroy() {
+    unByKey(olEventsKeys);
     this.clear();
-    unByKey([this.renderCompleteRef, this.changeSizeRef]);
   }
 }
