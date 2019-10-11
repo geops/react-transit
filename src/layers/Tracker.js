@@ -46,7 +46,7 @@ export default class Tracker {
 
   /**
    * Set visibility of the canvas.
-   * @param {boolean} visible
+   * @param {boolean} visible The visibility of the layer
    */
   setVisible(visible) {
     if (this.canvas) {
@@ -77,7 +77,7 @@ export default class Tracker {
   /**
    * Add a feature to the tracker.
    * @param {Number} id The feature id
-   * @param {ol.Feature} traj The tracker feature.
+   * @param {ol.Feature} traj The tracker feature {@link https://openlayers.org/en/latest/apidoc/module-ol_Feature-Feature.html ol/Feature}
    * @param {Boolean} addOnTop If true, the trajectory is added on top of
    *   the trajectory object. This affects the draw order. If addOnTop is
    *   true, the trajectory is drawn first and appears on bottom.

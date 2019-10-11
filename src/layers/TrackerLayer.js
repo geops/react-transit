@@ -157,7 +157,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Set visibility.
-   * @param {boolean} visible
+   * @param {boolean} visible The visibility of the layer
    * @param {boolean} stopPropagationDown Stops propagation down.
    * @param {boolean} stopPropagationUp Stops propagation up.
    * @param {boolean} stopPropagationSiblings Stops propagation toward siblings.
@@ -227,7 +227,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Get the current time.
-   * @returns {Date}
+   * @returns {Date} Current time
    */
   getCurrTime() {
     return this.currTime;
@@ -248,7 +248,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Get the Speed.
-   * @returns {number}
+   * @returns {number} Speed
    */
   getSpeed() {
     return this.speed;
@@ -256,7 +256,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Set the speed.
-   * @param {number} speed
+   * @param {number} speed Speed
    */
   setSpeed(speed) {
     this.speed = speed;
@@ -290,7 +290,7 @@ class TrackerLayer extends Layer {
    * Returns the vehicle which are at the given coordinates.
    * Returns null when no vehicle is located at the given coordinates.
    * @param {ol.coordinate} coordinate
-   * @returns {ol.feature | null}
+   * @returns {ol.feature | null} Vehicle feature
    * @private
    */
   getVehicleAtCoordinate(coordinate) {
