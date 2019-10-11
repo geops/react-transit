@@ -179,7 +179,7 @@ export default class Tracker {
           this.trajectories[i].rotation = rotation;
           this.trajectories[i].endFraction = timeFrac;
 
-          // It happens than the now date was some ms before the first timeIntervals we have.
+          // It happens that the now date was some ms before the first timeIntervals we have.
         } else if (now < timeIntervals[0][0]) {
           [[, , rotation]] = timeIntervals;
           timeFrac = 0;
