@@ -18,7 +18,7 @@ const lineInfos = PropTypes.shape({
     PropTypes.shape({
       arrivalDate: PropTypes.number, // time in milliseconds.
       arrivalDelay: PropTypes.number, // time in milliseconds.
-      arrivaleTime: PropTypes.number, // time in milliseconds.
+      arrivalTime: PropTypes.number, // time in milliseconds.
       cancelled: PropTypes.number,
       coordinates: PropTypes.arrayOf(PropTypes.number),
       departureDate: PropTypes.number, // time in milliseconds.

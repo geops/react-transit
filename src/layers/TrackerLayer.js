@@ -53,6 +53,9 @@ class TrackerLayer extends Layer {
 
     this.intervalStarted = false;
 
+    this.isHoverActive =
+      options.isHoverActive !== undefined ? options.isHoverActive : true;
+
     this.hoverVehicleId = null;
 
     this.selectedVehicleId = null;
@@ -293,21 +296,21 @@ class TrackerLayer extends Layer {
    * @returns {ol.feature | null}
    * @private
    */
-  getVehicleAtCoordinate(coordinate) {
+  getVehiclesAtCoordinate(coordinate) {
     const res = this.map.getView().getResolution();
     const ext = buffer([...coordinate, ...coordinate], 10 * res);
     const trajectories = this.tracker.getTrajectories();
-
+    const vehicles = [];
     for (let i = 0; i < trajectories.length; i += 1) {
       if (
         trajectories[i].coordinate &&
         containsCoordinate(ext, trajectories[i].coordinate)
       ) {
-        return trajectories[i];
+        vehicles.push(trajectories[i]);
       }
     }
 
-    return null;
+    return vehicles;
   }
 
   getRefreshTimeInMs() {
@@ -334,10 +337,10 @@ class TrackerLayer extends Layer {
   }
 
   onPointerMove(e) {
-    if (e.dragging) {
+    if (e.dragging || !this.isHoverActive) {
       return;
     }
-    const vehicle = this.getVehicleAtCoordinate(e.coordinate);
+    const [vehicle] = this.getVehiclesAtCoordinate(e.coordinate);
     this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
     this.hoverVehicleId = vehicle && vehicle.id;
     this.tracker.setHoverVehicleId(this.hoverVehicleId);
