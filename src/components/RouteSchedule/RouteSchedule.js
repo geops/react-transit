@@ -195,7 +195,7 @@ const renderDefaultStations = (lineInfos, onStationClick, trackerLayer) => (
         key={stop.stationId}
         role="button"
         className={`rt-route-station${
-          isPassed(stop, trackerLayer.getCurrTime()) ? ' rt-passed' : ''
+          isPassed(stop, trackerLayer.currTime) ? ' rt-passed' : ''
         }${isNotStop(stop) ? ' rt-no-stop' : ''}`}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
