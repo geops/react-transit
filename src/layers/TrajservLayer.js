@@ -202,7 +202,7 @@ class TrajservLayer extends TrackerLayer {
   constructor(options = {}) {
     super({ ...options });
 
-    this.url = options.url || 'https://api.geops.io/tracker';
+    this.url = options.url || 'https://api.geops.io/tracker/v1';
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.apiKey = options.apiKey;
