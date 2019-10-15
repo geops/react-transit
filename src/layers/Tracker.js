@@ -36,7 +36,7 @@ export default class Tracker {
     this.canvasContext = this.canvas.getContext('2d');
 
     // Array of ol events key. We don't use a class property to be sure
-    // it's not overrided by a descendant of this class.
+    // it's not overwritten by a descendant of this class.
     this.olEventsKeys = [
       // Update the size of the canvas accordingly to the map' size.
       this.map.once('rendercomplete', () => {
