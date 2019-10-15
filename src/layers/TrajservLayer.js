@@ -1,4 +1,3 @@
-import { unByKey } from 'ol/Observable';
 import qs from 'query-string';
 import Feature from 'ol/Feature';
 import { transform as transformCoords } from 'ol/proj';
@@ -19,10 +18,6 @@ import {
 const LINE_FILTER = 'publishedlinename';
 const ROUTE_FILTER = 'tripnumber';
 const OPERATOR_FILTER = 'operator';
-
-// Array of ol events key. We don't use a class property to be sure
-// it's not overrided by a descendant of this class.
-let olEventsKeys = [];
 
 /**
  * Responsible for loading tracker data from Trajserv.
@@ -265,7 +260,8 @@ class TrajservLayer extends TrackerLayer {
     }
     super.start(this.map);
     this.startUpdateTrajectories();
-    olEventsKeys = [
+    this.olEventsKeys = [
+      ...this.olEventsKeys,
       this.map.on('singleclick', e => {
         if (!this.clickCallbacks.length) {
           return;
@@ -303,7 +299,6 @@ class TrajservLayer extends TrackerLayer {
   }
 
   stop() {
-    unByKey(olEventsKeys);
     this.journeyId = null;
     this.stopUpdateTrajectories();
     this.abortFetchTrajectories();

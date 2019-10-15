@@ -6,10 +6,6 @@ import { buffer, containsCoordinate } from 'ol/extent';
 import Tracker from './Tracker';
 import { timeSteps } from '../config/tracker';
 
-// Array of ol events key. We don't use a class property to be sure
-// it's not overrided by a descendant of this class.
-let olEventsKeys = [];
-
 /**
  * Responsible for loading tracker data.
  * Extented from Layer {@link https://react-spatial.geops.de/docjs.html react-spatial/layers/Layer}
@@ -29,6 +25,9 @@ class TrackerLayer extends Layer {
       }),
       ...options,
     });
+
+    // Array of ol events key. Be careful to not override this value in child classe.
+    this.olEventsKeys = [];
 
     /**
      * Cache object for trajectories drawn.
@@ -95,18 +94,20 @@ class TrackerLayer extends Layer {
     this.visibilityRef = this.on('change:visible', v => {
       if (v.target.getVisible()) {
         this.start();
+      } else {
+        this.stop();
       }
     });
   }
 
   terminate() {
-    super.terminate();
     this.stop();
     unByKey(this.visibilityRef);
     if (this.tracker) {
       this.tracker.destroy();
       this.tracker = null;
     }
+    super.terminate();
   }
 
   /**
@@ -147,33 +148,6 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Set visibility.
-   * @param {boolean} visible
-   * @param {boolean} stopPropagationDown Stops propagation down.
-   * @param {boolean} stopPropagationUp Stops propagation up.
-   * @param {boolean} stopPropagationSiblings Stops propagation toward siblings.
-   */
-  setVisible(
-    visible,
-    stopPropagationDown = false,
-    stopPropagationUp = false,
-    stopPropagationSiblings = false,
-  ) {
-    super.setVisible(
-      visible,
-      stopPropagationDown,
-      stopPropagationUp,
-      stopPropagationSiblings,
-    );
-
-    if (this.getVisible()) {
-      this.start();
-    } else {
-      this.stop();
-    }
-  }
-
-  /**
    * Trackerlayer is started
    * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
    * @private
@@ -184,7 +158,7 @@ class TrackerLayer extends Layer {
     this.tracker.renderTrajectories(this.currTime);
     this.startUpdateTime();
 
-    olEventsKeys = [
+    this.olEventsKeys = [
       this.map.on('moveend', () => {
         const z = this.map.getView().getZoom();
 
@@ -217,12 +191,13 @@ class TrackerLayer extends Layer {
    * @private
    */
   stop() {
-    if (this.tracker) {
-      this.tracker.clear();
-      this.tracker.setVisible(false);
-    }
-    unByKey(olEventsKeys);
     this.stopUpdateTime();
+    if (this.tracker) {
+      this.tracker.setVisible(false);
+      this.tracker.clear();
+    }
+    unByKey(this.olEventsKeys);
+    this.olEventsKeys = [];
   }
 
   /**
@@ -311,9 +286,26 @@ class TrackerLayer extends Layer {
    */
   onClick(callback) {
     if (typeof callback === 'function') {
-      this.clickCallbacks.push(callback);
+      if (!this.clickCallbacks.includes(callback)) {
+        this.clickCallbacks.push(callback);
+      }
     } else {
       throw new Error('callback must be of type function.');
+    }
+  }
+
+  /**
+   * Unlistens to click events on the layer.
+   * @param {function} callback Callback function, called with the clicked
+   *   features (https://openlayers.org/en/latest/apidoc/module-ol_Feature.html),
+   *   the layer instance and the click event.
+   */
+  unClick(callback) {
+    if (typeof callback === 'function') {
+      const idx = this.clickCallbacks.indexOf(callback);
+      if (idx >= -1) {
+        this.clickCallbacks.splice(idx, 1);
+      }
     }
   }
 }

@@ -1,9 +1,5 @@
 import { unByKey } from 'ol/Observable';
 
-// Array of ol events key. We don't use a class property to be sure
-// it's not overrided by a descendant of this class.
-let olEventsKeys = [];
-
 /**
  * Tracker for OpenLayers.
  * @class
@@ -39,8 +35,10 @@ export default class Tracker {
     );
     this.canvasContext = this.canvas.getContext('2d');
 
-    // Update the size of the canvas accordingly to the map' size.
-    olEventsKeys = [
+    // Array of ol events key. We don't use a class property to be sure
+    // it's not overrided by a descendant of this class.
+    this.olEventsKeys = [
+      // Update the size of the canvas accordingly to the map' size.
       this.map.once('rendercomplete', () => {
         [this.canvas.width, this.canvas.height] = this.map.getSize();
         this.map.getTarget().appendChild(this.canvas);
@@ -241,7 +239,7 @@ export default class Tracker {
    * @private
    */
   destroy() {
-    unByKey(olEventsKeys);
+    unByKey(this.olEventsKeys);
     this.clear();
   }
 }

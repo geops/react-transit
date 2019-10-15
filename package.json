@@ -39,7 +39,7 @@
     "fixpack": "^2.3.1",
     "generact": "^0.4.0",
     "geops-docjs-template": "^1.0.0",
-    "husky": "^3.0.0",
+    "husky": "^3.0.9",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.1.0",
     "jest-canvas-mock": "^2.0.0-alpha.3",
@@ -72,7 +72,7 @@
     "stylelint-scss": "^3.4.0",
     "url-loader": "^2.0.0",
     "vinyl-fs": "^3.0.3",
-    "webpack": "^4.39.1"
+    "webpack": "^4.41.1"
   },
   "scripts": {
     "build": "buble --no modules,asyncAwait -i src -o build --objectAssign Object.assign --sourcemap && cp -t build package.json README.md LICENSE && cp -rf src/images build",
