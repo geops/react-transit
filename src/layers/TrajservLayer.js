@@ -315,55 +315,49 @@ class TrajservLayer extends TrackerLayer {
   /**
    * Draw the trajectory as a line with points for each stop.
    * @param {Array} stationsCoords Array of station coordinates.
-   * @param {Array} lineCoords Array of coordinates of the trajectory (linestring).
+   * @param {<LineString|MultiLineString} lineGeometry A LineString or a MultiLineString.
    * @param {string} color The color of the line.
    * @private
    */
-  drawTrajectory(stationsCoords, lineCoords, color) {
+  drawFullTrajectory(stationsCoords, lineGeometry, color) {
     // Don't allow white lines, use red instead.
     const vehiculeColor = /#ffffff/i.test(color) ? '#ff0000' : color;
+    const vectorSource = this.olLayer.getSource();
+    vectorSource.clear();
 
-    const abovePointFeatures = new Feature({
-      geometry: new MultiPoint(stationsCoords),
-    });
-    abovePointFeatures.setStyle(
-      new Style({
-        zIndex: 4,
-        image: new Circle({
-          radius: 4,
-          fill: new Fill({
-            color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
+    if (stationsCoords) {
+      const geometry = new MultiPoint(stationsCoords);
+      const aboveStationsFeature = new Feature(geometry);
+      aboveStationsFeature.setStyle(
+        new Style({
+          zIndex: 1,
+          image: new Circle({
+            radius: 5,
+            fill: new Fill({
+              color: '#000000',
+            }),
           }),
         }),
-      }),
-    );
-
-    const belowPointFeatures = new Feature({
-      geometry: new MultiPoint(stationsCoords),
-    });
-    belowPointFeatures.setStyle(
-      new Style({
-        zIndex: 1,
-        image: new Circle({
-          radius: 5,
-          fill: new Fill({
-            color: '#000000',
+      );
+      const belowStationsFeature = new Feature(geometry);
+      belowStationsFeature.setStyle(
+        new Style({
+          zIndex: 4,
+          image: new Circle({
+            radius: 4,
+            fill: new Fill({
+              color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
+            }),
           }),
         }),
-      }),
-    );
+      );
+      vectorSource.addFeatures([aboveStationsFeature, belowStationsFeature]);
+    }
 
     const lineFeat = new Feature({
-      geometry: new LineString(lineCoords),
+      geometry: lineGeometry,
     });
     lineFeat.setStyle([
-      new Style({
-        zIndex: 3,
-        stroke: new Stroke({
-          color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
-          width: 4,
-        }),
-      }),
       new Style({
         zIndex: 2,
         stroke: new Stroke({
@@ -371,15 +365,15 @@ class TrajservLayer extends TrackerLayer {
           width: 6,
         }),
       }),
+      new Style({
+        zIndex: 3,
+        stroke: new Stroke({
+          color: this.useDelayStyle ? '#a0a0a0' : vehiculeColor,
+          width: 4,
+        }),
+      }),
     ]);
-
-    const vectorSource = this.olLayer.getSource();
-    vectorSource.clear();
-    vectorSource.addFeatures([
-      abovePointFeatures,
-      lineFeat,
-      belowPointFeatures,
-    ]);
+    vectorSource.addFeature(lineFeat);
   }
 
   /**
@@ -444,16 +438,16 @@ class TrajservLayer extends TrackerLayer {
     this.fetchTrajectoryById(this.journeyId)
       .then(traj => {
         const { p: multiLine, t, c } = traj;
-
         const lineCoords = [];
         multiLine.forEach(line => {
           line.forEach(point => {
             lineCoords.push([point.x, point.y]);
           });
         });
-        this.drawTrajectory(
+
+        this.drawFullTrajectory(
           this.stationsCoords,
-          lineCoords,
+          new LineString(lineCoords),
           c ? `#${c}` : getBgColor(t),
         );
       })
