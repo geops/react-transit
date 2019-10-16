@@ -419,7 +419,11 @@ class TrajservLayer extends TrackerLayer {
     const url = `${this.url}/trajstations?${params}`;
     return fetch(url)
       .then(res => {
-        return res.json();
+        try {
+          return res.json();
+        } catch (err) {
+          throw new Error(err);
+        }
       })
       .then(resp => {
         const trajStations = TrajservLayer.translateTrajStationsResp(resp);
@@ -437,11 +441,8 @@ class TrajservLayer extends TrackerLayer {
   }
 
   highlightTrajectory() {
-    this.abortHighlightTrajectory();
-    this.abortControllerHighlight = new AbortController();
-    const { signal } = this.abortControllerHighlight;
-    this.fetchTrajectoryById(this.journeyId, { signal }).then(traj => {
-      if (traj) {
+    this.fetchTrajectoryById(this.journeyId)
+      .then(traj => {
         const { p, t, c } = traj;
 
         const lineCoords = [];
@@ -453,14 +454,10 @@ class TrajservLayer extends TrackerLayer {
           lineCoords,
           c ? `#${c}` : getBgColor(t),
         );
-      }
-    });
-  }
-
-  abortHighlightTrajectory() {
-    if (this.abortControllerHighlight) {
-      this.abortControllerHighlight.abort();
-    }
+      })
+      .catch(() => {
+        this.olLayer.getSource().clear();
+      });
   }
 
   /**
@@ -475,24 +472,13 @@ class TrajservLayer extends TrackerLayer {
     });
 
     const url = `${this.url}/trajectorybyid?${params}`;
-
-    this.abortFetchTrajectoryById();
-    this.abortControllerFetchById = new AbortController();
-    const { signal } = this.abortControllerFetchById;
-    return fetch(url, { signal })
-      .then(res => {
+    return fetch(url).then(res => {
+      try {
         return res.json();
-      })
-      .catch(err => {
-        // eslint-disable-next-line no-console
-        console.warn('Fetch trajectory by id request failed: ', err);
-      });
-  }
-
-  abortFetchTrajectoryById() {
-    if (this.abortControllerFetchById) {
-      this.abortControllerFetchById.abort();
-    }
+      } catch (err) {
+        throw new Error(err);
+      }
+    });
   }
 
   /**
