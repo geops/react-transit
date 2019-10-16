@@ -419,7 +419,11 @@ class TrajservLayer extends TrackerLayer {
     const url = `${this.url}/trajstations?${params}`;
     return fetch(url)
       .then(res => {
-        return res.json();
+        try {
+          return res.json();
+        } catch (err) {
+          throw new Error(err);
+        }
       })
       .then(resp => {
         const trajStations = TrajservLayer.translateTrajStationsResp(resp);
@@ -465,7 +469,11 @@ class TrajservLayer extends TrackerLayer {
 
     const url = `${this.url}/trajectorybyid?${params}`;
     return fetch(url).then(res => {
-      return res.json();
+      try {
+        return res.json();
+      } catch (err) {
+        throw new Error(err);
+      }
     });
   }
 
