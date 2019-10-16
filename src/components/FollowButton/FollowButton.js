@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Button from 'react-spatial/components/Button';
-import CenterActive from '../../images/FollowButton/centerActive.svg';
-import CenterInactive from '../../images/FollowButton/centerInactive.svg';
+import Follow from '../../images/FollowButton/follow.svg';
 
 import TrackerLayer from '../../layers/TrackerLayer';
 
@@ -103,11 +102,13 @@ class FollowButton extends PureComponent {
 
     return (
       <Button
-        className={className}
+        className={`${className}${
+          centerActived ? ' rt-active' : ' rt-inactive'
+        }`}
         title={title}
         onClick={() => this.toggleFollow(routeIdentifier)}
       >
-        {centerActived ? <CenterActive /> : <CenterInactive />}
+        <Follow />
       </Button>
     );
   }
