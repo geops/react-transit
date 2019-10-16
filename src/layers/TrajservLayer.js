@@ -443,11 +443,13 @@ class TrajservLayer extends TrackerLayer {
   highlightTrajectory() {
     this.fetchTrajectoryById(this.journeyId)
       .then(traj => {
-        const { p, t, c } = traj;
+        const { p: multiLine, t, c } = traj;
 
         const lineCoords = [];
-        p[0].forEach(point => {
-          lineCoords.push([point.x, point.y]);
+        multiLine.forEach(line => {
+          line.forEach(point => {
+            lineCoords.push([point.x, point.y]);
+          });
         });
         this.drawTrajectory(
           this.stationsCoords,
