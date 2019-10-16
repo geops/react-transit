@@ -22,8 +22,14 @@ const OPERATOR_FILTER = 'operator';
 /**
  * Responsible for loading tracker data from Trajserv.
  * @class
- * @param {Object} [options]
  * @inheritDoc
+ * @param {Object} [options] Layer options.
+ * @param {string} [url = https://api.geops.io/tracker] Tracker url.
+ * @param {string} options.apiKey Access key for [geOps services](https://developer.geops.io/).
+ * @param {Array.<string>|string} options.regexPublishedLineName Regex filter for line name. This filter has a higher prio over publishedLineName.
+ * @param {Array.<string>|string} options.publishedLineName Filter by line name, string: 'ICE',  list: 's1,s2,s9,s10,s15'
+ * @param {Array.<string>|string} options.tripNumber Filter by trip number, bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'
+ * @param {Array.<string>|string} options.operator Filter by operator, string: 'sbb', list: '(vbz\|zsg)'
  */
 class TrajservLayer extends TrackerLayer {
   /**
@@ -138,6 +144,7 @@ class TrajservLayer extends TrackerLayer {
    * @param {string} line
    * @param {string} route
    * @param {string} operator
+   * @param {string} regexLine
    * @private
    */
   static createFilter(line, trip, operator, regexLine) {
@@ -400,7 +407,7 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Fetch stations information with a trajectory ID
-   * @param {number} trajId the ID of the trajectory
+   * @param {number} trajId The ID of the trajectory
    * @private
    */
   fetchTrajectoryStations(trajId) {
@@ -447,7 +454,7 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Fetch trajectory information with a trajectory ID
-   * @param {number} journeyId the gtfs ID of the trajectory.
+   * @param {number} journeyId The gtfs ID of the trajectory.
    * @private
    */
   fetchTrajectoryById(journeyId) {

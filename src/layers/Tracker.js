@@ -51,7 +51,7 @@ export default class Tracker {
 
   /**
    * Set visibility of the canvas.
-   * @param {boolean} visible
+   * @param {boolean} visible The visibility of the layer
    */
   setVisible(visible) {
     if (this.canvas) {

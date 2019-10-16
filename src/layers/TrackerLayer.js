@@ -75,7 +75,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Initialize the layer and listen to feature clicks.
-   * @param {ol.map} map ol.map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html Map}
    * @private
    */
   init(map) {
@@ -226,7 +226,7 @@ class TrackerLayer extends Layer {
    * Returns the vehicle which are at the given coordinates.
    * Returns null when no vehicle is located at the given coordinates.
    * @param {ol.coordinate} coordinate
-   * @returns {ol.feature | null}
+   * @returns {ol.feature | null} Vehicle feature
    * @private
    */
   getVehiclesAtCoordinate(coordinate) {

@@ -10,7 +10,7 @@ import TrackerLayer from '../../layers/TrackerLayer';
 
 /**
  * Returns a paded number (with leading 0 for integer < 10).
- * @param {Number} number number.
+ * @param {Number} number Number.
  */
 const pad = number => {
   return `${number < 10 ? '0' : ''}${number}`;
@@ -18,7 +18,7 @@ const pad = number => {
 
 /**
  * Returns a 'hh:mm' string from a time.
- * @param {Number} t time in milliseconds.
+ * @param {Number} t Time in milliseconds.
  */
 const getTimeString = t => {
   if (t === -1) {
@@ -109,7 +109,7 @@ const getStationImg = (index, length) => {
 
 /**
  * Returns an image for first, middle or last stations.
- * @param {Number} index index of the station in the list.
+ * @param {Number} index Index of the station in the list.
  * @param {Number} length Length of the stations list.
  */
 const renderStationImg = (index, length) => {
