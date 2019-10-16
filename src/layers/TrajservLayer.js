@@ -441,19 +441,23 @@ class TrajservLayer extends TrackerLayer {
   }
 
   highlightTrajectory() {
-    this.fetchTrajectoryById(this.journeyId).then(traj => {
-      const { p, t, c } = traj;
+    this.fetchTrajectoryById(this.journeyId)
+      .then(traj => {
+        const { p, t, c } = traj;
 
-      const lineCoords = [];
-      p[0].forEach(point => {
-        lineCoords.push([point.x, point.y]);
+        const lineCoords = [];
+        p[0].forEach(point => {
+          lineCoords.push([point.x, point.y]);
+        });
+        this.drawTrajectory(
+          this.stationsCoords,
+          lineCoords,
+          c ? `#${c}` : getBgColor(t),
+        );
+      })
+      .catch(() => {
+        this.olLayer.getSource().clear();
       });
-      this.drawTrajectory(
-        this.stationsCoords,
-        lineCoords,
-        c ? `#${c}` : getBgColor(t),
-      );
-    });
   }
 
   /**
