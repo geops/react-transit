@@ -90,19 +90,22 @@
           color: rgb(237, 0, 76);
         }
       }
-
-      .rt-route-icon {
-        padding: 0 15px;
-      }
     }
 
-    .rt-route-station.rt-passed {
+    .rt-route-station.rt-passed,
+    .rt-route-station.rt-no-stop {
       opacity: 0.7;
 
       .rt-route-delay {
         span {
           display: none;
         }
+      }
+    }
+
+    .rt-route-station.rt-passed {
+      .rt-route-icon-mask {
+        height: 0;
       }
     }
 

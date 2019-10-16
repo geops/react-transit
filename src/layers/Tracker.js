@@ -16,8 +16,9 @@ export default class Tracker {
     this.map = map;
     this.trajectories = [];
     this.interpolate = !!opts.interpolate;
+    this.hoverVehicleId = null;
 
-    // we draw directly on the canvas since openlayers is too slow
+    // we draw directly on the canvas since openlayers is too slow.
     this.canvas = opts.canvas || document.createElement('canvas');
     this.canvas.setAttribute(
       'style',
@@ -34,19 +35,23 @@ export default class Tracker {
     );
     this.canvasContext = this.canvas.getContext('2d');
 
-    this.renderCompleteRef = this.map.once('rendercomplete', () => {
-      [this.canvas.width, this.canvas.height] = this.map.getSize();
-      this.map.getTarget().appendChild(this.canvas);
-    });
-
-    this.changeSizeRef = this.map.on('change:size', () => {
-      [this.canvas.width, this.canvas.height] = this.map.getSize();
-    });
+    // Array of ol events key. We don't use a class property to be sure
+    // it's not overwritten by a descendant of this class.
+    this.olEventsKeys = [
+      // Update the size of the canvas accordingly to the map' size.
+      this.map.once('rendercomplete', () => {
+        [this.canvas.width, this.canvas.height] = this.map.getSize();
+        this.map.getTarget().appendChild(this.canvas);
+      }),
+      this.map.on('change:size', () => {
+        [this.canvas.width, this.canvas.height] = this.map.getSize();
+      }),
+    ];
   }
 
   /**
    * Set visibility of the canvas.
-   * @param {boolean} visible
+   * @param {boolean} visible The visibility of the layer
    */
   setVisible(visible) {
     if (this.canvas) {
@@ -72,63 +77,6 @@ export default class Tracker {
    */
   getTrajectories() {
     return this.trajectories;
-  }
-
-  /**
-   * Add a feature to the tracker.
-   * @param {Number} id The feature id
-   * @param {ol.Feature} traj The tracker feature.
-   * @param {Boolean} addOnTop If true, the trajectory is added on top of
-   *   the trajectory object. This affects the draw order. If addOnTop is
-   *   true, the trajectory is drawn first and appears on bottom.
-   */
-  addTrajectory(id, traj, addOnTop) {
-    const trajectory = { ...traj, id };
-    const idx = this.trajectories.findIndex(t => t.train_id === id);
-    if (addOnTop) {
-      this.trajectories.unshift(trajectory);
-      if (idx !== -1) {
-        this.tracker.trajectories.splice(idx + 1, 1);
-      }
-    } else {
-      this.trajectories.push(trajectory);
-      if (idx !== -1) {
-        this.tracker.trajectories.splice(idx, 1);
-      }
-    }
-  }
-
-  /**
-   * Remove a trajectory with a given id.
-   * @param {Number} id The trajectory id
-   * @private
-   */
-  removeTrajectory(id) {
-    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
-      if (this.trajectories[i].id === id) {
-        this.trajectories.splice(i, 1);
-        break;
-      }
-    }
-  }
-
-  /**
-   * Remove a trajectory by attribute.
-   * @param {string} attributeName Name of the attribute.
-   * @param {*} value Attribute value.
-   * @private
-   */
-  removeTrajectoryByAttribute(attributeName, value) {
-    for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
-      if (this.trajectories[i][attributeName] === value) {
-        this.removeTrajectory(this.trajectories[i].id);
-
-        /* eslint-disable */
-        console.log(`Deleted trajectory with ${attributeName} = ${value}.`);
-        /* eslint-enable */
-        break;
-      }
-    }
   }
 
   /**
@@ -175,10 +123,11 @@ export default class Tracker {
   }
 
   /**
+   * Draw all the trajectories available to the canvas.
    * @param {Date} currTime
    * @private
    */
-  renderTrajectory(currTime = Date.now()) {
+  renderTrajectories(currTime = Date.now()) {
     this.clear();
     const res = this.map.getView().getResolution();
     let hoverVehicleImg;
@@ -204,6 +153,7 @@ export default class Tracker {
         let end;
         let startFrac;
         let endFrac;
+        let timeFrac;
 
         // Search th time interval.
         for (let j = 0; j < timeIntervals.length - 1; j += 1) {
@@ -221,7 +171,7 @@ export default class Tracker {
 
         if (start && end) {
           // interpolate position inside the time interval.
-          const timeFrac = this.interpolate
+          timeFrac = this.interpolate
             ? Math.min((now - start) / (end - start), 1)
             : 0;
 
@@ -234,7 +184,21 @@ export default class Tracker {
           // We set the rotation and the timeFraction of the trajectory (used by tralis).
           this.trajectories[i].rotation = rotation;
           this.trajectories[i].endFraction = timeFrac;
+
+          // It happens that the now date was some ms before the first timeIntervals we have.
+        } else if (now < timeIntervals[0][0]) {
+          [[, , rotation]] = timeIntervals;
+          timeFrac = 0;
+          coord = geometry.getFirstCoordinate();
+        } else if (now > timeIntervals[timeIntervals.length - 1][0]) {
+          [, , rotation] = timeIntervals[timeIntervals.length - 1];
+          timeFrac = 1;
+          coord = geometry.getLastCoordinate();
         }
+
+        // We set the rotation and the timeFraction of the trajectory (used by tralis).
+        this.trajectories[i].rotation = rotation || 0;
+        this.trajectories[i].endFraction = timeFrac || 0;
       }
 
       if (coord) {
@@ -271,11 +235,11 @@ export default class Tracker {
   }
 
   /**
-   * Kill the tracker.
+   * Clean the canvas and the events the tracker.
    * @private
    */
   destroy() {
+    unByKey(this.olEventsKeys);
     this.clear();
-    unByKey([this.renderCompleteRef, this.changeSizeRef]);
   }
 }

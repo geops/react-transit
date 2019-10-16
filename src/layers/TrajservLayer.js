@@ -1,4 +1,3 @@
-import { unByKey } from 'ol/Observable';
 import qs from 'query-string';
 import Feature from 'ol/Feature';
 import { transform as transformCoords } from 'ol/proj';
@@ -6,6 +5,7 @@ import { buffer, getWidth } from 'ol/extent';
 import { Point, MultiPoint, LineString } from 'ol/geom';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
+import { getDateString, getTimeString } from '../utils/TimeUtils';
 import {
   getRadius,
   getBgColor,
@@ -22,8 +22,14 @@ const OPERATOR_FILTER = 'operator';
 /**
  * Responsible for loading tracker data from Trajserv.
  * @class
- * @param {Object} [options]
  * @inheritDoc
+ * @param {Object} [options] Layer options.
+ * @param {string} [url = https://api.geops.io/tracker] Tracker url.
+ * @param {string} options.apiKey Access key for [geOps services](https://developer.geops.io/).
+ * @param {Array.<string>|string} options.regexPublishedLineName Regex filter for line name. This filter has a higher prio over publishedLineName.
+ * @param {Array.<string>|string} options.publishedLineName Filter by line name, string: 'ICE',  list: 's1,s2,s9,s10,s15'
+ * @param {Array.<string>|string} options.tripNumber Filter by trip number, bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'
+ * @param {Array.<string>|string} options.operator Filter by operator, string: 'sbb', list: '(vbz\|zsg)'
  */
 class TrajservLayer extends TrackerLayer {
   /**
@@ -138,6 +144,7 @@ class TrajservLayer extends TrackerLayer {
    * @param {string} line
    * @param {string} route
    * @param {string} operator
+   * @param {string} regexLine
    * @private
    */
   static createFilter(line, trip, operator, regexLine) {
@@ -197,10 +204,13 @@ class TrajservLayer extends TrackerLayer {
   constructor(options = {}) {
     super({ ...options });
 
-    this.url = options.url || 'https://api.geops.io/tracker';
+    this.url = options.url || 'https://api.geops.io/tracker/v1';
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.apiKey = options.apiKey;
+    this.requestIntervalSeconds = 3;
+    this.useDelayStyle = options.useDelayStyle || false;
+    this.delayOutlineColor = options.delayOutlineColor || '#000000';
     this.filterFc = TrajservLayer.createFilter(
       options.publishedLineName,
       options.tripNumber,
@@ -256,46 +266,49 @@ class TrajservLayer extends TrackerLayer {
       return;
     }
     super.start(this.map);
-
-    this.onSingleClickRef = this.map.on('singleclick', e => {
-      if (!this.clickCallbacks.length) {
-        return;
-      }
-
-      const vehicle = this.getVehicleAtCoordinate(e.coordinate);
-      const features = [];
-
-      if (vehicle) {
-        const geom = vehicle.coordinate ? new Point(vehicle.coordinate) : null;
-        features.push(new Feature({ geometry: geom, ...vehicle }));
-
-        if (features.length) {
-          this.selectedVehicleId = features[0].get('id');
-          this.journeyId = features[0].get('journeyIdentifier');
-          this.fetchTrajectoryStations(this.selectedVehicleId).then(r => {
-            this.clickCallbacks.forEach(c => c(r, this, e));
-          });
+    this.startUpdateTrajectories();
+    this.olEventsKeys = [
+      ...this.olEventsKeys,
+      this.map.on('singleclick', e => {
+        if (!this.clickCallbacks.length) {
+          return;
         }
-      } else {
-        this.selectedVehicleId = null;
-        this.olLayer.getSource().clear();
-        this.clickCallbacks.forEach(c => c(null, this, e));
-      }
-    });
 
-    this.onResolutionChangeRef = this.map
-      .getView()
-      .on('change:resolution', () => {
+        const [vehicle] = this.getVehiclesAtCoordinate(e.coordinate);
+        const features = [];
+
+        if (vehicle) {
+          const geom = vehicle.coordinate
+            ? new Point(vehicle.coordinate)
+            : null;
+          features.push(new Feature({ geometry: geom, ...vehicle }));
+
+          if (features.length) {
+            this.selectedVehicleId = features[0].get('id');
+            this.journeyId = features[0].get('journeyIdentifier');
+            this.fetchTrajectoryStations(this.selectedVehicleId).then(r => {
+              this.clickCallbacks.forEach(c => c(r, this, e));
+            });
+          }
+        } else {
+          this.selectedVehicleId = null;
+          this.olLayer.getSource().clear();
+          this.clickCallbacks.forEach(c => c(null, this, e));
+        }
+      }),
+      this.map.on('moveend', () => {
+        this.updateTrajectories();
         if (this.selectedVehicleId && this.journeyId) {
           this.highlightTrajectory();
         }
-      });
+      }),
+    ];
   }
 
   stop() {
-    unByKey(this.onSingleClickRef);
-    unByKey(this.onResolutionChangeRef);
     this.journeyId = null;
+    this.stopUpdateTrajectories();
+    this.abortFetchTrajectories();
     super.stop();
   }
 
@@ -370,14 +383,37 @@ class TrajservLayer extends TrackerLayer {
   }
 
   /**
+   * Fetch trajectories at given URL.
+   * @param {string} url
+   * @private
+   */
+  fetchTrajectories(url) {
+    this.abortFetchTrajectories();
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+    return fetch(url, { signal })
+      .then(data => data.json())
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.warn('Fetch trajectories request failed: ', err);
+      });
+  }
+
+  abortFetchTrajectories() {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  }
+
+  /**
    * Fetch stations information with a trajectory ID
-   * @param {number} trajId the ID of the trajectory
+   * @param {number} trajId The ID of the trajectory
    * @private
    */
   fetchTrajectoryStations(trajId) {
     const params = this.getUrlParams({
       id: trajId,
-      time: TrackerLayer.getTimeString(new Date()),
+      time: getTimeString(new Date()),
     });
 
     const url = `${this.url}/trajstations?${params}`;
@@ -429,17 +465,15 @@ class TrajservLayer extends TrackerLayer {
 
   /**
    * Fetch trajectory information with a trajectory ID
-   * @param {number} journeyId the gtfs ID of the trajectory.
+   * @param {number} journeyId The gtfs ID of the trajectory.
    * @private
    */
   fetchTrajectoryById(journeyId) {
-    const params = this.getUrlParams(
-      {
-        id: journeyId,
-        time: TrackerLayer.getTimeString(new Date()),
-      },
-      false,
-    );
+    const params = this.getUrlParams({
+      id: journeyId,
+      time: getTimeString(new Date()),
+    });
+
     const url = `${this.url}/trajectorybyid?${params}`;
 
     this.abortFetchTrajectoryById();
@@ -467,7 +501,9 @@ class TrajservLayer extends TrackerLayer {
    * @returns {Object}
    * @private
    */
-  getUrlParams(extraParams = {}, useBbox = true) {
+  getUrlParams(extraParams = {}) {
+    const ext = this.map.getView().calculateExtent();
+    const bbox = buffer(ext, getWidth(ext) / 10).join(',');
     const intervalMs = this.speed * 20000; // 20 seconds, arbitrary value, could be : (this.requestIntervalSeconds + 1) * 1000;
     const now = this.currTime;
 
@@ -490,9 +526,10 @@ class TrajservLayer extends TrackerLayer {
 
     const params = {
       ...extraParams,
-      btime: TrackerLayer.getTimeString(now),
-      etime: TrackerLayer.getTimeString(this.later),
-      date: TrackerLayer.getDateString(now),
+      bbox,
+      btime: getTimeString(now),
+      etime: getTimeString(this.later),
+      date: getDateString(now),
       rid: 1,
       a: 1,
       cd: 1,
@@ -504,11 +541,6 @@ class TrajservLayer extends TrackerLayer {
       // toff: this.currTime.getTime() / 1000,
     };
 
-    if (useBbox) {
-      const ext = this.map.getView().calculateExtent();
-      params.bbox = buffer(ext, getWidth(ext) / 10).join(',');
-    }
-
     // Allow to load only differences between the last request,
     // but currently the Tracker render method doesn't manage to render only diff.
     /* if (diff) {
@@ -519,6 +551,27 @@ class TrajservLayer extends TrackerLayer {
     return Object.keys(params)
       .map(k => `${k}=${params[k]}`)
       .join('&');
+  }
+
+  /**
+   * Start the update of trajectories.
+   * @private
+   */
+  startUpdateTrajectories() {
+    this.stopUpdateTrajectories();
+
+    this.updateTrajectories();
+    this.updateInterval = window.setInterval(() => {
+      this.updateTrajectories();
+    }, this.requestIntervalSeconds * 1000);
+  }
+
+  /**
+   * Stop the update of trajectories.
+   * @private
+   */
+  stopUpdateTrajectories() {
+    clearInterval(this.updateInterval);
   }
 
   /**
@@ -580,7 +633,7 @@ class TrajservLayer extends TrackerLayer {
   style(props) {
     const { type, name, id, color, textColor, delay, cancelled } = props;
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
-    const hover = this.hoverVehicleId === id;
+    const hover = this.tracker.hoverVehicleId === id;
     const selected = this.selectedVehicleId === id;
 
     this.styleCache[z] = this.styleCache[z] || {};

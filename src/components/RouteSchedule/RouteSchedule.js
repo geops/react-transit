@@ -10,7 +10,7 @@ import TrackerLayer from '../../layers/TrackerLayer';
 
 /**
  * Returns a paded number (with leading 0 for integer < 10).
- * @param {Number} number number.
+ * @param {Number} number Number.
  */
 const pad = number => {
   return `${number < 10 ? '0' : ''}${number}`;
@@ -18,7 +18,7 @@ const pad = number => {
 
 /**
  * Returns a 'hh:mm' string from a time.
- * @param {Number} t time in milliseconds.
+ * @param {Number} t Time in milliseconds.
  */
 const getTimeString = t => {
   if (t === -1) {
@@ -78,40 +78,43 @@ const getDelayColor = time => {
 };
 
 /**
+ * Returns true if the train doesn't stop to the station.
+ * @param {Object} stop Station information.
+ */
+const isNotStop = stop => {
+  return stop.arrivalTime === -1 && stop.departureTime === -1;
+};
+
+/**
  * Returns if the station has already been passed by the vehicule.
  * @param {Object} stop Station information.
  */
 const isPassed = (stop, time) => {
-  return stop.departureDate * 1000 + stop.departureDelay <= time;
+  // Sometimes stop.departureDelay is undefined.
+  return (
+    !isNotStop(stop) &&
+    stop.departureDate * 1000 + (stop.departureDelay || 0) <= time
+  );
+};
+
+const getStationImg = (index, length) => {
+  let src = station;
+  if (index === 0) {
+    src = firstStation;
+  } else if (index === length - 1) {
+    src = lastStation;
+  }
+  return src;
 };
 
 /**
  * Returns an image for first, middle or last stations.
- * @param {Number} index index of the station in the list.
+ * @param {Number} index Index of the station in the list.
  * @param {Number} length Length of the stations list.
  */
 const renderStationImg = (index, length) => {
-  if (index === 0) {
-    return (
-      <img
-        src={firstStation}
-        alt="routeScheduleLine"
-        className="rt-route-icon"
-      />
-    );
-  }
-  if (index === length - 1) {
-    return (
-      <img
-        src={lastStation}
-        alt="routeScheduleLine"
-        className="rt-route-icon"
-      />
-    );
-  }
-  return (
-    <img src={station} alt="routeScheduleLine" className="rt-route-icon" />
-  );
+  const src = getStationImg(index, length);
+  return <img src={src} alt="routeScheduleLine" className="rt-route-icon" />;
 };
 
 const propTypes = {
@@ -133,12 +136,12 @@ const propTypes = {
   /**
    * Render Header of the route scheduler.
    */
-  header: PropTypes.func,
+  renderHeader: PropTypes.func,
 
   /**
    * Render Body of the route scheduler.
    */
-  stations: PropTypes.func,
+  renderStations: PropTypes.func,
 
   /**
    * Function triggered on station's click event.
@@ -154,8 +157,8 @@ const propTypes = {
 const defaultProps = {
   className: 'rt-route-wrapper',
   lineInfos: null,
-  header: null,
-  stations: null,
+  renderHeader: null,
+  renderStations: null,
   onStationClick: () => {},
   renderHeaderButtons: null,
 };
@@ -169,7 +172,7 @@ const renderRouteIdentifier = (id, longName) => {
   return null;
 };
 
-const renderHeader = (lineInfos, renderHeaderButtons) => (
+const renderDefaultHeader = (lineInfos, renderHeaderButtons) => (
   <div className="rt-route-header">
     <span
       style={{
@@ -194,15 +197,15 @@ const renderHeader = (lineInfos, renderHeaderButtons) => (
   </div>
 );
 
-const renderStations = (lineInfos, onStationClick, trackerLayer) => (
+const renderDefaultStations = (lineInfos, onStationClick, trackerLayer) => (
   <div className="rt-route-body">
     {lineInfos.stations.map((stop, idx) => (
       <div
         key={stop.stationId}
         role="button"
         className={`rt-route-station${
-          isPassed(stop, trackerLayer.getCurrTime()) ? ' rt-passed' : ''
-        }`}
+          isPassed(stop, trackerLayer.currTime) ? ' rt-passed' : ''
+        }${isNotStop(stop) ? ' rt-no-stop' : ''}`}
         onClick={e => onStationClick(stop, e)}
         tabIndex={0}
         onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
@@ -257,16 +260,20 @@ const renderStations = (lineInfos, onStationClick, trackerLayer) => (
 function RouteSchedule({
   className,
   lineInfos,
-  header,
-  stations,
+  renderHeader,
+  renderStations,
   onStationClick,
   trackerLayer,
   renderHeaderButtons,
 }) {
   return lineInfos ? (
     <div className={className}>
-      {header || renderHeader(lineInfos, renderHeaderButtons)}
-      {stations || renderStations(lineInfos, onStationClick, trackerLayer)}
+      {(renderHeader || renderDefaultHeader)(lineInfos, renderHeaderButtons)}
+      {(renderStations || renderDefaultStations)(
+        lineInfos,
+        onStationClick,
+        trackerLayer,
+      )}
     </div>
   ) : null;
 }
