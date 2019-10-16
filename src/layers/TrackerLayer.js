@@ -13,28 +13,9 @@ import { timeSteps } from '../config/tracker';
  * @inheritDoc
  * @param {Object} options
  * @param {boolean} options.useDelayStyle Set the delay style.
- * @param {string} options.delayOutlineColor Set the delay outline color.
  * @param {string} options.onClick Callback function on feature click.
  */
 class TrackerLayer extends Layer {
-  static getDateString(now) {
-    const n = now || new Date();
-    let month = (n.getMonth() + 1).toString();
-    month = month.length === 1 ? `0${month}` : month;
-    let day = n.getDate().toString();
-    day = day.length === 1 ? `0${day}` : day;
-
-    return [now.getFullYear(), month, day].join('');
-  }
-
-  static getTimeString(time) {
-    return [
-      time.getHours() - 2,
-      time.getMinutes(),
-      `${time.getSeconds()}.${time.getMilliseconds()}`,
-    ].join(':');
-  }
-
   constructor(options = {}) {
     super({
       name: 'Tracker',
@@ -45,31 +26,46 @@ class TrackerLayer extends Layer {
       ...options,
     });
 
+    // Array of ol events key. Be careful to not override this value in child classe.
+    this.olEventsKeys = [];
+
+    /**
+     * Cache object for trajectories drawn.
+     * @private
+     */
     this.styleCache = {};
 
-    this.currentOffset = 0;
-
-    this.requestIntervalSeconds = 3;
-
-    this.intervalStarted = false;
-
-    this.hoverVehicleId = null;
-
-    this.selectedVehicleId = null;
-
-    this.currTime = new Date();
-
-    this.lastUpdateTime = new Date();
-
-    this.lastRequestTime = 0;
-
+    /**
+     * Time speed.
+     * @private
+     */
     this.speed = 1;
 
+    /**
+     * Time used to display the trajectories.
+     * @private
+     */
+    this.currTime = new Date();
+
+    /**
+     * Keep track of the last time used to render trajectories.
+     * Useful when the speed increase.
+     * @private
+     */
+    this.lastUpdateTime = new Date();
+
+    /**
+     * Activate/deactivate pointer hover effect.
+     * @private
+     */
+    this.isHoverActive =
+      options.isHoverActive !== undefined ? options.isHoverActive : true;
+
+    /**
+     * Callback function when a user click on a vehicle.
+     * @private
+     */
     this.clickCallbacks = [];
-
-    this.delayOutlineColor = options.delayOutlineColor || '#000000';
-
-    this.useDelayStyle = options.useDelayStyle || false;
 
     // Add click callback
     if (options.onClick) {
@@ -98,18 +94,57 @@ class TrackerLayer extends Layer {
     this.visibilityRef = this.on('change:visible', v => {
       if (v.target.getVisible()) {
         this.start();
+      } else {
+        this.stop();
       }
     });
   }
 
   terminate() {
-    super.terminate();
     this.stop();
     unByKey(this.visibilityRef);
     if (this.tracker) {
       this.tracker.destroy();
       this.tracker = null;
     }
+    super.terminate();
+  }
+
+  /**
+   * Get the duration before the next update.
+   * @private
+   */
+  getRefreshTimeInMs() {
+    const z = this.map.getView().getZoom();
+    const roundedZoom = Math.round(z);
+    const timeStep = timeSteps[roundedZoom] || 25;
+    const nextTick = Math.max(25, timeStep / this.speed);
+    return nextTick;
+  }
+
+  /**
+   * Set the current time, it triggers a rendering of the trajectories.
+   * @param {dateString | value} time
+   */
+  setCurrTime(time) {
+    const newTime = new Date(time);
+    this.currTime = newTime;
+    this.lastUpdateTime = new Date();
+    if (
+      !this.map.getView().getInteracting() &&
+      !this.map.getView().getAnimating()
+    ) {
+      this.tracker.renderTrajectories(this.currTime);
+    }
+  }
+
+  /**
+   * Set the speed.
+   * @param {number} speed
+   */
+  setSpeed(speed) {
+    this.speed = speed;
+    this.start();
   }
 
   /**
@@ -120,19 +155,35 @@ class TrackerLayer extends Layer {
   start() {
     this.stop();
     this.tracker.setVisible(true);
-    this.onMoveStartRef = this.map.on('movestart', () => this.onMoveStart());
-    this.onMoveEndRef = this.map.on('moveend', () => this.onMoveEnd());
-    this.onPointerMoveRef = this.map.on('pointermove', e =>
-      this.onPointerMove(e),
-    );
-    this.onPostRenderRef = this.map.on('postrender', () => {
-      if (this.isMapMoving) {
-        this.tracker.renderTrajectory(this.currTime);
-      }
-    });
-    this.tracker.renderTrajectory(this.currTime);
-    this.startUpdateTrajectories();
+    this.tracker.renderTrajectories(this.currTime);
     this.startUpdateTime();
+
+    this.olEventsKeys = [
+      this.map.on('moveend', () => {
+        const z = this.map.getView().getZoom();
+
+        if (z !== this.currentZoom) {
+          this.currentZoom = z;
+          this.startUpdateTime();
+        }
+      }),
+      this.map.on('pointermove', evt => {
+        if (this.map.getView().getInteracting() || !this.isHoverActive) {
+          return;
+        }
+        const [vehicle] = this.getVehiclesAtCoordinate(evt.coordinate);
+        this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
+        this.tracker.setHoverVehicleId(vehicle && vehicle.id);
+      }),
+      this.map.on('postrender', () => {
+        if (
+          this.map.getView().getInteracting() ||
+          this.map.getView().getAnimating()
+        ) {
+          this.tracker.renderTrajectories(this.currTime);
+        }
+      }),
+    ];
   }
 
   /**
@@ -140,67 +191,13 @@ class TrackerLayer extends Layer {
    * @private
    */
   stop() {
-    if (this.tracker) {
-      this.tracker.clear();
-      this.tracker.setVisible(false);
-    }
-    unByKey([
-      this.onMoveStartRef,
-      this.onMoveEndRef,
-      this.onPointerMoveRef,
-      this.onPostRenderRef,
-    ]);
-    this.stopUpdateTrajectories();
     this.stopUpdateTime();
-    this.abortFetchTrajectories();
-  }
-
-  /**
-   * Set visibility.
-   * @param {boolean} visible The visibility of the layer
-   * @param {boolean} stopPropagationDown Stops propagation down.
-   * @param {boolean} stopPropagationUp Stops propagation up.
-   * @param {boolean} stopPropagationSiblings Stops propagation toward siblings.
-   */
-  setVisible(
-    visible,
-    stopPropagationDown = false,
-    stopPropagationUp = false,
-    stopPropagationSiblings = false,
-  ) {
-    super.setVisible(
-      visible,
-      stopPropagationDown,
-      stopPropagationUp,
-      stopPropagationSiblings,
-    );
-
-    if (this.getVisible()) {
-      this.start();
-    } else {
-      this.stop();
+    if (this.tracker) {
+      this.tracker.setVisible(false);
+      this.tracker.clear();
     }
-  }
-
-  /**
-   * Start the update of trajectories.
-   * @private
-   */
-  startUpdateTrajectories() {
-    this.stopUpdateTrajectories();
-
-    this.updateTrajectories();
-    this.updateInterval = window.setInterval(() => {
-      this.updateTrajectories();
-    }, this.requestIntervalSeconds * 1000);
-  }
-
-  /**
-   * Stop the update of trajectories.
-   * @private
-   */
-  stopUpdateTrajectories() {
-    clearInterval(this.updateInterval);
+    unByKey(this.olEventsKeys);
+    this.olEventsKeys = [];
   }
 
   /**
@@ -226,121 +223,27 @@ class TrackerLayer extends Layer {
   }
 
   /**
-   * Get the current time.
-   * @returns {Date} Current time
-   */
-  getCurrTime() {
-    return this.currTime;
-  }
-
-  /**
-   * Set the current time, it triggers a rendering of the trajectories.
-   * @param {dateString | value} time
-   */
-  setCurrTime(time) {
-    const newTime = new Date(time);
-    this.currTime = newTime;
-    this.lastUpdateTime = new Date();
-    if (!this.isMapMoving) {
-      this.tracker.renderTrajectory(this.currTime);
-    }
-  }
-
-  /**
-   * Get the Speed.
-   * @returns {number} Speed
-   */
-  getSpeed() {
-    return this.speed;
-  }
-
-  /**
-   * Set the speed.
-   * @param {number} speed Speed
-   */
-  setSpeed(speed) {
-    this.speed = speed;
-    this.start();
-  }
-
-  /**
-   * Fetch trajectories at given URL.
-   * @param {string} url
-   * @private
-   */
-  fetchTrajectories(url) {
-    this.abortFetchTrajectories();
-    this.abortController = new AbortController();
-    const { signal } = this.abortController;
-    return fetch(url, { signal })
-      .then(data => data.json())
-      .catch(err => {
-        // eslint-disable-next-line no-console
-        console.warn('Fetch trajectories request failed: ', err);
-      });
-  }
-
-  abortFetchTrajectories() {
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-  }
-
-  /**
    * Returns the vehicle which are at the given coordinates.
    * Returns null when no vehicle is located at the given coordinates.
    * @param {ol.coordinate} coordinate
    * @returns {ol.feature | null} Vehicle feature
    * @private
    */
-  getVehicleAtCoordinate(coordinate) {
+  getVehiclesAtCoordinate(coordinate) {
     const res = this.map.getView().getResolution();
     const ext = buffer([...coordinate, ...coordinate], 10 * res);
     const trajectories = this.tracker.getTrajectories();
-
+    const vehicles = [];
     for (let i = 0; i < trajectories.length; i += 1) {
       if (
         trajectories[i].coordinate &&
         containsCoordinate(ext, trajectories[i].coordinate)
       ) {
-        return trajectories[i];
+        vehicles.push(trajectories[i]);
       }
     }
 
-    return null;
-  }
-
-  getRefreshTimeInMs() {
-    const z = this.map.getView().getZoom();
-    const roundedZoom = Math.round(z);
-    const timeStep = timeSteps[roundedZoom] || 25;
-    const nextTick = Math.max(25, timeStep / this.speed);
-    return nextTick;
-  }
-
-  onMoveStart() {
-    this.isMapMoving = true;
-  }
-
-  onMoveEnd() {
-    this.isMapMoving = false;
-    const z = this.map.getView().getZoom();
-
-    if (z !== this.currentZoom) {
-      this.currentZoom = z;
-      this.startUpdateTime();
-    }
-    this.updateTrajectories();
-  }
-
-  onPointerMove(e) {
-    if (e.dragging) {
-      return;
-    }
-    const vehicle = this.getVehicleAtCoordinate(e.coordinate);
-    this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
-    this.hoverVehicleId = vehicle && vehicle.id;
-    this.tracker.setHoverVehicleId(this.hoverVehicleId);
+    return vehicles;
   }
 
   /**
@@ -383,9 +286,26 @@ class TrackerLayer extends Layer {
    */
   onClick(callback) {
     if (typeof callback === 'function') {
-      this.clickCallbacks.push(callback);
+      if (!this.clickCallbacks.includes(callback)) {
+        this.clickCallbacks.push(callback);
+      }
     } else {
       throw new Error('callback must be of type function.');
+    }
+  }
+
+  /**
+   * Unlistens to click events on the layer.
+   * @param {function} callback Callback function, called with the clicked
+   *   features (https://openlayers.org/en/latest/apidoc/module-ol_Feature.html),
+   *   the layer instance and the click event.
+   */
+  unClick(callback) {
+    if (typeof callback === 'function') {
+      const idx = this.clickCallbacks.indexOf(callback);
+      if (idx >= -1) {
+        this.clickCallbacks.splice(idx, 1);
+      }
     }
   }
 }
