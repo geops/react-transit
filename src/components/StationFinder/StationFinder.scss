@@ -14,8 +14,6 @@
       padding: 0 0 0 15px;
       flex-grow: 2;
       text-overflow: ellipsis;
-      // min-width: 0;
-      // margin: 0;
       border: 0;
     }
 
@@ -58,13 +56,8 @@
 
   .tm-autocomplete-results {
     position: absolute;
-    overflow: auto;
-    max-height: 400px;
-    z-index: 800;
     top: calc(100% - 1px);
     left: 0;
-    right: 0;
-    margin: 0;
     background-color: #fff;
     width: calc(100% - 50px);
     border: 1px solid #515151;
