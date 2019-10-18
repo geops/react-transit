@@ -33,7 +33,7 @@ function StationFinderExample() {
         layers={layers}
       />
       <StationFinder
-        setCenter={setCenter}
+        onSelect={setCenter}
         apiKey={apiPublicKey}
         autocompleteProps={{
           placeholder: 'Search a station...',

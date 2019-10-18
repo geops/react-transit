@@ -13,9 +13,9 @@ const propTypes = {
   className: PropTypes.string,
 
   /**
-   * Function to center on the station.
+   * Function to be triggered on station selection.
    */
-  setCenter: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
 
   /**
    * Station finder url.
@@ -61,7 +61,7 @@ let abortCtrl = new AbortController();
 
 function StationFinder({
   className,
-  setCenter,
+  onSelect,
   stationsUrl,
   apiKey,
   children,
@@ -71,7 +71,7 @@ function StationFinder({
 }) {
   const [input, setInput] = useState('');
   const [stations, setStations] = useState([]);
-  const [selectedStation, selectStation] = useState(null);
+  const [selectedStation, setSelectedStation] = useState(null);
 
   useEffect(() => {
     const url = `${stationsUrl}?&q=${input.toString()}&key=${apiKey}`;
@@ -84,7 +84,7 @@ function StationFinder({
       abortCtrl.abort();
       setInput('');
       setStations([]);
-      selectStation(null);
+      setSelectedStation(null);
       return;
     }
 
@@ -119,8 +119,8 @@ function StationFinder({
       <Button
         onClick={() => {
           if (selectedStation) {
-            if (setCenter) {
-              setCenter(selectedStation.coordinates);
+            if (onSelect) {
+              onSelect(selectedStation.coordinates);
             }
             setStations([]);
           }
@@ -143,8 +143,8 @@ function StationFinder({
         onChange={val => setInput(val)}
         onSelect={val => {
           setInput(val.name);
-          selectStation(val);
-          setCenter(val.coordinates);
+          setSelectedStation(val);
+          onSelect(val.coordinates);
         }}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...autocompleteProps}
