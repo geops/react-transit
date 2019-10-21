@@ -43,14 +43,19 @@ const lineInfos = {
       departureTime: 609000000,
     },
   ],
-  vehiculeType: 0,
+  vehicleType: 0,
 };
 
 describe('RouteSchedule', () => {
   test('matches snapshots.', () => {
     const trackerLayer = new TrajservLayer();
     const component = renderer.create(
-      <RouteSchedule lineInfos={lineInfos} trackerLayer={trackerLayer} />,
+      <RouteSchedule
+        lineInfos={lineInfos}
+        trackerLayer={trackerLayer}
+        setCenter={() => {}}
+        renderHeaderButtons={() => <div>Button</div>}
+      />,
     );
     const tree = component.toJSON();
     expect(tree).toMatchSnapshot();

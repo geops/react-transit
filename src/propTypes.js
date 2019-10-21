@@ -31,7 +31,7 @@ const lineInfos = PropTypes.shape({
       wheelchairAccessible: PropTypes.number,
     }),
   ),
-  vehiculeType: PropTypes.number,
+  vehicleType: PropTypes.number,
   wheelchairAccessible: PropTypes.number,
 });
 

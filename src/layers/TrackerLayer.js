@@ -201,6 +201,20 @@ class TrackerLayer extends Layer {
   }
 
   /**
+   * Set the filter for tracker features.
+   * @param {Function} filter Filter function.
+   */
+  setFilter(filter) {
+    if (this.tracker) {
+      this.tracker.setFilter(filter);
+    }
+  }
+
+  getVehicle(filterFc) {
+    return this.tracker.getTrajectories().filter(filterFc);
+  }
+
+  /**
    * Start to update the current time depending on the speed.
    * @private
    */

@@ -101,7 +101,7 @@ class TrajservLayer extends TrackerLayer {
     const {
       id,
       hs: destination,
-      t: vehiculeType,
+      t: vehicleType,
       ln: longName,
       sn: shortName,
       wa: wheelchairAccessible,
@@ -119,7 +119,7 @@ class TrajservLayer extends TrackerLayer {
       destination,
       backgroundColor,
       color,
-      vehiculeType,
+      vehicleType,
       routeIdentifier,
       longName,
       shortName,

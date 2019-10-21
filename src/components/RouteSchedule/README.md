@@ -10,10 +10,11 @@ import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
 import TrajservLayer from 'react-transit/layers/TrajservLayer';
 import RouteSchedule from 'react-transit/components/RouteSchedule';
+import FilterButton from 'react-transit/components/FilterButton';
+import FollowButton from 'react-transit/components/FollowButton';
 
 let firstRender = null;
-const center = [951560, 6002550];
-const zoom = 14;
+const initialCenter = [951560, 6002550];
 const trackerLayer = new TrajservLayer({
   apiKey: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
 });
@@ -29,6 +30,7 @@ const layers = [
 
 function RouteScheduleExample() {
   const [lineInfos, setLineInfos] = useState(null);
+  const [center, setCenter] = useState(initialCenter);
 
   useEffect(()=> {
     trackerLayer.onClick((newLineInfos)=> {
@@ -38,8 +40,30 @@ function RouteScheduleExample() {
 
   return (
     <div className="rt-route-schedule-example">
-      <BasicMap center={center} zoom={zoom} layers={layers} />
-      <RouteSchedule lineInfos={lineInfos} trackerLayer={trackerLayer} />
+      <RouteSchedule
+        lineInfos={lineInfos}
+        trackerLayer={trackerLayer}
+        renderHeaderButtons={routeIdentifier => (
+          <>
+            <FilterButton
+              title="Filter"
+              routeIdentifier={routeIdentifier}
+              trackerLayer={trackerLayer}
+            />
+            <FollowButton
+              setCenter={setCenter}
+              title="Follow"
+              routeIdentifier={routeIdentifier}
+              trackerLayer={trackerLayer}
+            />
+          </>
+        )}
+      />
+      <BasicMap
+        center={center}
+        zoom={15}
+        layers={layers}
+      />
     </div>
   );
 }

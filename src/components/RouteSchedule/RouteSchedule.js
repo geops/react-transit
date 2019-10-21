@@ -147,6 +147,11 @@ const propTypes = {
    * Function triggered on station's click event.
    */
   onStationClick: PropTypes.func,
+
+  /**
+   * Function to render header buttons.
+   */
+  renderHeaderButtons: PropTypes.func,
 };
 
 const defaultProps = {
@@ -155,6 +160,7 @@ const defaultProps = {
   renderHeader: null,
   renderStations: null,
   onStationClick: () => {},
+  renderHeaderButtons: null,
 };
 
 const renderRouteIdentifier = (id, longName) => {
@@ -166,12 +172,12 @@ const renderRouteIdentifier = (id, longName) => {
   return null;
 };
 
-const renderDefaultHeader = lineInfos => (
+const renderDefaultHeader = (lineInfos, renderHeaderButtons) => (
   <div className="rt-route-header">
     <span
       style={{
         backgroundColor:
-          lineInfos.backgroundColor || bgColors[lineInfos.vehiculeType],
+          lineInfos.backgroundColor || bgColors[lineInfos.vehicleType],
         color: lineInfos.color || 'black',
       }}
       className="rt-route-icon"
@@ -184,6 +190,9 @@ const renderDefaultHeader = lineInfos => (
         {lineInfos.longName}
         {renderRouteIdentifier(lineInfos.routeIdentifier, lineInfos.longName)}
       </span>
+    </div>
+    <div className="rt-route-buttons">
+      {renderHeaderButtons && renderHeaderButtons(lineInfos.routeIdentifier)}
     </div>
   </div>
 );
@@ -255,10 +264,11 @@ function RouteSchedule({
   renderStations,
   onStationClick,
   trackerLayer,
+  renderHeaderButtons,
 }) {
   return lineInfos ? (
     <div className={className}>
-      {(renderHeader || renderDefaultHeader)(lineInfos)}
+      {(renderHeader || renderDefaultHeader)(lineInfos, renderHeaderButtons)}
       {(renderStations || renderDefaultStations)(
         lineInfos,
         onStationClick,

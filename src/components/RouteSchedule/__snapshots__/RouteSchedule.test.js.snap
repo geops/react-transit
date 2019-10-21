@@ -31,6 +31,13 @@ exports[`RouteSchedule matches snapshots. 1`] = `
          (3634)
       </span>
     </div>
+    <div
+      className="rt-route-buttons"
+    >
+      <div>
+        Button
+      </div>
+    </div>
   </div>
   <div
     className="rt-route-body"

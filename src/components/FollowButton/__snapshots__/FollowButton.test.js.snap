@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FollowButton should match snapshot. 1`] = `
+<div
+  aria-label="Follow up"
+  className="rt-follow-button rt-inactive"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex={0}
+  title="Follow up"
+>
+  <svg
+    data-file-name="SvgFollow"
+  />
+</div>
+`;
