@@ -31,7 +31,7 @@ module.exports = {
       name: 'Components',
       components: [
         'src/components/RouteSchedule/[A-Z]*.js',
-        'src/components/StationFinder/[A-Z]*.js',
+        'src/components/StopFinder/[A-Z]*.js',
         'src/components/TrackerControl/[A-Z]*.js',
       ],
       exampleMode: 'collapse',

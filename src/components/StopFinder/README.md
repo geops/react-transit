@@ -1,6 +1,6 @@
 #
 
-This demonstrates the use of StationFinder.
+This demonstrates the use of StopFinder.
 
 ```jsx
 import React from 'react';
@@ -9,7 +9,7 @@ import Layer from 'react-spatial/layers/Layer';
 import OLMap from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
-import StationFinder from 'react-transit/components/StationFinder';
+import StopFinder from 'react-transit/components/StopFinder';
 
 const map = new OLMap({ controls: [] });
 const layers = [
@@ -23,25 +23,25 @@ const layers = [
 const setCenter = newCenter => map.getView().setCenter(newCenter);
 const apiPublicKey = '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93';
 
-function StationFinderExample() {
+function StopFinderExample() {
   return (
-    <div className="rt-station-finder-example">
+    <div className="rt-stop-finder-example">
       <BasicMap
         map={map}
         center={[951560, 6002550]}
         zoom={14}
         layers={layers}
       />
-      <StationFinder
+      <StopFinder
         onSelect={setCenter}
         apiKey={apiPublicKey}
         autocompleteProps={{
-          placeholder: 'Search a station...',
+          placeholder: 'Search stops',
         }}
       />
     </div>
   );
 }
 
-<StationFinderExample />;
+<StopFinderExample />;
 ```
