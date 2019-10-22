@@ -29,7 +29,7 @@ const lineInfos = PropTypes.shape({
       wheelchairAccessible: PropTypes.boolean,
     }),
   ),
-  vehiculeType: PropTypes.number,
+  vehicleType: PropTypes.number,
   wheelchairAccessible: PropTypes.number,
 });
 

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 108 108"
+   version="1.1"
+   id="svg10"
+   sodipodi:docname="test.svg"
+   width="72"
+   height="72"
+   inkscape:version="0.92.4 (unknown)">
+  <metadata
+     id="metadata16">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>deactive Folgen</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs14" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1172"
+     id="namedview12"
+     showgrid="false"
+     inkscape:zoom="12.09"
+     inkscape:cx="34.761089"
+     inkscape:cy="47.159636"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg10"
+     fit-margin-top="-0.1" />
+  <title
+     id="title2">deactive Folgen</title>
+  <g
+     id="Ebene_2"
+     data-name="Ebene 2"
+     transform="matrix(2.25,0,0,2.25,-0.10663006,-0.01748344)">
+    <g
+       id="Ebene_1-2"
+       data-name="Ebene 1">
+      <rect
+         width="48"
+         height="48"
+         rx="2.8"
+         style="fill:none"
+         id="rect4"
+         x="0"
+         y="0" />
+      <path
+         d="M 25.7,39.1 23.6,24 8.5,21.9 c -0.1,-0.1 -0.1,-0.2 0,-0.2 l 29.3,-12 c 0.1,-0.1 0.2,0 0.1,0.1 l -12,29.3 c 0,0.1 -0.2,0.1 -0.2,0 z"
+         style="fill:#1d1d1b"
+         id="path6"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>
