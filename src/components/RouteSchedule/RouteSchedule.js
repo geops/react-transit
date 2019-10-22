@@ -91,14 +91,16 @@ const defaultRenderStation = ({
   const { stations } = lineInfos;
   const isFirstStation = idx === 0;
   const isLastStation = idx === stations.length - 1;
+  const isStationPassed = isPassed(stop, trackerLayer.currTime);
+  const isNotStation = isNotStop(stop);
   return (
     <div
       key={stationId}
       role="button"
       className={[
         'rt-route-station',
-        isPassed(stop, trackerLayer.currTime) ? ' rt-passed' : '',
-        isNotStop(stop) ? ' rt-no-stop' : '',
+        isStationPassed ? ' rt-passed' : '',
+        isNotStation ? ' rt-no-stop' : '',
       ].join('')}
       onClick={e => onStationClick(stop, e)}
       tabIndex={0}
@@ -132,7 +134,7 @@ const defaultRenderStation = ({
           {getHoursAndMinutes(departureTime)}
         </span>
       </div>
-      {renderStationImg(idx, stations.length)}
+      {renderStationImg(idx, stations.length, isStationPassed, isNotStation)}
       <div className={isLastStation && cancelled ? 'rt-route-cancelled' : null}>
         {stationName}
       </div>
