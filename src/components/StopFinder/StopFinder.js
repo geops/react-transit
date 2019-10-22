@@ -4,7 +4,7 @@ import { MdSearch } from 'react-icons/md';
 import { transform as transformCoords } from 'ol/proj';
 import Button from 'react-spatial/components/Button';
 import AutoComplete from 'react-spatial/components/Autocomplete';
-import './StationFinder.scss';
+import './StopFinder.scss';
 
 const propTypes = {
   /**
@@ -13,14 +13,14 @@ const propTypes = {
   className: PropTypes.string,
 
   /**
-   * Function to be triggered on station selection.
+   * Function to be triggered on stop selection.
    */
   onSelect: PropTypes.func.isRequired,
 
   /**
-   * Station finder url.
+   * stop finder url.
    */
-  stationsUrl: PropTypes.string,
+  stopsUrl: PropTypes.string,
 
   /**
    * Access key for [geOps services](https://developer.geops.io/).
@@ -49,8 +49,8 @@ const propTypes = {
 };
 
 const defaultProps = {
-  className: 'rt-station-finder',
-  stationsUrl: 'https://api.geops.io/stops/v1/',
+  className: 'rt-stop-finder',
+  stopsUrl: 'https://api.geops.io/stops/v1/',
   children: <MdSearch />,
   featsProjection: 'EPSG:3857',
   autocompleteProps: {},
@@ -59,10 +59,10 @@ const defaultProps = {
 
 let abortCtrl = new AbortController();
 
-function StationFinder({
+function StopFinder({
   className,
   onSelect,
-  stationsUrl,
+  stopsUrl,
   apiKey,
   children,
   featsProjection,
@@ -70,11 +70,11 @@ function StationFinder({
   t,
 }) {
   const [input, setInput] = useState('');
-  const [stations, setStations] = useState([]);
-  const [selectedStation, setSelectedStation] = useState(null);
+  const [stops, setStops] = useState([]);
+  const [selectedStop, setSelectedStop] = useState(null);
 
   useEffect(() => {
-    const url = `${stationsUrl}?&q=${input.toString()}&key=${apiKey}`;
+    const url = `${stopsUrl}?&q=${input.toString()}&key=${apiKey}`;
 
     abortCtrl.abort();
     abortCtrl = new AbortController();
@@ -83,8 +83,8 @@ function StationFinder({
     if (!input) {
       abortCtrl.abort();
       setInput('');
-      setStations([]);
-      setSelectedStation(null);
+      setStops([]);
+      setSelectedStop(null);
       return;
     }
 
@@ -108,7 +108,7 @@ function StationFinder({
         return results;
       })
       .then(results => {
-        setStations(results);
+        setStops(results);
       })
       // eslint-disable-next-line
       .catch(error => console.warn(error));
@@ -118,11 +118,11 @@ function StationFinder({
     return (
       <Button
         onClick={() => {
-          if (selectedStation) {
+          if (selectedStop) {
             if (onSelect) {
-              onSelect(selectedStation.coordinates);
+              onSelect(selectedStop.coordinates);
             }
-            setStations([]);
+            setStops([]);
           }
         }}
       >
@@ -135,7 +135,7 @@ function StationFinder({
     <div className={className}>
       <AutoComplete
         value={input}
-        items={stations}
+        items={stops}
         getItemKey={s => s.key}
         renderItem={s => s.name}
         button={renderButton(children)}
@@ -143,7 +143,7 @@ function StationFinder({
         onChange={val => setInput(val)}
         onSelect={val => {
           setInput(val.name);
-          setSelectedStation(val);
+          setSelectedStop(val);
           onSelect(val.coordinates);
         }}
         // eslint-disable-next-line react/jsx-props-no-spreading
@@ -153,7 +153,7 @@ function StationFinder({
   );
 }
 
-StationFinder.propTypes = propTypes;
-StationFinder.defaultProps = defaultProps;
+StopFinder.propTypes = propTypes;
+StopFinder.defaultProps = defaultProps;
 
-export default StationFinder;
+export default StopFinder;

@@ -1,4 +1,4 @@
-.rt-station-finder {
+.rt-stop-finder {
   font-family: Arial, sans-serif;
   position: relative;
   width: 350px;
@@ -28,9 +28,8 @@
       cursor: pointer;
 
       svg {
-        height: 50%;
         width: 100%;
-        padding: 10px;
+        margin: auto;
       }
     }
 
@@ -44,6 +43,10 @@
         height: 100%;
         width: 100%;
       }
+
+      svg {
+        height: 65%;
+      }
     }
 
     .tm-bt-clear {
@@ -51,6 +54,7 @@
 
       svg {
         color: grey;
+        height: 50%;
       }
     }
   }
