@@ -79,16 +79,14 @@ class TrajservLayer extends TrackerLayer {
         stationId,
         stationName,
         coordinates,
-        arrivalTime,
-        departureTime,
-        arrivalDate,
-        departureDate,
+        arrivalTime: arrivalTime !== -1 ? arrivalDate * 1000 : null,
+        departureTime: departureTime !== -1 ? departureDate * 1000 : null,
         arrivalDelay,
         departureDelay,
-        noDropOff,
-        noPickUp,
-        cancelled,
-        wheelchairAccessible,
+        noDropOff: !!noDropOff,
+        noPickUp: !!noPickUp,
+        cancelled: !!cancelled,
+        wheelchairAccessible: !!wheelchairAccessible,
       });
     }
 
@@ -124,8 +122,8 @@ class TrajservLayer extends TrackerLayer {
       longName,
       shortName,
       stations,
-      wheelchairAccessible,
-      bicyclesAllowed,
+      wheelchairAccessible: !!wheelchairAccessible,
+      bicyclesAllowed: !!bicyclesAllowed,
       realTime,
       feedsId,
       operatingInformations: {

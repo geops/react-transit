@@ -5,56 +5,9 @@ import firstStation from '../../images/RouteSchedule/firstStation.png';
 import station from '../../images/RouteSchedule/station.png';
 import lastStation from '../../images/RouteSchedule/lastStation.png';
 import { bgColors } from '../../config/tracker';
+import { getHoursAndMinutes, getDelayString } from '../../utils/TimeUtils';
 
 import TrackerLayer from '../../layers/TrackerLayer';
-
-/**
- * Returns a paded number (with leading 0 for integer < 10).
- * @param {Number} number Number.
- */
-const pad = number => {
-  return `${number < 10 ? '0' : ''}${number}`;
-};
-
-/**
- * Returns a 'hh:mm' string from a time.
- * @param {Number} t Time in milliseconds.
- */
-const getTimeString = t => {
-  if (t === -1) {
-    return '';
-  }
-  const h = Math.floor(t / 36000000);
-  const m = Math.floor((t % 36000000) / 600000);
-  return `${pad(h)}:${pad(m)}`;
-};
-
-/**
- * Returns a color class to display the delay.
- * @param {Number} time Delay time in milliseconds.
- */
-const getDelayString = t => {
-  const h = Math.floor(t / 3600000);
-  const m = Math.floor((t % 3600000) / 60000);
-  const s = Math.floor(((t % 3600000) % 60000) / 1000);
-
-  if (s === 0 && h === 0 && m === 0) {
-    return '0';
-  }
-  if (s === 0 && h === 0) {
-    return `${m}m`;
-  }
-  if (s === 0) {
-    return `${h}h${m}m`;
-  }
-  if (m === 0 && h === 0) {
-    return `${s}s`;
-  }
-  if (h === 0) {
-    return `${m}m${s}s`;
-  }
-  return `${h}h${m}m${s}s`;
-};
 
 /**
  * Returns a color class to display the delay.
@@ -82,7 +35,7 @@ const getDelayColor = time => {
  * @param {Object} stop Station information.
  */
 const isNotStop = stop => {
-  return stop.arrivalTime === -1 && stop.departureTime === -1;
+  return !stop.arrivalTime && !stop.departureTime;
 };
 
 /**
@@ -91,10 +44,9 @@ const isNotStop = stop => {
  */
 const isPassed = (stop, time) => {
   // Sometimes stop.departureDelay is undefined.
-  return (
-    !isNotStop(stop) &&
-    stop.departureDate * 1000 + (stop.departureDelay || 0) <= time
-  );
+  const timeToCompare = stop.departureTime || stop.arrivalTime || 0;
+  const delayToCompare = stop.departureDelay || stop.arrivalDelay || 0;
+  return !isNotStop(stop) && timeToCompare + delayToCompare <= time;
 };
 
 const getStationImg = (index, length) => {
@@ -233,10 +185,10 @@ const renderDefaultStations = (lineInfos, onStationClick, trackerLayer) => (
         </div>
         <div className="rt-route-times">
           <span className="rt-route-time-arrival">
-            {getTimeString(stop.arrivalTime)}
+            {getHoursAndMinutes(stop.arrivalTime)}
           </span>
           <span className="rt-route-time-departure">
-            {getTimeString(stop.departureTime)}
+            {getHoursAndMinutes(stop.departureTime)}
           </span>
         </div>
         {renderStationImg(idx, lineInfos.stations.length)}
