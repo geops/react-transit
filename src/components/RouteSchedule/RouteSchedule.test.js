@@ -2,10 +2,12 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import 'jest-date-mock';
 import TrajservLayer from '../../layers/TrajservLayer';
 import RouteSchedule from '.';
 
 configure({ adapter: new Adapter() });
+const RealDate = Date;
 
 const lineInfos = {
   backgroundColor: 'ff8a00',
@@ -34,19 +36,44 @@ const lineInfos = {
       departureTime: 1571729903000,
     },
     {
+      stationId: '4',
+      stationName: 'no stop',
+      coordinates: [8.54119, 47.36646],
+      arrivalDelay: null, // +0
+      arrivalTime: 0,
+      departureDelay: null, // +2m
+      departureTime: 0,
+    },
+    {
       stationId: '3',
       stationName: 'third stop',
       coordinates: [8.54119, 50],
       arrivalDelay: 240000, // +4m
       arrivalTime: 1571730323000,
       departureDelay: 0, // +0
-      departureTime: 1571730323000,
+      departureTime: 0,
     },
   ],
   vehicleType: 0,
 };
 
 describe('RouteSchedule', () => {
+  beforeEach(() => {
+    global.Date = jest.fn(() => ({
+      getHours: () => {
+        return 9;
+      },
+      getMinutes: () => {
+        return 1;
+      },
+    }));
+    Object.assign(Date, RealDate);
+  });
+
+  afterEach(() => {
+    global.Date = RealDate;
+  });
+
   test('matches snapshots.', () => {
     const trackerLayer = new TrajservLayer();
     const component = renderer.create(
