@@ -36,7 +36,7 @@ exports[`RouteSchedule matches snapshots. 1`] = `
     className="rt-route-body"
   >
     <div
-      className="rt-route-station"
+      className="rt-route-station rt-passed"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
@@ -57,12 +57,12 @@ exports[`RouteSchedule matches snapshots. 1`] = `
         <span
           className="rt-route-time-arrival"
         >
-          16:45
+          09:33
         </span>
         <span
           className="rt-route-time-departure"
         >
-          16:45
+          09:33
         </span>
       </div>
       <img
@@ -77,7 +77,7 @@ exports[`RouteSchedule matches snapshots. 1`] = `
       </div>
     </div>
     <div
-      className="rt-route-station"
+      className="rt-route-station rt-passed"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
@@ -103,12 +103,12 @@ exports[`RouteSchedule matches snapshots. 1`] = `
         <span
           className="rt-route-time-arrival"
         >
-          16:55
+          09:38
         </span>
         <span
           className="rt-route-time-departure"
         >
-          16:55
+          09:38
         </span>
       </div>
       <img
@@ -123,7 +123,7 @@ exports[`RouteSchedule matches snapshots. 1`] = `
       </div>
     </div>
     <div
-      className="rt-route-station"
+      className="rt-route-station rt-passed"
       onClick={[Function]}
       onKeyPress={[Function]}
       role="button"
@@ -144,12 +144,12 @@ exports[`RouteSchedule matches snapshots. 1`] = `
         <span
           className="rt-route-time-arrival"
         >
-          16:55
+          09:45
         </span>
         <span
           className="rt-route-time-departure"
         >
-          16:55
+          09:45
         </span>
       </div>
       <img

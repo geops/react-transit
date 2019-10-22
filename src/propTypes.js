@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 const lineInfos = PropTypes.shape({
   backgroundColor: PropTypes.string,
-  bicyclesAllowed: PropTypes.number,
+  bicyclesAllowed: PropTypes.boolean,
   color: PropTypes.string,
   destination: PropTypes.string,
   feedsId: PropTypes.number,
@@ -16,19 +16,17 @@ const lineInfos = PropTypes.shape({
   shortName: PropTypes.string,
   stations: PropTypes.arrayOf(
     PropTypes.shape({
-      arrivalDate: PropTypes.number, // time in milliseconds.
       arrivalDelay: PropTypes.number, // time in milliseconds.
       arrivalTime: PropTypes.number, // time in milliseconds.
-      cancelled: PropTypes.number,
+      cancelled: PropTypes.boolean,
       coordinates: PropTypes.arrayOf(PropTypes.number),
-      departureDate: PropTypes.number, // time in milliseconds.
       departureDelay: PropTypes.number, // time in milliseconds.
       departureTime: PropTypes.number, // time in milliseconds.
-      noDropOff: PropTypes.number,
-      noPickUp: PropTypes.number,
+      noDropOff: PropTypes.boolean,
+      noPickUp: PropTypes.boolean,
       stationId: PropTypes.string,
       stationName: PropTypes.string,
-      wheelchairAccessible: PropTypes.number,
+      wheelchairAccessible: PropTypes.boolean,
     }),
   ),
   vehiculeType: PropTypes.number,

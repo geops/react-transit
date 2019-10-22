@@ -91,8 +91,8 @@ class TrackerLayer extends Layer {
       this.start();
     }
 
-    this.visibilityRef = this.on('change:visible', v => {
-      if (v.target.getVisible()) {
+    this.visibilityRef = this.on('change:visible', evt => {
+      if (evt.target.getVisible()) {
         this.start();
       } else {
         this.stop();

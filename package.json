@@ -105,7 +105,8 @@
     "parser": "babel-eslint",
     "extends": [
       "airbnb",
-      "prettier"
+      "prettier",
+      "prettier/react"
     ],
     "plugins": [
       "prettier"
