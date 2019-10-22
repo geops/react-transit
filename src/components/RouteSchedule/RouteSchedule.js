@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unused-prop-types */
+/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactTransitPropTypes from '../../propTypes';
@@ -64,9 +66,124 @@ const getStationImg = (index, length) => {
  * @param {Number} index Index of the station in the list.
  * @param {Number} length Length of the stations list.
  */
-const renderStationImg = (index, length) => {
+const defaultRenderStationImg = (index, length) => {
   const src = getStationImg(index, length);
   return <img src={src} alt="routeScheduleLine" className="rt-route-icon" />;
+};
+
+const defaultRenderStation = ({
+  lineInfos,
+  onStationClick,
+  trackerLayer,
+  renderStationImg,
+  stop,
+  idx,
+}) => {
+  const {
+    stationId,
+    arrivalDelay,
+    departureDelay,
+    arrivalTime,
+    departureTime,
+    cancelled,
+    stationName,
+  } = stop;
+  const { stations } = lineInfos;
+  const isFirstStation = idx === 0;
+  const isLastStation = idx === stations.length - 1;
+  const isStationPassed = isPassed(stop, trackerLayer.currTime);
+  const isNotStation = isNotStop(stop);
+  return (
+    <div
+      key={stationId}
+      role="button"
+      className={[
+        'rt-route-station',
+        isStationPassed ? ' rt-passed' : '',
+        isNotStation ? ' rt-no-stop' : '',
+      ].join('')}
+      onClick={e => onStationClick(stop, e)}
+      tabIndex={0}
+      onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
+    >
+      <div className="rt-route-delay">
+        {typeof arrivalDelay === 'undefined' || isFirstStation ? null : (
+          <span
+            className={`rt-route-delay-arrival${` ${getDelayColor(
+              arrivalDelay,
+            )}`}`}
+          >
+            {`+${getDelayString(arrivalDelay)}`}
+          </span>
+        )}
+        {typeof departureDelay === 'undefined' || isLastStation ? null : (
+          <span
+            className={`rt-route-delay-departure${` ${getDelayColor(
+              departureDelay,
+            )}`}`}
+          >
+            {`+${getDelayString(departureDelay)}`}
+          </span>
+        )}
+      </div>
+      <div className="rt-route-times">
+        <span className="rt-route-time-arrival">
+          {getHoursAndMinutes(arrivalTime)}
+        </span>
+        <span className="rt-route-time-departure">
+          {getHoursAndMinutes(departureTime)}
+        </span>
+      </div>
+      {renderStationImg(idx, stations.length, isStationPassed, isNotStation)}
+      <div className={isLastStation && cancelled ? 'rt-route-cancelled' : null}>
+        {stationName}
+      </div>
+    </div>
+  );
+};
+
+const renderRouteIdentifier = ({ routeIdentifier, longName }) => {
+  // first part of the id, without leading zeros.
+  const id = parseInt(routeIdentifier.split('.')[0], 10);
+  if (!longName.includes(id)) {
+    return ` (${id})`;
+  }
+  return null;
+};
+
+const defaultRenderheader = ({ lineInfos, renderHeaderButtons }) => {
+  const {
+    vehicleType,
+    shortName,
+    longName,
+    color,
+    backgroundColor,
+    destination,
+    routeIdentifier,
+  } = lineInfos;
+  return (
+    <div className="rt-route-header">
+      <span
+        className="rt-route-icon"
+        style={{
+          backgroundColor: backgroundColor || bgColors[vehicleType],
+          color: color || 'black',
+        }}
+      >
+        {shortName}
+      </span>
+      <div className="rt-route-title">
+        <span className="rt-route-name">{destination}</span>
+        <span>
+          {longName}
+          {renderRouteIdentifier(lineInfos)}
+        </span>
+      </div>
+      <div className="rt-route-buttons">
+        {renderHeaderButtons(routeIdentifier)}
+      </div>
+    </div>
+  );
 };
 
 const propTypes = {
@@ -91,9 +208,14 @@ const propTypes = {
   renderHeader: PropTypes.func,
 
   /**
-   * Render Body of the route scheduler.
+   * Render the status of the station image.
    */
-  renderStations: PropTypes.func,
+  renderStationImg: PropTypes.func,
+
+  /**
+   * Render a station.
+   */
+  renderStation: PropTypes.func,
 
   /**
    * Function triggered on station's click event.
@@ -107,130 +229,38 @@ const propTypes = {
 };
 
 const defaultProps = {
-  className: 'rt-route-wrapper',
+  className: 'rt-route-schedule',
   lineInfos: null,
-  renderHeader: null,
-  renderStations: null,
+  renderHeader: defaultRenderheader,
+  renderStation: defaultRenderStation,
+  renderStationImg: defaultRenderStationImg,
+  renderHeaderButtons: () => null,
   onStationClick: () => {},
-  renderHeaderButtons: null,
 };
-
-const renderRouteIdentifier = (id, longName) => {
-  // first part of the id, without leading zeros.
-  const routeIdentifier = parseInt(id.split('.')[0], 10);
-  if (!longName.includes(routeIdentifier)) {
-    return ` (${routeIdentifier})`;
-  }
-  return null;
-};
-
-const renderDefaultHeader = (lineInfos, renderHeaderButtons) => (
-  <div className="rt-route-header">
-    <span
-      style={{
-        backgroundColor:
-          lineInfos.backgroundColor || bgColors[lineInfos.vehicleType],
-        color: lineInfos.color || 'black',
-      }}
-      className="rt-route-icon"
-    >
-      {lineInfos.shortName}
-    </span>
-    <div className="rt-route-title">
-      <span className="rt-route-name">{lineInfos.destination}</span>
-      <span>
-        {lineInfos.longName}
-        {renderRouteIdentifier(lineInfos.routeIdentifier, lineInfos.longName)}
-      </span>
-    </div>
-    <div className="rt-route-buttons">
-      {renderHeaderButtons && renderHeaderButtons(lineInfos.routeIdentifier)}
-    </div>
-  </div>
-);
-
-const renderDefaultStations = (lineInfos, onStationClick, trackerLayer) => (
-  <div className="rt-route-body">
-    {lineInfos.stations.map((stop, idx) => (
-      <div
-        key={stop.stationId}
-        role="button"
-        className={`rt-route-station${
-          isPassed(stop, trackerLayer.currTime) ? ' rt-passed' : ''
-        }${isNotStop(stop) ? ' rt-no-stop' : ''}`}
-        onClick={e => onStationClick(stop, e)}
-        tabIndex={0}
-        onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
-      >
-        <div className="rt-route-delay">
-          {typeof stop.arrivalDelay === 'undefined' || idx === 0 ? null : (
-            <span
-              className={`rt-route-delay-arrival${` ${getDelayColor(
-                stop.arrivalDelay,
-              )}`}`}
-            >
-              {`+${getDelayString(stop.arrivalDelay)}`}
-            </span>
-          )}
-          {typeof stop.departureDelay === 'undefined' ||
-          idx === lineInfos.stations.length - 1 ? null : (
-            <span
-              className={`rt-route-delay-arrival${` ${getDelayColor(
-                stop.departureDelay,
-              )}`}`}
-            >
-              {`+${getDelayString(stop.departureDelay)}`}
-            </span>
-          )}
-        </div>
-        <div className="rt-route-times">
-          <span className="rt-route-time-arrival">
-            {getHoursAndMinutes(stop.arrivalTime)}
-          </span>
-          <span className="rt-route-time-departure">
-            {getHoursAndMinutes(stop.departureTime)}
-          </span>
-        </div>
-        {renderStationImg(idx, lineInfos.stations.length)}
-        <div
-          className={
-            idx === lineInfos.stations.length - 1 && stop.cancelled
-              ? 'rt-route-cancelled'
-              : null
-          }
-        >
-          {stop.stationName}
-        </div>
-      </div>
-    ))}
-  </div>
-);
 
 /**
  * RouteSchedule displays information, stops and punctuality about the clicked route.
  */
-function RouteSchedule({
-  className,
-  lineInfos,
-  renderHeader,
-  renderStations,
-  onStationClick,
-  trackerLayer,
-  renderHeaderButtons,
-}) {
-  return lineInfos ? (
+function RouteSchedule(props) {
+  const { lineInfos, className, renderStation, renderHeader } = props;
+
+  if (!lineInfos) {
+    return null;
+  }
+
+  return (
     <div className={className}>
-      {(renderHeader || renderDefaultHeader)(lineInfos, renderHeaderButtons)}
-      {(renderStations || renderDefaultStations)(
-        lineInfos,
-        onStationClick,
-        trackerLayer,
-      )}
+      {renderHeader({ ...props })}
+      <div className="rt-route-body">
+        {lineInfos.stations.map((stop, idx) =>
+          renderStation({ ...props, stop, idx }),
+        )}
+      </div>
     </div>
-  ) : null;
+  );
 }
 
 RouteSchedule.propTypes = propTypes;
 RouteSchedule.defaultProps = defaultProps;
 
-export default RouteSchedule;
+export default React.memo(RouteSchedule);

@@ -2,7 +2,7 @@
 
 exports[`RouteSchedule matches snapshots. 1`] = `
 <div
-  className="rt-route-wrapper"
+  className="rt-route-schedule"
 >
   <div
     className="rt-route-header"
@@ -53,7 +53,7 @@ exports[`RouteSchedule matches snapshots. 1`] = `
         className="rt-route-delay"
       >
         <span
-          className="rt-route-delay-arrival green"
+          className="rt-route-delay-departure green"
         >
           +1m
         </span>
@@ -99,7 +99,7 @@ exports[`RouteSchedule matches snapshots. 1`] = `
           +0
         </span>
         <span
-          className="rt-route-delay-arrival green"
+          className="rt-route-delay-departure green"
         >
           +2m
         </span>
@@ -145,7 +145,7 @@ exports[`RouteSchedule matches snapshots. 1`] = `
           +0
         </span>
         <span
-          className="rt-route-delay-arrival green"
+          className="rt-route-delay-departure green"
         >
           +0
         </span>

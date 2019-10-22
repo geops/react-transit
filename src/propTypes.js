@@ -24,13 +24,13 @@ const lineInfos = PropTypes.shape({
       departureTime: PropTypes.number, // time in milliseconds.
       noDropOff: PropTypes.boolean,
       noPickUp: PropTypes.boolean,
-      stationId: PropTypes.string,
+      stationId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       stationName: PropTypes.string,
       wheelchairAccessible: PropTypes.boolean,
     }),
   ),
   vehicleType: PropTypes.number,
-  wheelchairAccessible: PropTypes.number,
+  wheelchairAccessible: PropTypes.boolean,
 });
 
 export default {
