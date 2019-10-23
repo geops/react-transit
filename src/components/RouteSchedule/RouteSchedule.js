@@ -66,7 +66,7 @@ const getStationImg = (index, length) => {
  * @param {Number} index Index of the station in the list.
  * @param {Number} length Length of the stations list.
  */
-const defaultRenderStationImg = (index, length) => {
+const defaultRenderStationImg = (stations, index, length) => {
   const src = getStationImg(index, length);
   return <img src={src} alt="routeScheduleLine" className="rt-route-icon" />;
 };
@@ -134,7 +134,7 @@ const defaultRenderStation = ({
           {getHoursAndMinutes(departureTime)}
         </span>
       </div>
-      {renderStationImg(idx, stations.length, isStationPassed, isNotStation)}
+      {renderStationImg(stations, idx, stations.length, isNotStation)}
       <div className={isLastStation && cancelled ? 'rt-route-cancelled' : null}>
         {stationName}
       </div>
