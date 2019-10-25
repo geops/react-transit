@@ -1,7 +1,5 @@
 .rt-stop-finder {
-  font-family: Arial, sans-serif;
   position: relative;
-  width: 350px;
 
   .tm-search-input {
     border: 1px solid #515151;
@@ -11,7 +9,6 @@
     input {
       height: 100%;
       width: 100%;
-      font-size: 15px;
       padding: 0 0 0 15px;
       flex-grow: 2;
       text-overflow: ellipsis;

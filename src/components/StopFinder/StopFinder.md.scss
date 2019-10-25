@@ -3,8 +3,17 @@
     padding-bottom: 10px;
   }
 
-  .tm-search-input {
+  .rt-stop-finder {
+    font-family: Arial, sans-serif;
     width: 350px;
-    height: 50px;
+
+    .tm-search-input {
+      width: 350px;
+      height: 50px;
+
+      input {
+        font-size: 15px;
+      }
+    }
   }
 }
