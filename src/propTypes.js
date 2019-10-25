@@ -1,5 +1,8 @@
 import PropTypes from 'prop-types';
 
+const STATE_BOARDING = 'BOARDING';
+const STATE_LEAVING = 'LEAVING';
+
 const station = PropTypes.shape({
   arrivalDelay: PropTypes.number, // time in milliseconds.
   arrivalTime: PropTypes.number, // time in milliseconds.
@@ -14,6 +17,7 @@ const station = PropTypes.shape({
   stationId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   stationName: PropTypes.string,
   wheelchairAccessible: PropTypes.boolean,
+  state: PropTypes.oneOf([null, STATE_BOARDING, STATE_LEAVING]),
 });
 
 const lineInfos = PropTypes.shape({
@@ -38,4 +42,6 @@ const lineInfos = PropTypes.shape({
 export default {
   lineInfos,
   station,
+  STATE_BOARDING,
+  STATE_LEAVING,
 };
