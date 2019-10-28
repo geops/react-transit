@@ -120,7 +120,7 @@ function StopFinder({
         onClick={() => {
           if (selectedStop) {
             if (onSelect) {
-              onSelect(selectedStop.coordinates);
+              onSelect(selectedStop);
             }
             setStops([]);
           }
@@ -144,7 +144,7 @@ function StopFinder({
         onSelect={val => {
           setInput(val.name);
           setSelectedStop(val);
-          onSelect(val.coordinates);
+          onSelect(val);
         }}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...autocompleteProps}
