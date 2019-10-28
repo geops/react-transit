@@ -14,7 +14,7 @@ export const getDateString = now => {
 // ex: 09:05:01.123
 export const getTimeString = date => {
   return [
-    date.getHours() - 2,
+    date.getHours() - 1,
     date.getMinutes(),
     `${date.getSeconds()}.${date.getMilliseconds()}`,
   ].join(':');
