@@ -12,11 +12,11 @@ export const getDateString = now => {
 
 // Get the time string of Date object.
 // ex: 09:05:01.123
-export const getTimeString = date => {
+export const getUTCTimeString = date => {
   return [
-    date.getHours() - 1,
-    date.getMinutes(),
-    `${date.getSeconds()}.${date.getMilliseconds()}`,
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    `${date.getUTCSeconds()}.${date.getUTCMilliseconds()}`,
   ].join(':');
 };
 

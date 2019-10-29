@@ -5,7 +5,7 @@ import { buffer, getWidth } from 'ol/extent';
 import { Point, MultiPoint, LineString } from 'ol/geom';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import TrackerLayer from './TrackerLayer';
-import { getDateString, getTimeString } from '../utils/TimeUtils';
+import { getDateString, getUTCTimeString } from '../utils/TimeUtils';
 import {
   getRadius,
   getBgColor,
@@ -405,7 +405,7 @@ class TrajservLayer extends TrackerLayer {
   fetchTrajectoryStations(trajId) {
     const params = this.getUrlParams({
       id: trajId,
-      time: getTimeString(new Date()),
+      time: getUTCTimeString(new Date()),
     });
 
     const url = `${this.url}/trajstations?${params}`;
@@ -462,7 +462,7 @@ class TrajservLayer extends TrackerLayer {
   fetchTrajectoryById(journeyId) {
     const params = this.getUrlParams({
       id: journeyId,
-      time: getTimeString(new Date()),
+      time: getUTCTimeString(new Date()),
     });
 
     const url = `${this.url}/trajectorybyid?${params}`;
@@ -507,8 +507,8 @@ class TrajservLayer extends TrackerLayer {
     const params = {
       ...extraParams,
       bbox,
-      btime: getTimeString(now),
-      etime: getTimeString(this.later),
+      btime: getUTCTimeString(now),
+      etime: getUTCTimeString(this.later),
       date: getDateString(now),
       rid: 1,
       a: 1,
