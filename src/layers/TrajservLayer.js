@@ -386,6 +386,9 @@ class TrajservLayer extends TrackerLayer {
     return fetch(url, { signal })
       .then(data => data.json())
       .catch(err => {
+        if (err.name === 'AbortError') {
+          return;
+        }
         // eslint-disable-next-line no-console
         console.warn('Fetch trajectories request failed: ', err);
       });
