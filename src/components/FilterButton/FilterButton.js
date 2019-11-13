@@ -26,10 +26,16 @@ const propTypes = {
    * Trackerlayer.
    */
   trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
+
+  /**
+   * Children content of the button.
+   */
+  children: PropTypes.element,
 };
 
 const defaultProps = {
   className: 'rt-control-button rt-route-filter',
+  children: <Filter focusable={false} />,
   title: 'Filter',
 };
 
@@ -87,7 +93,7 @@ class FilterButton extends PureComponent {
   }
 
   render() {
-    const { className, title, routeIdentifier } = this.props;
+    const { className, title, routeIdentifier, children } = this.props;
     const { filterActivated } = this.state;
 
     return (
@@ -98,7 +104,7 @@ class FilterButton extends PureComponent {
         title={title}
         onClick={() => this.toggleFilter(routeIdentifier)}
       >
-        <Filter />
+        {children}
       </Button>
     );
   }

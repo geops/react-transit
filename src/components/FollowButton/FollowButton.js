@@ -30,10 +30,16 @@ const propTypes = {
    * Function to set the map center, Used to follow a train.
    */
   setCenter: PropTypes.func.isRequired,
+
+  /**
+   * Children content of the button.
+   */
+  children: PropTypes.element,
 };
 
 const defaultProps = {
   className: 'rt-control-button rt-route-follow',
+  children: <Follow focusable={false} />,
   title: 'Follow',
 };
 
@@ -97,7 +103,7 @@ class FollowButton extends PureComponent {
   }
 
   render() {
-    const { className, title, routeIdentifier } = this.props;
+    const { className, title, routeIdentifier, children } = this.props;
     const { centerActived } = this.state;
 
     return (
@@ -108,7 +114,7 @@ class FollowButton extends PureComponent {
         title={title}
         onClick={() => this.toggleFollow(routeIdentifier)}
       >
-        <Follow />
+        {children}
       </Button>
     );
   }
