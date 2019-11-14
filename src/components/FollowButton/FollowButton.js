@@ -22,6 +22,16 @@ const propTypes = {
   routeIdentifier: PropTypes.string.isRequired,
 
   /**
+   * Button is active.
+   */
+  active: PropTypes.bool.isRequired,
+
+  /**
+   * Set active value.
+   */
+  setActive: PropTypes.func.isRequired,
+
+  /**
    * Trackerlayer.
    */
   trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
@@ -47,13 +57,6 @@ const defaultProps = {
  * Button enables the follow of a selected train.
  */
 class FollowButton extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      centerActived: false,
-    };
-  }
-
   componentDidUpdate(prevProps) {
     const { routeIdentifier } = this.props;
     if (routeIdentifier !== prevProps.routeIdentifier) {
@@ -78,10 +81,9 @@ class FollowButton extends PureComponent {
   }
 
   toggleFollow(routeIdentifier) {
-    const { centerActived } = this.state;
-    const { trackerLayer } = this.props;
+    const { trackerLayer, active, setActive } = this.props;
 
-    const activated = !centerActived;
+    const activated = !active;
 
     if (activated && trackerLayer && trackerLayer.tracker) {
       this.centerOnTrajectory(routeIdentifier);
@@ -92,25 +94,21 @@ class FollowButton extends PureComponent {
       clearInterval(this.updateInterval);
     }
 
-    this.setState({
-      centerActived: activated,
-    });
+    setActive(activated);
   }
 
   changeRouteIdentifier() {
+    const { setActive } = this.props;
     clearInterval(this.updateInterval);
-    this.setState({ centerActived: false });
+    setActive(false);
   }
 
   render() {
-    const { className, title, routeIdentifier, children } = this.props;
-    const { centerActived } = this.state;
+    const { className, title, routeIdentifier, active, children } = this.props;
 
     return (
       <Button
-        className={`${className}${
-          centerActived ? ' rt-active' : ' rt-inactive'
-        }`}
+        className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
         onClick={() => this.toggleFollow(routeIdentifier)}
       >
