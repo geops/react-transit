@@ -14,7 +14,7 @@ test('FollowButton should match snapshot.', () => {
       className="rt-filter-button"
       title="Filter up"
       active={false}
-      setActive={() => {}}
+      onChange={() => {}}
       routeIdentifier="test"
       trackerLayer={trackerLayer}
     />,
@@ -33,7 +33,7 @@ test('FollowButton should toggle.', () => {
       className="rt-filter-button"
       routeIdentifier="test"
       active={filterActive}
-      setActive={active => setFilterActive(active)}
+      onChange={active => setFilterActive(active)}
       trackerLayer={trackerLayer}
     />,
   );

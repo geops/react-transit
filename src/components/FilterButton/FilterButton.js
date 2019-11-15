@@ -28,9 +28,9 @@ const propTypes = {
   active: PropTypes.bool.isRequired,
 
   /**
-   * Set active value.
+   * Function triggered on button change.
    */
-  setActive: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
 
   /**
    * Trackerlayer.
@@ -70,7 +70,7 @@ class FilterButton extends PureComponent {
   }
 
   toggleFilter(routeIdentifier) {
-    const { trackerLayer, active, setActive } = this.props;
+    const { trackerLayer, active, onChange } = this.props;
 
     const activated = !active;
 
@@ -102,7 +102,7 @@ class FilterButton extends PureComponent {
       }
     }
 
-    setActive(activated);
+    onChange(activated);
   }
 
   render() {
