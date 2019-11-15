@@ -141,7 +141,7 @@ class TrajservLayer extends TrackerLayer {
    * @param {string} regexLine
    * @private
    */
-  static createFilter(line, trip, operator, regexLine) {
+  static createFilter(line, trip, operator, regexLine, isConstructor) {
     const filterList = [];
 
     if (!line && !trip && !operator && !regexLine) {
@@ -149,7 +149,7 @@ class TrajservLayer extends TrackerLayer {
     }
 
     if (regexLine) {
-      // regexLine has higher prio over line filter
+      // regexLine has higher prio over line filter when passed in constructor.
       const regexLineList =
         typeof regexLine === 'string' ? [regexLine] : regexLine;
       const lineFilter = t =>
@@ -157,7 +157,7 @@ class TrajservLayer extends TrackerLayer {
       filterList.push(lineFilter);
     }
 
-    if (line && !regexLine) {
+    if (line && (!regexLine || !isConstructor)) {
       const lineFiltersList = typeof line === 'string' ? line.split(',') : line;
       const lineList = lineFiltersList.map(l =>
         l.replace(/\s+/g, '').toUpperCase(),
@@ -198,6 +198,7 @@ class TrajservLayer extends TrackerLayer {
   constructor(options = {}) {
     super({ ...options });
 
+    this.options = options;
     this.url = options.url || 'https://api.geops.io/tracker/v1';
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
@@ -210,6 +211,7 @@ class TrajservLayer extends TrackerLayer {
       options.tripNumber,
       options.operator,
       options.regexPublishedLineName,
+      true,
     );
   }
 
@@ -225,19 +227,7 @@ class TrajservLayer extends TrackerLayer {
       return;
     }
 
-    // Setting filters from the permalink.
-    const parameters = qs.parse(window.location.search.toLowerCase());
-    const lineParam = parameters[TrajservLayer.LINE_FILTER];
-    const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
-    const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
-
-    if (lineParam || routeParam || opParam) {
-      this.filterFc = TrajservLayer.createFilter(
-        lineParam ? lineParam.split(',') : undefined,
-        routeParam ? routeParam.split(',') : undefined,
-        opParam ? opParam.split(',') : undefined,
-      );
-    }
+    this.addTrackerFilters();
 
     if (this.tracker && this.filterFc) {
       this.tracker.setFilter(this.filterFc);
@@ -255,10 +245,38 @@ class TrajservLayer extends TrackerLayer {
     }
   }
 
+  addTrackerFilters() {
+    // Setting filters from the permalink.
+    const parameters = qs.parse(window.location.search.toLowerCase());
+    const lineParam = parameters[TrajservLayer.LINE_FILTER];
+    const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
+    const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
+    const { regexPublishedLineName } = this.options;
+
+    if (lineParam || routeParam || opParam || regexPublishedLineName) {
+      this.filterFc = TrajservLayer.createFilter(
+        lineParam ? lineParam.split(',') : undefined,
+        routeParam ? routeParam.split(',') : undefined,
+        opParam ? opParam.split(',') : undefined,
+        regexPublishedLineName,
+        false,
+      );
+    } else {
+      this.filterFc = null;
+    }
+  }
+
   start() {
     if (!this.map) {
       return;
     }
+
+    this.addTrackerFilters();
+
+    if (this.tracker) {
+      this.tracker.setFilter(this.filterFc);
+    }
+
     super.start(this.map);
     this.startUpdateTrajectories();
     this.olEventsKeys = [

@@ -88,13 +88,15 @@ class FilterButton extends PureComponent {
         const lineParam = parameters[TrajservLayer.LINE_FILTER];
         const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
         const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
-
+        const { regexPublishedLineName } = trackerLayer.options;
         filterFc = null;
-        if (lineParam || routeParam || opParam) {
+        if (lineParam || routeParam || opParam || regexPublishedLineName) {
           filterFc = TrajservLayer.createFilter(
             lineParam ? lineParam.split(',') : undefined,
             routeParam ? routeParam.split(',') : undefined,
             opParam ? opParam.split(',') : undefined,
+            regexPublishedLineName,
+            false,
           );
         }
 
