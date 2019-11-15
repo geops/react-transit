@@ -83,6 +83,7 @@ class FilterButton extends PureComponent {
         this.updatePermalink(false);
         trackerLayer.setFilter(filterFc);
       } else {
+        this.updatePermalink(true);
         const parameters = qs.parse(window.location.search.toLowerCase());
         const lineParam = parameters[TrajservLayer.LINE_FILTER];
         const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
@@ -98,7 +99,6 @@ class FilterButton extends PureComponent {
         }
 
         trackerLayer.setFilter(filterFc);
-        this.updatePermalink(true);
       }
     }
 
