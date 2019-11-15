@@ -74,7 +74,7 @@ class FilterButton extends PureComponent {
 
     const activated = !active;
 
-    const filterFc = TrajservLayer.createFilter(
+    let filterFc = TrajservLayer.createFilter(
       undefined,
       routeIdentifier.split('.')[0],
     );
@@ -83,8 +83,22 @@ class FilterButton extends PureComponent {
         this.updatePermalink(false);
         trackerLayer.setFilter(filterFc);
       } else {
+        const parameters = qs.parse(window.location.search.toLowerCase());
+        const lineParam = parameters[TrajservLayer.LINE_FILTER];
+        const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
+        const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
+
+        filterFc = null;
+        if (lineParam || routeParam || opParam) {
+          filterFc = TrajservLayer.createFilter(
+            lineParam ? lineParam.split(',') : undefined,
+            routeParam ? routeParam.split(',') : undefined,
+            opParam ? opParam.split(',') : undefined,
+          );
+        }
+
+        trackerLayer.setFilter(filterFc);
         this.updatePermalink(true);
-        trackerLayer.setFilter(null);
       }
     }
 

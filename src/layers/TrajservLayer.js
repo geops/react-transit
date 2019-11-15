@@ -15,10 +15,6 @@ import {
   getTextSize,
 } from '../config/tracker';
 
-const LINE_FILTER = 'publishedlinename';
-const ROUTE_FILTER = 'tripnumber';
-const OPERATOR_FILTER = 'operator';
-
 /**
  * Responsible for loading tracker data from Trajserv.
  * @class
@@ -231,9 +227,9 @@ class TrajservLayer extends TrackerLayer {
 
     // Setting filters from the permalink.
     const parameters = qs.parse(window.location.search.toLowerCase());
-    const lineParam = parameters[LINE_FILTER];
-    const routeParam = parameters[ROUTE_FILTER];
-    const opParam = parameters[OPERATOR_FILTER];
+    const lineParam = parameters[TrajservLayer.LINE_FILTER];
+    const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
+    const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
 
     if (lineParam || routeParam || opParam) {
       this.filterFc = TrajservLayer.createFilter(
@@ -706,5 +702,9 @@ class TrajservLayer extends TrackerLayer {
     return this.styleCache[z][type][name][delay][hover][selected];
   }
 }
+
+TrajservLayer.LINE_FILTER = 'publishedlinename';
+TrajservLayer.ROUTE_FILTER = 'tripnumber';
+TrajservLayer.OPERATOR_FILTER = 'operator';
 
 export default TrajservLayer;
