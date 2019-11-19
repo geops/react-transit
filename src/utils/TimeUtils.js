@@ -10,7 +10,7 @@ export const getDateString = now => {
   return [now.getFullYear(), month, day].join('');
 };
 
-// Get the time string of Date object.
+// Get the UTC time string of Date object.
 // ex: 09:05:01.123
 export const getUTCTimeString = date => {
   return [
