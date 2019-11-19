@@ -27,9 +27,9 @@ const propTypes = {
   active: PropTypes.bool.isRequired,
 
   /**
-   * Function triggered on button change.
+   * Function triggered on button click.
    */
-  onChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
 
   /**
    * Trackerlayer.
@@ -81,7 +81,7 @@ class FollowButton extends PureComponent {
   }
 
   toggleFollow(routeIdentifier) {
-    const { trackerLayer, active, onChange } = this.props;
+    const { trackerLayer, active, onClick } = this.props;
 
     const activated = !active;
 
@@ -94,13 +94,13 @@ class FollowButton extends PureComponent {
       clearInterval(this.updateInterval);
     }
 
-    onChange(activated);
+    onClick(activated);
   }
 
   changeRouteIdentifier() {
-    const { onChange } = this.props;
+    const { onClick } = this.props;
     clearInterval(this.updateInterval);
-    onChange(false);
+    onClick(false);
   }
 
   render() {

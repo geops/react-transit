@@ -50,7 +50,7 @@ function RouteScheduleExample() {
             <FilterButton
               title="Filter"
               active={fitlerActive}
-              onChange={active => setFitlerActive(active)}
+              onClick={active => setFitlerActive(active)}
               routeIdentifier={routeIdentifier}
               trackerLayer={trackerLayer}
             />
@@ -58,7 +58,7 @@ function RouteScheduleExample() {
               setCenter={setCenter}
               title="Follow"
               active={followActive}
-              onChange={active => setFollowActive(active)}
+              onClick={active => setFollowActive(active)}
               routeIdentifier={routeIdentifier}
               trackerLayer={trackerLayer}
             />

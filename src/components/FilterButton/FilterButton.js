@@ -28,9 +28,9 @@ const propTypes = {
   active: PropTypes.bool.isRequired,
 
   /**
-   * Function triggered on button change.
+   * Function triggered on button click.
    */
-  onChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
 
   /**
    * Trackerlayer.
@@ -70,11 +70,11 @@ class FilterButton extends PureComponent {
   }
 
   toggleFilter(routeIdentifier) {
-    const { trackerLayer, active, onChange } = this.props;
+    const { trackerLayer, active, onClick } = this.props;
 
     const activated = !active;
 
-    let filterFc = TrajservLayer.createFilter(
+    const filterFc = TrajservLayer.createFilter(
       undefined,
       routeIdentifier.split('.')[0],
     );
@@ -84,27 +84,11 @@ class FilterButton extends PureComponent {
         trackerLayer.setFilter(filterFc);
       } else {
         this.updatePermalink(true);
-        const parameters = qs.parse(window.location.search.toLowerCase());
-        const lineParam = parameters[TrajservLayer.LINE_FILTER];
-        const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
-        const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
-        const { regexPublishedLineName } = trackerLayer.options;
-        filterFc = null;
-        if (lineParam || routeParam || opParam || regexPublishedLineName) {
-          filterFc = TrajservLayer.createFilter(
-            lineParam ? lineParam.split(',') : undefined,
-            routeParam ? routeParam.split(',') : undefined,
-            opParam ? opParam.split(',') : undefined,
-            regexPublishedLineName,
-            false,
-          );
-        }
-
-        trackerLayer.setFilter(filterFc);
+        trackerLayer.addTrackerFilters();
       }
     }
 
-    onChange(activated);
+    onClick(activated);
   }
 
   render() {

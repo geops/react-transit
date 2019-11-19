@@ -141,7 +141,7 @@ class TrajservLayer extends TrackerLayer {
    * @param {string} regexLine
    * @private
    */
-  static createFilter(line, trip, operator, regexLine, isConstructor) {
+  static createFilter(line, trip, operator, regexLine) {
     const filterList = [];
 
     if (!line && !trip && !operator && !regexLine) {
@@ -149,7 +149,6 @@ class TrajservLayer extends TrackerLayer {
     }
 
     if (regexLine) {
-      // regexLine has higher prio over line filter when passed in constructor.
       const regexLineList =
         typeof regexLine === 'string' ? [regexLine] : regexLine;
       const lineFilter = t =>
@@ -157,7 +156,7 @@ class TrajservLayer extends TrackerLayer {
       filterList.push(lineFilter);
     }
 
-    if (line && (!regexLine || !isConstructor)) {
+    if (line) {
       const lineFiltersList = typeof line === 'string' ? line.split(',') : line;
       const lineList = lineFiltersList.map(l =>
         l.replace(/\s+/g, '').toUpperCase(),
@@ -206,13 +205,6 @@ class TrajservLayer extends TrackerLayer {
     this.requestIntervalSeconds = 3;
     this.useDelayStyle = options.useDelayStyle || false;
     this.delayOutlineColor = options.delayOutlineColor || '#000000';
-    this.filterFc = TrajservLayer.createFilter(
-      options.publishedLineName,
-      options.tripNumber,
-      options.operator,
-      options.regexPublishedLineName,
-      true,
-    );
   }
 
   /**
@@ -225,12 +217,6 @@ class TrajservLayer extends TrackerLayer {
 
     if (!this.map) {
       return;
-    }
-
-    this.addTrackerFilters();
-
-    if (this.tracker && this.filterFc) {
-      this.tracker.setFilter(this.filterFc);
     }
 
     // Sort the trajectories.
@@ -259,10 +245,13 @@ class TrajservLayer extends TrackerLayer {
         routeParam ? routeParam.split(',') : undefined,
         opParam ? opParam.split(',') : undefined,
         regexPublishedLineName,
-        false,
       );
     } else {
       this.filterFc = null;
+    }
+
+    if (this.tracker) {
+      this.tracker.setFilter(this.filterFc);
     }
   }
 
@@ -272,10 +261,6 @@ class TrajservLayer extends TrackerLayer {
     }
 
     this.addTrackerFilters();
-
-    if (this.tracker) {
-      this.tracker.setFilter(this.filterFc);
-    }
 
     super.start(this.map);
     this.startUpdateTrajectories();
