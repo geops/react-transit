@@ -210,6 +210,16 @@ class TrackerLayer extends Layer {
     }
   }
 
+  /**
+   * Set the sort for tracker features.
+   * @param {Function} sort Sort function.
+   */
+  setSort(sort) {
+    if (this.tracker && sort) {
+      this.tracker.setSort(sort);
+    }
+  }
+
   getVehicle(filterFc) {
     return this.tracker.getTrajectories().filter(filterFc);
   }

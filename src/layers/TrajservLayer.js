@@ -220,11 +220,11 @@ class TrajservLayer extends TrackerLayer {
     }
 
     // Sort the trajectories.
-    if (this.tracker && this.sortFc) {
-      this.tracker.setSort(this.sortFc);
-    } else if (this.tracker && this.useDelayStyle) {
+    if (this.sortFc) {
+      this.setSort(this.sortFc);
+    } else if (this.useDelayStyle) {
       // Automatic sorting depending on delay, higher delay on top.
-      this.tracker.setSort((a, b) => {
+      this.setSort((a, b) => {
         if (a.delay === null) return 1;
         return a.delay < b.delay ? 1 : -1;
       });
@@ -250,9 +250,7 @@ class TrajservLayer extends TrackerLayer {
       this.filterFc = null;
     }
 
-    if (this.tracker) {
-      this.tracker.setFilter(this.filterFc);
-    }
+    this.setFilter(this.filterFc);
   }
 
   start() {
