@@ -22,6 +22,16 @@ const propTypes = {
   routeIdentifier: PropTypes.string.isRequired,
 
   /**
+   * Button is active.
+   */
+  active: PropTypes.bool.isRequired,
+
+  /**
+   * Function triggered on button click.
+   */
+  onClick: PropTypes.func.isRequired,
+
+  /**
    * Trackerlayer.
    */
   trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
@@ -30,10 +40,16 @@ const propTypes = {
    * Function to set the map center, Used to follow a train.
    */
   setCenter: PropTypes.func.isRequired,
+
+  /**
+   * Children content of the button.
+   */
+  children: PropTypes.element,
 };
 
 const defaultProps = {
   className: 'rt-control-button rt-route-follow',
+  children: <Follow focusable={false} />,
   title: 'Follow',
 };
 
@@ -41,13 +57,6 @@ const defaultProps = {
  * Button enables the follow of a selected train.
  */
 class FollowButton extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      centerActived: false,
-    };
-  }
-
   componentDidUpdate(prevProps) {
     const { routeIdentifier } = this.props;
     if (routeIdentifier !== prevProps.routeIdentifier) {
@@ -72,10 +81,9 @@ class FollowButton extends PureComponent {
   }
 
   toggleFollow(routeIdentifier) {
-    const { centerActived } = this.state;
-    const { trackerLayer } = this.props;
+    const { trackerLayer, active, onClick } = this.props;
 
-    const activated = !centerActived;
+    const activated = !active;
 
     if (activated && trackerLayer && trackerLayer.tracker) {
       this.centerOnTrajectory(routeIdentifier);
@@ -86,29 +94,25 @@ class FollowButton extends PureComponent {
       clearInterval(this.updateInterval);
     }
 
-    this.setState({
-      centerActived: activated,
-    });
+    onClick(activated);
   }
 
   changeRouteIdentifier() {
+    const { onClick } = this.props;
     clearInterval(this.updateInterval);
-    this.setState({ centerActived: false });
+    onClick(false);
   }
 
   render() {
-    const { className, title, routeIdentifier } = this.props;
-    const { centerActived } = this.state;
+    const { className, title, routeIdentifier, active, children } = this.props;
 
     return (
       <Button
-        className={`${className}${
-          centerActived ? ' rt-active' : ' rt-inactive'
-        }`}
+        className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
         onClick={() => this.toggleFollow(routeIdentifier)}
       >
-        <Follow />
+        {children}
       </Button>
     );
   }

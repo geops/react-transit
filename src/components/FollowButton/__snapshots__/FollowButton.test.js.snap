@@ -12,6 +12,7 @@ exports[`FollowButton should match snapshot. 1`] = `
 >
   <svg
     data-file-name="SvgFollow"
+    focusable={false}
   />
 </div>
 `;

@@ -18,6 +18,8 @@ test('FollowButton should match snapshot.', () => {
     <FollowButton
       className="rt-follow-button"
       title="Follow up"
+      active={false}
+      onClick={() => {}}
       routeIdentifier="test"
       trackerLayer={trackerLayer}
       setCenter={() => funcs.onClick()}
@@ -28,27 +30,33 @@ test('FollowButton should match snapshot.', () => {
 });
 
 test('FollowButton should toggle.', () => {
+  let followActive = false;
+  const setFollowActive = () => {
+    followActive = !followActive;
+  };
   const bt = shallow(
     <FollowButton
       className="rt-follow-button"
       title="Follow up"
+      active={followActive}
+      onClick={active => setFollowActive(active)}
       routeIdentifier="test"
       trackerLayer={trackerLayer}
       setCenter={() => funcs.onClick()}
     />,
   );
 
-  expect(bt.state('centerActived')).toBe(false);
+  expect(followActive).toBe(false);
 
   bt.find('.rt-follow-button')
     .first()
     .simulate('click');
 
-  expect(bt.state('centerActived')).toBe(true);
+  expect(followActive).toBe(true);
 
   bt.find('.rt-follow-button')
     .first()
     .simulate('click');
 
-  expect(bt.state('centerActived')).toBe(false);
+  expect(followActive).toBe(false);
 });

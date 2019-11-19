@@ -23,13 +23,29 @@ const propTypes = {
   routeIdentifier: PropTypes.string.isRequired,
 
   /**
+   * Button is active.
+   */
+  active: PropTypes.bool.isRequired,
+
+  /**
+   * Function triggered on button click.
+   */
+  onClick: PropTypes.func.isRequired,
+
+  /**
    * Trackerlayer.
    */
   trackerLayer: PropTypes.instanceOf(TrackerLayer).isRequired,
+
+  /**
+   * Children content of the button.
+   */
+  children: PropTypes.element,
 };
 
 const defaultProps = {
   className: 'rt-control-button rt-route-filter',
+  children: <Filter focusable={false} />,
   title: 'Filter',
 };
 
@@ -37,14 +53,6 @@ const defaultProps = {
  * Button enables the filtering of a selected train.
  */
 class FilterButton extends PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      filterActivated: false,
-    };
-  }
-
   updatePermalink(isRemoving) {
     const { routeIdentifier } = this.props;
 
@@ -62,10 +70,9 @@ class FilterButton extends PureComponent {
   }
 
   toggleFilter(routeIdentifier) {
-    const { filterActivated } = this.state;
-    const { trackerLayer } = this.props;
+    const { trackerLayer, active, onClick } = this.props;
 
-    const activated = !filterActivated;
+    const activated = !active;
 
     const filterFc = TrajservLayer.createFilter(
       undefined,
@@ -77,28 +84,23 @@ class FilterButton extends PureComponent {
         trackerLayer.setFilter(filterFc);
       } else {
         this.updatePermalink(true);
-        trackerLayer.setFilter(null);
+        trackerLayer.addTrackerFilters();
       }
     }
 
-    this.setState({
-      filterActivated: activated,
-    });
+    onClick(activated);
   }
 
   render() {
-    const { className, title, routeIdentifier } = this.props;
-    const { filterActivated } = this.state;
+    const { className, title, routeIdentifier, active, children } = this.props;
 
     return (
       <Button
-        className={`${className}${
-          filterActivated ? ' rt-active' : ' rt-inactive'
-        }`}
+        className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
         onClick={() => this.toggleFilter(routeIdentifier)}
       >
-        <Filter />
+        {children}
       </Button>
     );
   }

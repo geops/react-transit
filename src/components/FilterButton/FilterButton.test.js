@@ -13,6 +13,8 @@ test('FollowButton should match snapshot.', () => {
     <FilterButton
       className="rt-filter-button"
       title="Filter up"
+      active={false}
+      onClick={() => {}}
       routeIdentifier="test"
       trackerLayer={trackerLayer}
     />,
@@ -22,25 +24,31 @@ test('FollowButton should match snapshot.', () => {
 });
 
 test('FollowButton should toggle.', () => {
+  let filterActive = false;
+  const setFilterActive = () => {
+    filterActive = !filterActive;
+  };
   const bt = shallow(
     <FilterButton
       className="rt-filter-button"
       routeIdentifier="test"
+      active={filterActive}
+      onClick={active => setFilterActive(active)}
       trackerLayer={trackerLayer}
     />,
   );
 
-  expect(bt.state('filterActivated')).toBe(false);
+  expect(filterActive).toBe(false);
 
   bt.find('.rt-filter-button')
     .first()
     .simulate('click');
 
-  expect(bt.state('filterActivated')).toBe(true);
+  expect(filterActive).toBe(true);
 
   bt.find('.rt-filter-button')
     .first()
     .simulate('click');
 
-  expect(bt.state('filterActivated')).toBe(false);
+  expect(filterActive).toBe(false);
 });

@@ -15,10 +15,6 @@ import {
   getTextSize,
 } from '../config/tracker';
 
-const LINE_FILTER = 'publishedlinename';
-const ROUTE_FILTER = 'tripnumber';
-const OPERATOR_FILTER = 'operator';
-
 /**
  * Responsible for loading tracker data from Trajserv.
  * @class
@@ -153,7 +149,6 @@ class TrajservLayer extends TrackerLayer {
     }
 
     if (regexLine) {
-      // regexLine has higher prio over line filter
       const regexLineList =
         typeof regexLine === 'string' ? [regexLine] : regexLine;
       const lineFilter = t =>
@@ -161,7 +156,7 @@ class TrajservLayer extends TrackerLayer {
       filterList.push(lineFilter);
     }
 
-    if (line && !regexLine) {
+    if (line) {
       const lineFiltersList = typeof line === 'string' ? line.split(',') : line;
       const lineList = lineFiltersList.map(l =>
         l.replace(/\s+/g, '').toUpperCase(),
@@ -202,6 +197,7 @@ class TrajservLayer extends TrackerLayer {
   constructor(options = {}) {
     super({ ...options });
 
+    this.options = options;
     this.url = options.url || 'https://api.geops.io/tracker/v1';
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
@@ -209,12 +205,6 @@ class TrajservLayer extends TrackerLayer {
     this.requestIntervalSeconds = 3;
     this.useDelayStyle = options.useDelayStyle || false;
     this.delayOutlineColor = options.delayOutlineColor || '#000000';
-    this.filterFc = TrajservLayer.createFilter(
-      options.publishedLineName,
-      options.tripNumber,
-      options.operator,
-      options.regexPublishedLineName,
-    );
   }
 
   /**
@@ -229,40 +219,47 @@ class TrajservLayer extends TrackerLayer {
       return;
     }
 
-    // Setting filters from the permalink.
-    const parameters = qs.parse(window.location.search.toLowerCase());
-    const lineParam = parameters[LINE_FILTER];
-    const routeParam = parameters[ROUTE_FILTER];
-    const opParam = parameters[OPERATOR_FILTER];
-
-    if (lineParam || routeParam || opParam) {
-      this.filterFc = TrajservLayer.createFilter(
-        lineParam ? lineParam.split(',') : undefined,
-        routeParam ? routeParam.split(',') : undefined,
-        opParam ? opParam.split(',') : undefined,
-      );
-    }
-
-    if (this.tracker && this.filterFc) {
-      this.tracker.setFilter(this.filterFc);
-    }
-
     // Sort the trajectories.
-    if (this.tracker && this.sortFc) {
-      this.tracker.setSort(this.sortFc);
-    } else if (this.tracker && this.useDelayStyle) {
+    if (this.sortFc) {
+      this.setSort(this.sortFc);
+    } else if (this.useDelayStyle) {
       // Automatic sorting depending on delay, higher delay on top.
-      this.tracker.setSort((a, b) => {
+      this.setSort((a, b) => {
         if (a.delay === null) return 1;
         return a.delay < b.delay ? 1 : -1;
       });
     }
   }
 
+  addTrackerFilters() {
+    // Setting filters from the permalink.
+    const parameters = qs.parse(window.location.search.toLowerCase());
+    const lineParam = parameters[TrajservLayer.LINE_FILTER];
+    const routeParam = parameters[TrajservLayer.ROUTE_FILTER];
+    const opParam = parameters[TrajservLayer.OPERATOR_FILTER];
+    const { regexPublishedLineName } = this.options;
+
+    if (lineParam || routeParam || opParam || regexPublishedLineName) {
+      this.filterFc = TrajservLayer.createFilter(
+        lineParam ? lineParam.split(',') : undefined,
+        routeParam ? routeParam.split(',') : undefined,
+        opParam ? opParam.split(',') : undefined,
+        regexPublishedLineName,
+      );
+    } else {
+      this.filterFc = null;
+    }
+
+    this.setFilter(this.filterFc);
+  }
+
   start() {
     if (!this.map) {
       return;
     }
+
+    this.addTrackerFilters();
+
     super.start(this.map);
     this.startUpdateTrajectories();
     this.olEventsKeys = [
@@ -386,6 +383,9 @@ class TrajservLayer extends TrackerLayer {
     return fetch(url, { signal })
       .then(data => data.json())
       .catch(err => {
+        if (err.name === 'AbortError') {
+          return;
+        }
         // eslint-disable-next-line no-console
         console.warn('Fetch trajectories request failed: ', err);
       });
@@ -703,5 +703,9 @@ class TrajservLayer extends TrackerLayer {
     return this.styleCache[z][type][name][delay][hover][selected];
   }
 }
+
+TrajservLayer.LINE_FILTER = 'publishedlinename';
+TrajservLayer.ROUTE_FILTER = 'tripnumber';
+TrajservLayer.OPERATOR_FILTER = 'operator';
 
 export default TrajservLayer;
