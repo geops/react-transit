@@ -1,7 +1,7 @@
 {
   "name": "react-transit",
   "description": "Components to display transit data in React map apps.",
-  "version": "0.1.1-beta.26",
+  "version": "0.1.1-beta.27",
   "license": "MIT",
   "dependencies": {
     "abortcontroller-polyfill": "^1.4.0",
