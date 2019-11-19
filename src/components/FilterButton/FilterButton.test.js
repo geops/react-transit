@@ -2,6 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import { MdFilterList } from 'react-icons/md';
 import TrajservLayer from '../../layers/TrajservLayer';
 import FilterButton from '.';
 
@@ -17,7 +18,9 @@ test('FollowButton should match snapshot.', () => {
       onClick={() => {}}
       routeIdentifier="test"
       trackerLayer={trackerLayer}
-    />,
+    >
+      <MdFilterList />
+    </FilterButton>,
   );
   const tree = component.toJSON();
   expect(tree).toMatchSnapshot();
@@ -35,7 +38,9 @@ test('FollowButton should toggle.', () => {
       active={filterActive}
       onClick={active => setFilterActive(active)}
       trackerLayer={trackerLayer}
-    />,
+    >
+      <MdFilterList />
+    </FilterButton>,
   );
 
   expect(filterActive).toBe(false);
