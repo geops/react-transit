@@ -2,6 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import { MdNavigation } from 'react-icons/md';
 import TrajservLayer from '../../layers/TrajservLayer';
 import FollowButton from '.';
 
@@ -23,7 +24,9 @@ test('FollowButton should match snapshot.', () => {
       routeIdentifier="test"
       trackerLayer={trackerLayer}
       setCenter={() => funcs.onClick()}
-    />,
+    >
+      <MdNavigation />
+    </FollowButton>,
   );
   const tree = component.toJSON();
   expect(tree).toMatchSnapshot();
@@ -43,7 +46,9 @@ test('FollowButton should toggle.', () => {
       routeIdentifier="test"
       trackerLayer={trackerLayer}
       setCenter={() => funcs.onClick()}
-    />,
+    >
+      <MdNavigation />
+    </FollowButton>,
   );
 
   expect(followActive).toBe(false);

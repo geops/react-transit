@@ -13,6 +13,9 @@ import RouteSchedule from 'react-transit/components/RouteSchedule';
 import FilterButton from 'react-transit/components/FilterButton';
 import FollowButton from 'react-transit/components/FollowButton';
 
+import Filter from '../../images/FilterButton/filter.svg';
+import Follow from '../../images/FollowButton/follow.svg';
+
 let firstRender = null;
 const initialCenter = [951560, 6002550];
 const trackerLayer = new TrajservLayer({
@@ -53,7 +56,9 @@ function RouteScheduleExample() {
               onClick={active => setFitlerActive(active)}
               routeIdentifier={routeIdentifier}
               trackerLayer={trackerLayer}
-            />
+            >
+              <Filter />
+            </FilterButton>
             <FollowButton
               setCenter={setCenter}
               title="Follow"
@@ -61,7 +66,9 @@ function RouteScheduleExample() {
               onClick={active => setFollowActive(active)}
               routeIdentifier={routeIdentifier}
               trackerLayer={trackerLayer}
-            />
+            >
+              <Follow />
+            </FollowButton>
           </>
         )}
       />

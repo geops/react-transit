@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Button from 'react-spatial/components/Button';
-import Follow from '../../images/FollowButton/follow.svg';
 
 import TrackerLayer from '../../layers/TrackerLayer';
 
@@ -44,12 +43,11 @@ const propTypes = {
   /**
    * Children content of the button.
    */
-  children: PropTypes.element,
+  children: PropTypes.element.isRequired,
 };
 
 const defaultProps = {
   className: 'rt-control-button rt-route-follow',
-  children: <Follow focusable={false} />,
   title: 'Follow',
 };
 
