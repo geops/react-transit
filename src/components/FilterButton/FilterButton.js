@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import qs from 'query-string';
 import PropTypes from 'prop-types';
 import Button from 'react-spatial/components/Button';
-import Filter from '../../images/FilterButton/filter.svg';
 import TrackerLayer from '../../layers/TrackerLayer';
 import TrajservLayer from '../../layers/TrajservLayer';
 
@@ -40,12 +39,11 @@ const propTypes = {
   /**
    * Children content of the button.
    */
-  children: PropTypes.element,
+  children: PropTypes.element.isRequired,
 };
 
 const defaultProps = {
   className: 'rt-control-button rt-route-filter',
-  children: <Filter focusable={false} />,
   title: 'Filter',
 };
 

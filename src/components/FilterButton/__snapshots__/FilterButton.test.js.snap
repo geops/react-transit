@@ -9,10 +9,5 @@ exports[`FollowButton should match snapshot. 1`] = `
   role="button"
   tabIndex={0}
   title="Filter up"
->
-  <svg
-    data-file-name="SvgFilter"
-    focusable={false}
-  />
-</div>
+/>
 `;
