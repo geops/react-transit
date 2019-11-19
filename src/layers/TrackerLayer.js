@@ -215,7 +215,7 @@ class TrackerLayer extends Layer {
    * @param {Function} sort Sort function.
    */
   setSort(sort) {
-    if (this.tracker && sort) {
+    if (this.tracker) {
       this.tracker.setSort(sort);
     }
   }
