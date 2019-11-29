@@ -110,7 +110,7 @@ class FollowButton extends PureComponent {
         className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
         onClick={toggle}
-        onKeyPress={toggle}
+        onKeyPress={e => e.which === 13 && toggle()}
         role="button"
         tabIndex={0}
       >
