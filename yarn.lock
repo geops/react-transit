@@ -10322,16 +10322,7 @@ query-string@^4.1.0:
     object-assign "^4.1.0"
     strict-uri-encode "^1.0.0"
 
-query-string@^6.4.2:
-  version "6.8.3"
-  resolved "https://registry.yarnpkg.com/query-string/-/query-string-6.8.3.tgz#fd9fb7ffb068b79062b43383685611ee47777d4b"
-  integrity sha512-llcxWccnyaWlODe7A9hRjkvdCKamEKTh+wH8ITdTc3OhchaqUZteiSCX/2ablWHVrkVIe04dntnaZJ7BdyW0lQ==
-  dependencies:
-    decode-uri-component "^0.2.0"
-    split-on-first "^1.0.0"
-    strict-uri-encode "^2.0.0"
-
-query-string@^6.9.0:
+query-string@^6.4.2, query-string@^6.9.0:
   version "6.9.0"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-6.9.0.tgz#1c3b727c370cf00f177c99f328fda2108f8fa3dd"
   integrity sha512-KG4bhCFYapExLsUHrFt+kQVEegF2agm4cpF/VNc6pZVthIfCc/GK8t8VyNIE3nyXG9DK3Tf2EGkxjR6/uRdYsA==
@@ -10566,9 +10557,9 @@ react-simple-code-editor@^0.10.0:
   integrity sha512-bL5W5mAxSW6+cLwqqVWY47Silqgy2DKDTR4hDBrLrUqC5BXc29YVx17l2IZk5v36VcDEq1Bszu2oHm1qBwKqBA==
 
 react-spatial@^0.1.1-beta.10:
-  version "0.1.1-beta.10"
-  resolved "https://registry.yarnpkg.com/react-spatial/-/react-spatial-0.1.1-beta.10.tgz#1b5f2c1315dd806d0152a76765417a1d79b8391e"
-  integrity sha512-96yAlhYLyOFQme+pCLyQ+1gS9TLKreExSiS6BOQaD0c3bAc/hARBE2pRrhgjpyNaCiEd38Qtews4TiE2kZGkDQ==
+  version "0.1.1-beta.13"
+  resolved "https://registry.yarnpkg.com/react-spatial/-/react-spatial-0.1.1-beta.13.tgz#b39d403aa9c2f94a729d6859ec84b80fb5a8890d"
+  integrity sha512-wsRJgOSrmpGiCBIwLl2Bpvpnq51kBdt2/VNKFTzjp/nKOVt+tnx2cVA1eAVPTtpK8okmVaBa8AEeqo6WtfTYVw==
   dependencies:
     query-string "^6.4.2"
     react-draggable "^4.0.3"
