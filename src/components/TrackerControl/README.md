@@ -4,7 +4,6 @@ This demonstrates the use of TrackerControl.
 
 ```jsx
 import React from 'react';
-import Dialog from 'react-spatial/components/Dialog';
 import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import TileLayer from 'ol/layer/Tile';
@@ -22,17 +21,17 @@ const layers = [
       source: new OSMSource(),
     }),
   }),
-  trackerLayer
-]
+  trackerLayer,
+];
 
-function  TrackerControlExample()  {
+function TrackerControlExample() {
   return (
     <>
-      <BasicMap center={[951560, 6002550]} zoom={14} layers={layers}/>
+      <BasicMap center={[951560, 6002550]} zoom={14} layers={layers} />
       <TrackerControl trackerLayer={trackerLayer} />
     </>
   );
 }
 
-<TrackerControlExample/>;
+<TrackerControlExample />;
 ```

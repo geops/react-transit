@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import Button from 'react-spatial/components/Button';
 
 import TrackerLayer from '../../layers/TrackerLayer';
 
@@ -103,15 +102,20 @@ class FollowButton extends PureComponent {
 
   render() {
     const { className, title, routeIdentifier, active, children } = this.props;
+    const toggle = () => this.toggleFollow(routeIdentifier);
 
     return (
-      <Button
+      <div
+        aria-label={title}
         className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
-        onClick={() => this.toggleFollow(routeIdentifier)}
+        onClick={toggle}
+        onKeyPress={e => e.which === 13 && toggle()}
+        role="button"
+        tabIndex={0}
       >
         {children}
-      </Button>
+      </div>
     );
   }
 }
