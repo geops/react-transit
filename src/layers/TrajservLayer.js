@@ -649,7 +649,8 @@ class TrajservLayer extends TrackerLayer {
         ctx.restore();
       }
 
-      if (hover) {
+      // Show delay if feature is hovered or if delay is above 5mins.
+      if (hover || delay >= 300000) {
         // Draw delay text
         ctx.save();
         ctx.textAlign = 'left';
