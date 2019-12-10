@@ -7,27 +7,46 @@ import SearchService from './SearchService';
 import StopFinder from './engines/StopFinder';
 
 const propTypes = {
+  /**
+   * Flat object to provide custom search engines: key is the section and value an instance of the Engine class.
+   */
   engines: PropTypes.object,
-  inputProps: PropTypes.object,
-  onHighlight: PropTypes.func,
-  onSelect: PropTypes.func,
+
+  /**
+   * A function which will receive the searchService instance and needs to return a render function for the section title.
+   */
   getRenderSectionTitle: PropTypes.func,
+
+  /**
+   * Props for the search input field.
+   */
+  inputProps: PropTypes.object,
+
+  /**
+   * Callback function which will be called with the hovered suggestion.
+   */
+  onHighlight: PropTypes.func,
+
+  /**
+   * Callback function which will be called with the selected suggestion.
+   */
+  onSelect: PropTypes.func,
 };
 
 const defaultProps = {
   engines: { stops: new StopFinder() },
+  getRenderSectionTitle: () => () => null,
   onHighlight: () => null,
   onSelect: () => null,
-  getRenderSectionTitle: () => () => null,
 };
 
 function Search({
   apiKey,
   engines,
+  getRenderSectionTitle,
   inputProps,
   onHighlight,
   onSelect,
-  getRenderSectionTitle,
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [value, setValue] = useState('');

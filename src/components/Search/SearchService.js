@@ -5,6 +5,18 @@ class SearchService {
     Object.entries(this.engines).forEach(([, e]) => e.setApiKey(apiKey));
   }
 
+  countItems(section) {
+    return this.engines[section].items && this.engines[section].items.length;
+  }
+
+  render(item) {
+    return this.engines[item.section].render(item);
+  }
+
+  value(item) {
+    return this.engines[item.section].constructor.value(item);
+  }
+
   search(value) {
     Object.entries(this.engines).forEach(([section, engine], position) => {
       engine.search(value).then(items => {
@@ -14,17 +26,8 @@ class SearchService {
     });
   }
 
-  render(item) {
-    return this.engines[item.section].render(item);
-  }
-
-  select(item) {
-    this.engines[item.section].select(item);
-    this.highlight(item, true);
-  }
-
-  countItems(section) {
-    return this.engines[section].items && this.engines[section].items.length;
+  sectionCollapsed(section) {
+    return this.engines[section].collapsed;
   }
 
   toggleSection(toggledSection) {
@@ -32,10 +35,6 @@ class SearchService {
       engine.collapse(!(section === toggledSection && engine.collapsed));
       this.upsert(section, engine.getItems(), position);
     });
-  }
-
-  sectionCollapsed(section) {
-    return this.engines[section].collapsed;
   }
 
   upsert(section, items, position) {
@@ -47,10 +46,6 @@ class SearchService {
       newSuggestions.splice(start, deleteCount, { section, items });
       return newSuggestions;
     });
-  }
-
-  value(item) {
-    return this.engines[item.section].constructor.value(item);
   }
 }
 
