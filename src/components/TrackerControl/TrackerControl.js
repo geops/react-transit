@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Button from 'react-spatial/components/Button';
 import { IoIosSpeedometer } from 'react-icons/io';
 import { FaPlay, FaForward, FaBackward, FaRegDotCircle } from 'react-icons/fa';
 
@@ -35,9 +34,17 @@ const decreaseSpeed = speed => {
 
 const defaultRenderButton = (icon, onClick, title) => {
   return (
-    <Button onClick={onClick} className="rt-control-button" title={title}>
+    <div
+      aria-label={title}
+      role="button"
+      onClick={onClick}
+      onKeyPress={onClick}
+      className="rt-control-button"
+      tabIndex={0}
+      title={title}
+    >
       {icon}
-    </Button>
+    </div>
   );
 };
 

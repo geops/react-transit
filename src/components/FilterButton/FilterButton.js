@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import qs from 'query-string';
 import PropTypes from 'prop-types';
-import Button from 'react-spatial/components/Button';
 import TrackerLayer from '../../layers/TrackerLayer';
 import TrajservLayer from '../../layers/TrajservLayer';
 
@@ -91,15 +90,20 @@ class FilterButton extends PureComponent {
 
   render() {
     const { className, title, routeIdentifier, active, children } = this.props;
+    const toggle = () => this.toggleFilter(routeIdentifier);
 
     return (
-      <Button
+      <div
+        aria-label={title}
         className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
-        onClick={() => this.toggleFilter(routeIdentifier)}
+        onClick={toggle}
+        onKeyPress={e => e.which === 13 && toggle()}
+        role="button"
+        tabIndex={0}
       >
         {children}
-      </Button>
+      </div>
     );
   }
 }

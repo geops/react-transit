@@ -22,6 +22,7 @@ import {
  * @param {Object} [options] Layer options.
  * @param {string} [url = https://api.geops.io/tracker] Tracker url.
  * @param {string} options.apiKey Access key for [geOps services](https://developer.geops.io/).
+ * @param {number} options.delayDisplay delay from which the time is always display on the feature (in milliseconds).
  * @param {Array.<string>|string} options.regexPublishedLineName Regex filter for line name. This filter has a higher prio over publishedLineName.
  * @param {Array.<string>|string} options.publishedLineName Filter by line name, string: 'ICE',  list: 's1,s2,s9,s10,s15'
  * @param {Array.<string>|string} options.tripNumber Filter by trip number, bus in zurich: '2068', list of buses in Zurich: '2068,3003,3451,3953'
@@ -202,6 +203,7 @@ class TrajservLayer extends TrackerLayer {
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.apiKey = options.apiKey;
+    this.delayDisplay = options.delayDisplay || 300000;
     this.requestIntervalSeconds = 3;
     this.useDelayStyle = options.useDelayStyle || false;
     this.delayOutlineColor = options.delayOutlineColor || '#000000';
@@ -649,7 +651,8 @@ class TrajservLayer extends TrackerLayer {
         ctx.restore();
       }
 
-      if (hover) {
+      // Show delay if feature is hovered or if delay is above 5mins.
+      if (hover || delay >= this.delayDisplay) {
         // Draw delay text
         ctx.save();
         ctx.textAlign = 'left';
