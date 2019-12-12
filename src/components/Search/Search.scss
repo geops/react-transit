@@ -7,6 +7,7 @@
 
   .react-autosuggest__container {
     width: 100%;
+    position: relative;
 
     .react-autosuggest__input {
       border: 1px solid #515151;
@@ -14,14 +15,18 @@
       text-overflow: ellipsis;
       font-size: 1em;
       height: 48px;
-      width: 100%;
+      width: calc(100% - 1em);
+
+      &::-ms-clear {
+        display: none;
+      }
     }
 
     .react-autosuggest__suggestions-container--open {
       background-color: #fff;
       position: absolute;
       top: calc(100% - 1px);
-      width: calc(100% - 47px);
+      width: 100%;
       border: 1px solid #515151;
 
       .react-autosuggest__suggestions-list {
@@ -47,19 +52,26 @@
     cursor: pointer;
     background: none;
     border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    padding: 0;
+
+    svg {
+      width: 50px;
+    }
 
     &.rt-search-button-clear {
       position: absolute;
       color: #515151;
       right: 50px;
-      height: 50px;
     }
 
     &.rt-search-button-submit {
       border: 1px solid #515151;
       background-color: #515151;
       color: #fff;
-      width: 50px;
     }
   }
 }
