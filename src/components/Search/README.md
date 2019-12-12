@@ -8,7 +8,7 @@ import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import OLMap from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
-import { transform } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import OSMSource from 'ol/source/OSM';
 import Search from 'react-transit/components/Search';
 
@@ -22,8 +22,7 @@ const layers = [
   }),
 ];
 const setCenter = ({ geometry }) => {
-  const center = transform(geometry.coordinates, 'EPSG:4326', 'EPSG:3857');
-  map.getView().setCenter(center);
+  map.getView().setCenter(fromLonLat(geometry.coordinates, 'EPSG:3857'));
 };
 
 const apiPublicKey = '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93';
