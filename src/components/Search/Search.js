@@ -13,12 +13,12 @@ const propTypes = {
   engines: PropTypes.object,
 
   /**
-   * A function which will receive the searchService instance and needs to return a render function for the section title.
+   * A function which will receive the searchService instance and needs to return a render function for the section title, see [react-autosuggest documentation](https://github.com/moroshko/react-autosuggest#render-section-title-prop) for details.
    */
   getRenderSectionTitle: PropTypes.func,
 
   /**
-   * Props for the search input field.
+   * Props for the search input field, see [react-autosuggest documentation](https://github.com/moroshko/react-autosuggest#input-props-prop) for details.
    */
   inputProps: PropTypes.object,
 
