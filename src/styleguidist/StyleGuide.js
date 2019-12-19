@@ -111,6 +111,7 @@ export function StyleGuideRenderer({
       })
       .catch(() => {
         setApiKey('error');
+        // eslint-disable-next-line no-console
         console.error('Request to get the apiKey failed');
       });
   }, []);
