@@ -25,8 +25,6 @@ const setCenter = ({ geometry }) => {
   map.getView().setCenter(fromLonLat(geometry.coordinates, 'EPSG:3857'));
 };
 
-const apiPublicKey = '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93';
-
 function SearchExample() {
   return (
     <div className="rt-stop-finder-example">
@@ -38,7 +36,7 @@ function SearchExample() {
       />
       <Search
         onSelect={setCenter}
-        apiKey={apiPublicKey}
+        apiKey={window.apiKey}
         inputProps={{
           placeholder: 'Search stops',
         }}

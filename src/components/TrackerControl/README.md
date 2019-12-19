@@ -14,7 +14,7 @@ import TrackerControl from 'react-transit/components/TrackerControl';
 const trackerLayer = new TrajservLayer({
   apiKey: window.apiKey,
 });
-console.log(window.apiKey);
+
 const layers = [
   new Layer({
     name: 'Layer',
