@@ -2,6 +2,8 @@
 
 This demonstrates the use of RouteSchedule.
 
+The `apiKey` used here is for demonstration purposes only. Please get your own api key at https://developer.geops.io/.
+
 ```jsx
 import React, { useState, useEffect } from 'react';
 import BasicMap from 'react-spatial/components/BasicMap';
@@ -18,6 +20,9 @@ import Follow from '../../images/FollowButton/follow.svg';
 
 let firstRender = null;
 const initialCenter = [951560, 6002550];
+
+// The `apiKey` used here is for demonstration purposes only.
+// Please get your own api key at https://developer.geops.io/.
 const trackerLayer = new TrajservLayer({
   apiKey: window.apiKey,
 });

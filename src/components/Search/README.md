@@ -2,6 +2,8 @@
 
 This demonstrates the use of the Search component.
 
+The `apiKey` used here is for demonstration purposes only. Please get your own api key at https://developer.geops.io/.
+
 ```jsx
 import React from 'react';
 import BasicMap from 'react-spatial/components/BasicMap';
@@ -36,6 +38,8 @@ function SearchExample() {
       />
       <Search
         onSelect={setCenter}
+        // The `apiKey` used here is for demonstration purposes only.
+        // Please get your own api key at https://developer.geops.io/.
         apiKey={window.apiKey}
         inputProps={{
           placeholder: 'Search stops',
