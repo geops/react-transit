@@ -27,6 +27,10 @@ const setCenter = ({ geometry }) => {
   map.getView().setCenter(fromLonLat(geometry.coordinates, 'EPSG:3857'));
 };
 
+// The `apiKey` used here is for demonstration purposes only.
+// Please get your own api key at https://developer.geops.io/.
+const { apiKey } = window;
+
 function SearchExample() {
   return (
     <div className="rt-stop-finder-example">
@@ -38,9 +42,7 @@ function SearchExample() {
       />
       <Search
         onSelect={setCenter}
-        // The `apiKey` used here is for demonstration purposes only.
-        // Please get your own api key at https://developer.geops.io/.
-        apiKey={window.apiKey}
+        apiKey={apiKey}
         inputProps={{
           placeholder: 'Search stops',
         }}

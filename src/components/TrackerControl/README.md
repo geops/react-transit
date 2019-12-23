@@ -13,9 +13,9 @@ import OSMSource from 'ol/source/OSM';
 import TrajservLayer from 'react-transit/layers/TrajservLayer';
 import TrackerControl from 'react-transit/components/TrackerControl';
 
+// The `apiKey` used here is for demonstration purposes only.
+// Please get your own api key at https://developer.geops.io/.
 const trackerLayer = new TrajservLayer({
-  // The `apiKey` used here is for demonstration purposes only.
-  // Please get your own api key at https://developer.geops.io/.
   apiKey: window.apiKey,
 });
 
