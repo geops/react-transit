@@ -1,6 +1,7 @@
 class Engine {
   constructor() {
     this.collapsed = true;
+    this.items = [];
   }
 
   collapse(collapsed) {
@@ -15,7 +16,7 @@ class Engine {
     this.apiKey = apiKey;
   }
 
-  setItems(items) {
+  setItems(items = []) {
     this.items = items;
   }
 }

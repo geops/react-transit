@@ -28,6 +28,12 @@ const propTypes = {
   onHighlight: PropTypes.func,
 
   /**
+   * Function to define whether the suggestions are displayed or not.
+   * See 'shouldRenderSuggestions' in [react-autosuggest documentation](https://github.com/moroshko/react-autosuggest#input-props-prop) for details.
+   */
+  shouldRenderSuggestions: PropTypes.func,
+
+  /**
    * Callback function which will be called with the selected suggestion.
    */
   onSelect: PropTypes.func,
@@ -37,6 +43,7 @@ const defaultProps = {
   engines: { stops: new StopFinder() },
   getRenderSectionTitle: () => () => null,
   onHighlight: () => null,
+  shouldRenderSuggestions: newValue => newValue.trim().length > 2,
   onSelect: () => null,
 };
 
@@ -46,6 +53,7 @@ function Search({
   getRenderSectionTitle,
   inputProps,
   onHighlight,
+  shouldRenderSuggestions,
   onSelect,
 }) {
   const [suggestions, setSuggestions] = useState([]);
@@ -71,7 +79,10 @@ function Search({
                   const { items, section } = filtered[0];
                   searchService.select({ ...items[0], section });
                 }
-              } else if (key === 'ArrowDown' || key === 'ArrowUp') {
+              } else if (
+                (key === 'ArrowDown' || key === 'ArrowUp') &&
+                typeof searchService.highlightSection === 'function'
+              ) {
                 searchService.highlightSection(); // for improved accessibility
               }
             },
@@ -83,13 +94,17 @@ function Search({
             items ? items.map(i => ({ ...i, section })) : []
           }
           getSuggestionValue={suggestion => searchService.value(suggestion)}
-          onSuggestionsFetchRequested={() => searchService.search(value)}
+          onSuggestionsFetchRequested={({ value: newValue }) =>
+            searchService.search(newValue)
+          }
           onSuggestionsClearRequested={() => setSuggestions([])}
           onSuggestionHighlighted={({ suggestion }) => onHighlight(suggestion)}
           onSuggestionSelected={(e, { suggestion }) => onSelect(suggestion)}
           renderSuggestion={suggestion => searchService.render(suggestion)}
           renderSectionTitle={getRenderSectionTitle(searchService)}
-          shouldRenderSuggestions={newValue => newValue.trim().length > 2}
+          shouldRenderSuggestions={newValue =>
+            shouldRenderSuggestions(newValue)
+          }
           suggestions={suggestions}
         />
         {value && (
