@@ -628,6 +628,7 @@ class TrajservLayer extends TrackerLayer {
 
     if (!this.styleCache[z][type][name][delay][hover][selected]) {
       let radius = getRadius(type, z);
+
       if (hover || selected) {
         radius += 5;
       }
