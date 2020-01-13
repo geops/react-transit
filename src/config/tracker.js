@@ -78,7 +78,8 @@ export const getRadius = (type = 0, zoom) => {
   try {
     let typeIdx = type;
     if (typeof type === 'string') {
-      typeIdx = types.indexOf(type);
+      const matched = types.find(t => new RegExp(type).test(t));
+      typeIdx = types.indexOf(matched);
     }
     return trackerRaduisMapping[typeIdx][zoom];
   } catch (e) {
@@ -90,7 +91,8 @@ export const getBgColor = (type = 0) => {
   try {
     let typeIdx = type;
     if (typeof type === 'string') {
-      typeIdx = types.indexOf(type);
+      const matched = types.find(t => new RegExp(type).test(t));
+      typeIdx = types.indexOf(matched);
     }
     return bgColors[typeIdx];
   } catch (e) {
@@ -102,7 +104,8 @@ export const getTextColor = (type = 0) => {
   try {
     let typeIdx = type;
     if (typeof type === 'string') {
-      typeIdx = types.indexOf(type);
+      const matched = types.find(t => new RegExp(type).test(t));
+      typeIdx = types.indexOf(matched);
     }
     return textColors[typeIdx];
   } catch (e) {
