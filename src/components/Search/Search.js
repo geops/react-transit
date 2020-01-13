@@ -79,10 +79,11 @@ function Search({
                   const { items, section } = filtered[0];
                   searchService.select({ ...items[0], section });
                 }
-              } else if (key === 'ArrowDown' || key === 'ArrowUp') {
-                if (typeof searchService.highlightSection === 'function') {
-                  searchService.highlightSection(); // for improved accessibility
-                }
+              } else if (
+                (key === 'ArrowDown' || key === 'ArrowUp') &&
+                typeof searchService.highlightSection === 'function'
+              ) {
+                searchService.highlightSection(); // for improved accessibility
               }
             },
             value,
@@ -93,15 +94,17 @@ function Search({
             items ? items.map(i => ({ ...i, section })) : []
           }
           getSuggestionValue={suggestion => searchService.value(suggestion)}
-          onSuggestionsFetchRequested={({value: newValue}) =>
-            searchService.search(suggestion.value)
+          onSuggestionsFetchRequested={({ value: newValue }) =>
+            searchService.search(newValue)
           }
           onSuggestionsClearRequested={() => setSuggestions([])}
           onSuggestionHighlighted={({ suggestion }) => onHighlight(suggestion)}
           onSuggestionSelected={(e, { suggestion }) => onSelect(suggestion)}
           renderSuggestion={suggestion => searchService.render(suggestion)}
           renderSectionTitle={getRenderSectionTitle(searchService)}
-          shouldRenderSuggestions={newValue => shouldRenderSuggestions(newValue)}
+          shouldRenderSuggestions={newValue =>
+            shouldRenderSuggestions(newValue)
+          }
           suggestions={suggestions}
         />
         {value && (
