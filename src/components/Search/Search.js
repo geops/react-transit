@@ -101,7 +101,7 @@ function Search({
           onSuggestionSelected={(e, { suggestion }) => onSelect(suggestion)}
           renderSuggestion={suggestion => searchService.render(suggestion)}
           renderSectionTitle={getRenderSectionTitle(searchService)}
-          shouldRenderSuggestions={sug => shouldRenderSuggestions(sug)}
+          shouldRenderSuggestions={newValue => shouldRenderSuggestions(newValue)}
           suggestions={suggestions}
         />
         {value && (
