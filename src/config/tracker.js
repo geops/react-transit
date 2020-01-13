@@ -11,14 +11,6 @@ const trackerRaduisMapping = {
   9: [5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 9, 12.5, 14, 15, 15, 15, 15],
 };
 
-const getTypeIndex = (type, types) => {
-  if (typeof type === 'string') {
-    const matched = types.find(t => new RegExp(type).test(t));
-    return types.indexOf(matched);
-  }
-  return type;
-};
-
 export const types = [
   'Tram',
   'Subway / Metro / S-Bahn',
@@ -82,9 +74,17 @@ export const timeSteps = [
   50,
 ];
 
+const getTypeIndex = type => {
+  if (typeof type === 'string') {
+    const matched = types.find(t => new RegExp(type).test(t));
+    return types.indexOf(matched);
+  }
+  return type;
+};
+
 export const getRadius = (type = 0, zoom) => {
   try {
-    const typeIdx = getTypeIndex(type, types);
+    const typeIdx = getTypeIndex(type);
     return trackerRaduisMapping[typeIdx][zoom];
   } catch (e) {
     return 1;
@@ -93,7 +93,7 @@ export const getRadius = (type = 0, zoom) => {
 
 export const getBgColor = (type = 0) => {
   try {
-    const typeIdx = getTypeIndex(type, types);
+    const typeIdx = getTypeIndex(type);
     return bgColors[typeIdx];
   } catch (e) {
     return 1;
@@ -102,7 +102,7 @@ export const getBgColor = (type = 0) => {
 
 export const getTextColor = (type = 0) => {
   try {
-    const typeIdx = getTypeIndex(type, types);
+    const typeIdx = getTypeIndex(type);
     return textColors[typeIdx];
   } catch (e) {
     return 1;
