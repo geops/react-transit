@@ -93,7 +93,7 @@ function Search({
             items ? items.map(i => ({ ...i, section })) : []
           }
           getSuggestionValue={suggestion => searchService.value(suggestion)}
-          onSuggestionsFetchRequested={suggestion =>
+          onSuggestionsFetchRequested={({value: newValue}) =>
             searchService.search(suggestion.value)
           }
           onSuggestionsClearRequested={() => setSuggestions([])}
