@@ -64,10 +64,28 @@ function Search({
     [apiKey, engines, setSuggestions],
   );
 
+  const theme = {
+    container: 'rt-search__container',
+    containerOpen: 'rt-search__container--open',
+    input: 'rt-search__input',
+    inputOpen: 'rt-search__input--open',
+    inputFocused: 'rt-search__input--focused',
+    suggestionsContainer: 'rt-search__suggestions-container',
+    suggestionsContainerOpen: 'rt-search__suggestions-container--open',
+    suggestionsList: 'rt-search__suggestions-list',
+    suggestion: 'rt-search__suggestion',
+    suggestionFirst: 'rt-search__suggestion--first',
+    suggestionHighlighted: 'rt-search__suggestion--highlighted',
+    sectionContainer: 'rt-search__section-container',
+    sectionContainerFirst: 'rt-search__section-container--first',
+    sectionTitle: 'rt-search__section-title',
+  };
+
   return (
     Object.keys(engines).length > 0 && (
       <div className="rt-search">
         <Autosuggest
+          theme={theme}
           inputProps={{
             autoFocus: true,
             tabIndex: 0,

@@ -5,11 +5,11 @@
   width: 350px;
   position: relative;
 
-  .react-autosuggest__container {
+  .rt-search__container {
     width: 100%;
     position: relative;
 
-    .react-autosuggest__input {
+    .rt-search__input {
       border: 1px solid #515151;
       padding: 0 0 0 1em;
       text-overflow: ellipsis;
@@ -22,20 +22,20 @@
       }
     }
 
-    .react-autosuggest__suggestions-container--open {
+    .rt-search__suggestions-container--open {
       background-color: #fff;
       position: absolute;
       top: calc(100% - 1px);
       width: 100%;
       border: 1px solid #515151;
 
-      .react-autosuggest__suggestions-list {
+      .rt-search__suggestions-list {
         padding: 0;
         margin: 0.5em 0;
         list-style: none;
       }
 
-      .react-autosuggest__suggestion {
+      .rt-search__suggestion {
         padding: 0.5em 1em;
         cursor: pointer;
         color: #515151;
