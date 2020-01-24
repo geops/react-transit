@@ -37,6 +37,11 @@ const propTypes = {
    * Callback function which will be called with the selected suggestion.
    */
   onSelect: PropTypes.func,
+
+  /**
+   * CSS class of the component.
+   */
+  className: PropTypes.string,
 };
 
 const defaultProps = {
@@ -45,6 +50,7 @@ const defaultProps = {
   onHighlight: () => null,
   shouldRenderSuggestions: newValue => newValue.trim().length > 2,
   onSelect: () => null,
+  className: 'rt-search',
 };
 
 function Search({
@@ -55,6 +61,7 @@ function Search({
   onHighlight,
   shouldRenderSuggestions,
   onSelect,
+  className,
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [value, setValue] = useState('');
@@ -65,20 +72,20 @@ function Search({
   );
 
   const theme = {
-    container: 'rt-search__container',
-    containerOpen: 'rt-search__container--open',
-    input: 'rt-search__input',
-    inputOpen: 'rt-search__input--open',
-    inputFocused: 'rt-search__input--focused',
-    suggestionsContainer: 'rt-search__suggestions-container',
-    suggestionsContainerOpen: 'rt-search__suggestions-container--open',
-    suggestionsList: 'rt-search__suggestions-list',
-    suggestion: 'rt-search__suggestion',
-    suggestionFirst: 'rt-search__suggestion--first',
-    suggestionHighlighted: 'rt-search__suggestion--highlighted',
-    sectionContainer: 'rt-search__section-container',
-    sectionContainerFirst: 'rt-search__section-container--first',
-    sectionTitle: 'rt-search__section-title',
+    container: `${className}__container`,
+    containerOpen: `${className}__container--open`,
+    input: `${className}__input`,
+    inputOpen: `${className}__input--open`,
+    inputFocused: `${className}__input--focused`,
+    suggestionsContainer: `${className}__suggestions-container`,
+    suggestionsContainerOpen: `${className}__suggestions-container--open`,
+    suggestionsList: `${className}__suggestions-list`,
+    suggestion: `${className}__suggestion`,
+    suggestionFirst: `${className}__suggestion--first`,
+    suggestionHighlighted: `${className}__suggestion--highlighted`,
+    sectionContainer: `${className}__section-container`,
+    sectionContainerFirst: `${className}__section-container--first`,
+    sectionTitle: `${className}__section-title`,
   };
 
   return (
