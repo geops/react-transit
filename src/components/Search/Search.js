@@ -37,6 +37,11 @@ const propTypes = {
    * Callback function which will be called with the selected suggestion.
    */
   onSelect: PropTypes.func,
+
+  /**
+   * CSS class of the component.
+   */
+  className: PropTypes.string,
 };
 
 const defaultProps = {
@@ -45,6 +50,7 @@ const defaultProps = {
   onHighlight: () => null,
   shouldRenderSuggestions: newValue => newValue.trim().length > 2,
   onSelect: () => null,
+  className: 'rt-search',
 };
 
 function Search({
@@ -55,6 +61,7 @@ function Search({
   onHighlight,
   shouldRenderSuggestions,
   onSelect,
+  className,
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [value, setValue] = useState('');
@@ -64,10 +71,30 @@ function Search({
     [apiKey, engines, setSuggestions],
   );
 
+  const theme = useMemo(() => {
+    return {
+      container: `${className}__container`,
+      containerOpen: `${className}__container--open`,
+      input: `${className}__input`,
+      inputOpen: `${className}__input--open`,
+      inputFocused: `${className}__input--focused`,
+      suggestionsContainer: `${className}__suggestions-container`,
+      suggestionsContainerOpen: `${className}__suggestions-container--open`,
+      suggestionsList: `${className}__suggestions-list`,
+      suggestion: `${className}__suggestion`,
+      suggestionFirst: `${className}__suggestion--first`,
+      suggestionHighlighted: `${className}__suggestion--highlighted`,
+      sectionContainer: `${className}__section-container`,
+      sectionContainerFirst: `${className}__section-container--first`,
+      sectionTitle: `${className}__section-title`,
+    };
+  }, [className]);
+
   return (
     Object.keys(engines).length > 0 && (
       <div className="rt-search">
         <Autosuggest
+          theme={theme}
           inputProps={{
             autoFocus: true,
             tabIndex: 0,

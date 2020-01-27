@@ -8,7 +8,7 @@ exports[`Search matches snapshots. 1`] = `
     aria-expanded={false}
     aria-haspopup="listbox"
     aria-owns="react-autowhatever-1"
-    className="react-autosuggest__container"
+    className="rt-search__container"
     role="combobox"
   >
     <input
@@ -17,7 +17,7 @@ exports[`Search matches snapshots. 1`] = `
       aria-controls="react-autowhatever-1"
       autoComplete="off"
       autoFocus={true}
-      className="react-autosuggest__input"
+      className="rt-search__input"
       onBlur={[Function]}
       onChange={[Function]}
       onFocus={[Function]}
@@ -28,7 +28,7 @@ exports[`Search matches snapshots. 1`] = `
       value=""
     />
     <div
-      className="react-autosuggest__suggestions-container"
+      className="rt-search__suggestions-container"
       id="react-autowhatever-1"
       role="listbox"
     />
