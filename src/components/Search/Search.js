@@ -71,22 +71,24 @@ function Search({
     [apiKey, engines, setSuggestions],
   );
 
-  const theme = {
-    container: `${className}__container`,
-    containerOpen: `${className}__container--open`,
-    input: `${className}__input`,
-    inputOpen: `${className}__input--open`,
-    inputFocused: `${className}__input--focused`,
-    suggestionsContainer: `${className}__suggestions-container`,
-    suggestionsContainerOpen: `${className}__suggestions-container--open`,
-    suggestionsList: `${className}__suggestions-list`,
-    suggestion: `${className}__suggestion`,
-    suggestionFirst: `${className}__suggestion--first`,
-    suggestionHighlighted: `${className}__suggestion--highlighted`,
-    sectionContainer: `${className}__section-container`,
-    sectionContainerFirst: `${className}__section-container--first`,
-    sectionTitle: `${className}__section-title`,
-  };
+  const theme = useMemo(() => {
+    return {
+      container: `${className}__container`,
+      containerOpen: `${className}__container--open`,
+      input: `${className}__input`,
+      inputOpen: `${className}__input--open`,
+      inputFocused: `${className}__input--focused`,
+      suggestionsContainer: `${className}__suggestions-container`,
+      suggestionsContainerOpen: `${className}__suggestions-container--open`,
+      suggestionsList: `${className}__suggestions-list`,
+      suggestion: `${className}__suggestion`,
+      suggestionFirst: `${className}__suggestion--first`,
+      suggestionHighlighted: `${className}__suggestion--highlighted`,
+      sectionContainer: `${className}__section-container`,
+      sectionContainerFirst: `${className}__section-container--first`,
+      sectionTitle: `${className}__section-title`,
+    };
+  }, [className]);
 
   return (
     Object.keys(engines).length > 0 && (
