@@ -51,7 +51,7 @@
     "jest-svg-transformer": "^1.0.0",
     "jest-transform-file": "^1.1.1",
     "jsts": "^2.1.0",
-    "lint-staged": "^9.4.3",
+    "lint-staged": "^10.0.3",
     "mapbox-gl": "^1.4.1",
     "node-sass": "^4.11.0",
     "ol": "^6.1.1",
