@@ -1,8 +1,10 @@
 # React Transit
 
 [![npm](https://img.shields.io/npm/v/react-transit.svg?style=flat-square)](https://www.npmjs.com/package/react-transit)
-[![build](https://travis-ci.com/geops/react-transit.svg?branch=master)](https://travis-ci.com/geops/react-spattransitial)
+[![build](https://github.com/geops/react-transit/workflows/main/badge.svg)](https://github.com/geops/react-transit/actions?query=workflow%3Amain)
+[![dependabot](https://badgen.net/dependabot/geops/react-transit/?icon=dependabot)](https://github.com/marketplace/dependabot-preview)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3906ac5a-46f8-4de3-ae19-4be77060a368/deploy-status)](https://app.netlify.com/sites/react-transit/deploys)
 
 This library provides React components to visualize real-time geographical information based on [OpenLayers](https://openlayers.org/).
 
