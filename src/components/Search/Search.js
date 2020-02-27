@@ -42,15 +42,22 @@ const propTypes = {
    * CSS class of the component.
    */
   className: PropTypes.string,
+
+  /**
+   * Key to access the engine api.
+   */
+  apiKey: PropTypes.string,
 };
 
 const defaultProps = {
+  apiKey: null,
   engines: { stops: new StopFinder() },
   getRenderSectionTitle: () => () => null,
   onHighlight: () => null,
   shouldRenderSuggestions: newValue => newValue.trim().length > 2,
   onSelect: () => null,
   className: 'rt-search',
+  inputProps: {},
 };
 
 function Search({
