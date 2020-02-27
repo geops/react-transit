@@ -3,18 +3,18 @@ import React from 'react';
 import Engine from './Engine';
 
 class StopFinder extends Engine {
-  constructor(endpoint = 'https://api.geops.io/stops/v1/', options) {
+  constructor(endpoint = 'https://api.geops.io/stops/v1/', options = {}) {
     super();
-    this.params = options || {};
+    this.options = options;
     this.endpoint = endpoint;
   }
 
   search(value) {
-    const paramString = `${Object.keys(this.params)
-      .map(p => `${p}=${this.params[p]}`)
+    const optionsString = `${Object.keys(this.options)
+      .map(p => `${p}=${this.options[p]}`)
       .join('&')}`;
     return fetch(
-      `${this.endpoint}?&q=${value}&key=${this.apiKey}&${paramString}}`,
+      `${this.endpoint}?&q=${value}&key=${this.apiKey}&${optionsString}}`,
     )
       .then(data => data.json())
       .then(featureCollection => featureCollection.features);
