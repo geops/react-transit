@@ -18,8 +18,11 @@ import Follow from '../../images/FollowButton/follow.svg';
 
 let firstRender = null;
 const initialCenter = [951560, 6002550];
+
+// The `apiKey` used here is for demonstration purposes only.
+// Please get your own api key at https://developer.geops.io/.
 const trackerLayer = new TrajservLayer({
-  apiKey: '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93',
+  apiKey: window.apiKey,
 });
 const layers = [
   new Layer({

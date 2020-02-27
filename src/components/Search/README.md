@@ -1,6 +1,6 @@
 #
 
-This demonstrates the use of StopFinder.
+This demonstrates the use of the Search component.
 
 ```jsx
 import React from 'react';
@@ -8,8 +8,9 @@ import BasicMap from 'react-spatial/components/BasicMap';
 import Layer from 'react-spatial/layers/Layer';
 import OLMap from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
+import { fromLonLat } from 'ol/proj';
 import OSMSource from 'ol/source/OSM';
-import StopFinder from 'react-transit/components/StopFinder';
+import Search from 'react-transit/components/Search';
 
 const map = new OLMap({ controls: [] });
 const layers = [
@@ -20,10 +21,15 @@ const layers = [
     }),
   }),
 ];
-const setCenter = stop => map.getView().setCenter(stop.coordinates);
-const apiPublicKey = '5cc87b12d7c5370001c1d6551c1d597442444f8f8adc27fefe2f6b93';
+const setCenter = ({ geometry }) => {
+  map.getView().setCenter(fromLonLat(geometry.coordinates, 'EPSG:3857'));
+};
 
-function StopFinderExample() {
+// The `apiKey` used here is for demonstration purposes only.
+// Please get your own api key at https://developer.geops.io/.
+const { apiKey } = window;
+
+function SearchExample() {
   return (
     <div className="rt-stop-finder-example">
       <BasicMap
@@ -32,10 +38,10 @@ function StopFinderExample() {
         zoom={14}
         layers={layers}
       />
-      <StopFinder
+      <Search
         onSelect={setCenter}
-        apiKey={apiPublicKey}
-        autocompleteProps={{
+        apiKey={apiKey}
+        inputProps={{
           placeholder: 'Search stops',
         }}
       />
@@ -43,5 +49,5 @@ function StopFinderExample() {
   );
 }
 
-<StopFinderExample />;
+<SearchExample />;
 ```

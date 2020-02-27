@@ -74,12 +74,17 @@ export const timeSteps = [
   50,
 ];
 
+const getTypeIndex = type => {
+  if (typeof type === 'string') {
+    const matched = types.find(t => new RegExp(type).test(t));
+    return types.indexOf(matched);
+  }
+  return type;
+};
+
 export const getRadius = (type = 0, zoom) => {
   try {
-    let typeIdx = type;
-    if (typeof type === 'string') {
-      typeIdx = types.indexOf(type);
-    }
+    const typeIdx = getTypeIndex(type);
     return trackerRaduisMapping[typeIdx][zoom];
   } catch (e) {
     return 1;
@@ -88,10 +93,7 @@ export const getRadius = (type = 0, zoom) => {
 
 export const getBgColor = (type = 0) => {
   try {
-    let typeIdx = type;
-    if (typeof type === 'string') {
-      typeIdx = types.indexOf(type);
-    }
+    const typeIdx = getTypeIndex(type);
     return bgColors[typeIdx];
   } catch (e) {
     return 1;
@@ -100,10 +102,7 @@ export const getBgColor = (type = 0) => {
 
 export const getTextColor = (type = 0) => {
   try {
-    let typeIdx = type;
-    if (typeof type === 'string') {
-      typeIdx = types.indexOf(type);
-    }
+    const typeIdx = getTypeIndex(type);
     return textColors[typeIdx];
   } catch (e) {
     return 1;
