@@ -12,6 +12,8 @@
   "peerDependencies": {
     "mapbox-gl": "^1.2.0",
     "ol": "^6.0.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "react-spatial": "^0.1.0-beta.2"
   },
   "devDependencies": {
@@ -83,6 +85,7 @@
     "doc": "bash ./scripts/prepare-doc.sh",
     "doc:server": "styleguidist server",
     "format": "prettier --write 'src/**/*.js' && eslint 'src/**/*.js' --fix && stylelint 'src/**/*.css' 'src/**/*.scss' --fix",
+    "link2": "cmdToAdd=$(node ./scripts/read-pkg-json.js add) && $cmdToAdd && yarn build && cmdToRemove=$(node ./scripts/read-pkg-json.js remove) && $cmdToRemove && cd build $$ yarn link",
     "lint": "eslint 'src/**/*.js' && stylelint 'src/**/*.css' 'src/**/*.scss'",
     "postbuild": "cp package.json build/ && cd src && find .  -name '*.scss' | cpio -pdm ../build",
     "prebuild": "rm -rf build/",
