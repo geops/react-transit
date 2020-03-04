@@ -10431,9 +10431,9 @@ react-simple-code-editor@^0.10.0:
   integrity sha512-bL5W5mAxSW6+cLwqqVWY47Silqgy2DKDTR4hDBrLrUqC5BXc29YVx17l2IZk5v36VcDEq1Bszu2oHm1qBwKqBA==
 
 react-spatial@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/react-spatial/-/react-spatial-0.2.3.tgz#3db2c4d71cf9de8b7fad5c1fde38a67dd4174640"
-  integrity sha512-/ZqrawNMMtlULMRJsdJjO8z5YDUIemNptNYLRclKWtkd2cNUQdc2AiI1T2m7aRswHWvmqpybdLHCXjyR2JBcZw==
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/react-spatial/-/react-spatial-0.2.5.tgz#d5598f82e1563e788e9fa5eb0ffa7e2bd719329c"
+  integrity sha512-eHN2UTXGQZCvx4E3a76xXiBpItjOsIbtAXvN7Sny44pZQLfQ5PmPapIhOv8TdZeDsFM6dVk9iwZmCgeZ8KrQjw==
   dependencies:
     query-string "^6.11.0"
     radians-degrees "^1.0.0"
