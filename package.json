@@ -11,7 +11,7 @@
   },
   "peerDependencies": {
     "mapbox-gl": "^1.8.1",
-    "ol": "^6.2.1",
+    "ol": "6.1.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-spatial": "^0.2.8"
