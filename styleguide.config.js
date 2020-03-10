@@ -11,6 +11,7 @@ module.exports = {
   require: [
     path.join(__dirname, 'src/themes/default/examples.scss'),
     path.join(__dirname, 'src/styleguidist/styleguidist.css'),
+    'ol/ol.css',
     'react-app-polyfill/ie11',
     'react-app-polyfill/stable',
     'abortcontroller-polyfill/dist/abortcontroller-polyfill-only',
