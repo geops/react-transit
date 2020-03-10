@@ -157,6 +157,7 @@ class TrackerLayer extends Layer {
     this.tracker.setVisible(true);
     this.tracker.renderTrajectories(this.currTime);
     this.startUpdateTime();
+    this.currentZoom = this.map.getView().getZoom();
 
     this.olEventsKeys = [
       this.map.on('moveend', () => {
