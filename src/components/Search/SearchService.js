@@ -19,7 +19,7 @@ class SearchService {
 
   search(value) {
     Object.entries(this.engines).forEach(([section, engine], position) => {
-      engine.search(value).then(items => {
+      engine.search(value).then((items) => {
         engine.setItems(items);
         this.upsert(section, engine.getItems(items), position);
       });
@@ -38,8 +38,10 @@ class SearchService {
   }
 
   upsert(section, items, position) {
-    this.setSuggestions(oldSuggestions => {
-      const sectionIndex = oldSuggestions.findIndex(s => s.section === section);
+    this.setSuggestions((oldSuggestions) => {
+      const sectionIndex = oldSuggestions.findIndex(
+        (s) => s.section === section,
+      );
       const start = sectionIndex === -1 ? position : sectionIndex;
       const deleteCount = sectionIndex === -1 ? 0 : 1;
       const newSuggestions = [...oldSuggestions];

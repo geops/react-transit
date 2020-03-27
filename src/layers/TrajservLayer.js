@@ -152,40 +152,40 @@ class TrajservLayer extends TrackerLayer {
     if (regexLine) {
       const regexLineList =
         typeof regexLine === 'string' ? [regexLine] : regexLine;
-      const lineFilter = t =>
-        regexLineList.some(tr => new RegExp(tr, 'i').test(t.name));
+      const lineFilter = (t) =>
+        regexLineList.some((tr) => new RegExp(tr, 'i').test(t.name));
       filterList.push(lineFilter);
     }
 
     if (line) {
       const lineFiltersList = typeof line === 'string' ? line.split(',') : line;
-      const lineList = lineFiltersList.map(l =>
+      const lineList = lineFiltersList.map((l) =>
         l.replace(/\s+/g, '').toUpperCase(),
       );
-      const lineFilter = l => {
-        return lineList.some(filter => filter === l.name.toUpperCase());
+      const lineFilter = (l) => {
+        return lineList.some((filter) => filter === l.name.toUpperCase());
       };
       filterList.push(lineFilter);
     }
 
     if (trip) {
       const tripFilters = typeof trip === 'string' ? trip.split(',') : trip;
-      const tripList = tripFilters.map(rt => parseInt(rt, 10));
-      const tripFilter = t => {
+      const tripList = tripFilters.map((rt) => parseInt(rt, 10));
+      const tripFilter = (t) => {
         const tripId = parseInt(t.routeIdentifier.split('.')[0], 10);
-        return tripList.some(tr => tr === tripId);
+        return tripList.some((tr) => tr === tripId);
       };
       filterList.push(tripFilter);
     }
 
     if (operator) {
       const operatorList = typeof operator === 'string' ? [operator] : operator;
-      const operatorFilter = t =>
-        operatorList.some(op => new RegExp(op, 'i').test(t.operator));
+      const operatorFilter = (t) =>
+        operatorList.some((op) => new RegExp(op, 'i').test(t.operator));
       filterList.push(operatorFilter);
     }
 
-    return t => {
+    return (t) => {
       for (let i = 0; i < filterList.length; i += 1) {
         if (!filterList[i](t)) {
           return false;
@@ -266,7 +266,7 @@ class TrajservLayer extends TrackerLayer {
     this.startUpdateTrajectories();
     this.olEventsKeys = [
       ...this.olEventsKeys,
-      this.map.on('singleclick', e => {
+      this.map.on('singleclick', (e) => {
         if (!this.clickCallbacks.length) {
           return;
         }
@@ -283,14 +283,14 @@ class TrajservLayer extends TrackerLayer {
           if (features.length) {
             this.selectedVehicleId = features[0].get('id');
             this.journeyId = features[0].get('journeyIdentifier');
-            this.fetchTrajectoryStations(this.selectedVehicleId).then(r => {
-              this.clickCallbacks.forEach(c => c(r, this, e));
+            this.fetchTrajectoryStations(this.selectedVehicleId).then((r) => {
+              this.clickCallbacks.forEach((c) => c(r, this, e));
             });
           }
         } else {
           this.selectedVehicleId = null;
           this.olLayer.getSource().clear();
-          this.clickCallbacks.forEach(c => c(null, this, e));
+          this.clickCallbacks.forEach((c) => c(null, this, e));
         }
       }),
       this.map.on('moveend', () => {
@@ -383,8 +383,8 @@ class TrajservLayer extends TrackerLayer {
     this.abortController = new AbortController();
     const { signal } = this.abortController;
     return fetch(url, { signal })
-      .then(data => data.json())
-      .catch(err => {
+      .then((data) => data.json())
+      .catch((err) => {
         if (err.name === 'AbortError') {
           return;
         }
@@ -412,18 +412,18 @@ class TrajservLayer extends TrackerLayer {
 
     const url = `${this.url}/trajstations?${params}`;
     return fetch(url)
-      .then(res => {
+      .then((res) => {
         try {
           return res.json();
         } catch (err) {
           throw new Error(err);
         }
       })
-      .then(resp => {
+      .then((resp) => {
         const trajStations = TrajservLayer.translateTrajStationsResp(resp);
 
         this.stationsCoords = [];
-        trajStations.stations.forEach(station => {
+        trajStations.stations.forEach((station) => {
           this.stationsCoords.push(
             transformCoords(station.coordinates, 'EPSG:4326', 'EPSG:3857'),
           );
@@ -436,11 +436,11 @@ class TrajservLayer extends TrackerLayer {
 
   highlightTrajectory() {
     this.fetchTrajectoryById(this.journeyId)
-      .then(traj => {
+      .then((traj) => {
         const { p: multiLine, t, c } = traj;
         const lineCoords = [];
-        multiLine.forEach(line => {
-          line.forEach(point => {
+        multiLine.forEach((line) => {
+          line.forEach((point) => {
             lineCoords.push([point.x, point.y]);
           });
         });
@@ -468,7 +468,7 @@ class TrajservLayer extends TrackerLayer {
     });
 
     const url = `${this.url}/trajectorybyid?${params}`;
-    return fetch(url).then(res => {
+    return fetch(url).then((res) => {
       try {
         return res.json();
       } catch (err) {
@@ -531,7 +531,7 @@ class TrajservLayer extends TrackerLayer {
     } */
 
     return Object.keys(params)
-      .map(k => `${k}=${params[k]}`)
+      .map((k) => `${k}=${params[k]}`)
       .join('&');
   }
 
@@ -565,7 +565,7 @@ class TrajservLayer extends TrackerLayer {
       `${this.url}/trajectory_collection?${this.getUrlParams({
         attr_det: 1,
       })}`,
-    ).then(data => {
+    ).then((data) => {
       if (!data) {
         return;
       }
@@ -617,16 +617,9 @@ class TrajservLayer extends TrackerLayer {
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.tracker.hoverVehicleId === id;
     const selected = this.selectedVehicleId === id;
+    const key = `${z}${type}${name}${delay}${hover}${selected}`;
 
-    this.styleCache[z] = this.styleCache[z] || {};
-    this.styleCache[z][type] = this.styleCache[z][type] || {};
-    this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
-    this.styleCache[z][type][name][delay] =
-      this.styleCache[z][type][name][delay] || {};
-    this.styleCache[z][type][name][delay][hover] =
-      this.styleCache[z][type][name][delay][hover] || {};
-
-    if (!this.styleCache[z][type][name][delay][hover][selected]) {
+    if (!this.styleCache[key]) {
       let radius = getRadius(type, z);
 
       if (hover || selected) {
@@ -698,13 +691,12 @@ class TrajservLayer extends TrackerLayer {
           ? textColor || getTextColor(type)
           : '#000000';
         ctx.font = `bold ${textSize}px Arial`;
-
         ctx.fillText(shortname, origin, origin);
       }
-      this.styleCache[z][type][name][delay][hover][selected] = canvas;
+      this.styleCache[key] = canvas;
     }
 
-    return this.styleCache[z][type][name][delay][hover][selected];
+    return this.styleCache[key];
   }
 }
 

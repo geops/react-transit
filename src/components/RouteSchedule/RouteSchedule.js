@@ -15,7 +15,7 @@ import TrackerLayer from '../../layers/TrackerLayer';
  * Returns a color class to display the delay.
  * @param {Number} time Delay time in milliseconds.
  */
-const getDelayColor = time => {
+const getDelayColor = (time) => {
   const secs = Math.round(((time / 1800 / 2) * 3600) / 1000);
   if (secs >= 3600) {
     return 'dark-red';
@@ -36,7 +36,7 @@ const getDelayColor = time => {
  * Returns true if the train doesn't stop to the station.
  * @param {Object} stop Station information.
  */
-const isNotStop = stop => {
+const isNotStop = (stop) => {
   return !stop.arrivalTime && !stop.departureTime;
 };
 
@@ -102,9 +102,9 @@ const defaultRenderStation = ({
         isStationPassed ? ' rt-passed' : '',
         isNotStation ? ' rt-no-stop' : '',
       ].join('')}
-      onClick={e => onStationClick(stop, e)}
+      onClick={(e) => onStationClick(stop, e)}
       tabIndex={0}
-      onKeyPress={e => e.which === 13 && onStationClick(stop, e)}
+      onKeyPress={(e) => e.which === 13 && onStationClick(stop, e)}
     >
       <div className="rt-route-delay">
         {typeof arrivalDelay === 'undefined' || isFirstStation ? null : (

@@ -1,6 +1,6 @@
 // Get a Date object as date string .
 // ex: 2019 09 01
-export const getDateString = now => {
+export const getDateString = (now) => {
   const n = now || new Date();
   let month = (n.getMonth() + 1).toString();
   month = month.length === 1 ? `0${month}` : month;
@@ -12,7 +12,7 @@ export const getDateString = now => {
 
 // Get the UTC time string of Date object.
 // ex: 09:05:01.123
-export const getUTCTimeString = date => {
+export const getUTCTimeString = (date) => {
   return [
     date.getUTCHours(),
     date.getUTCMinutes(),
@@ -21,7 +21,7 @@ export const getUTCTimeString = date => {
 };
 
 // Returns a string representation of a number, with a zero if the number is lower than 10.
-export const pad = integer => {
+export const pad = (integer) => {
   return integer < 10 ? `0${integer}` : integer;
 };
 
@@ -29,7 +29,7 @@ export const pad = integer => {
  * Returns a 'hh:mm' string from a time in ms.
  * @param {Number} timeInMs Time in milliseconds.
  */
-export const getHoursAndMinutes = timeInMs => {
+export const getHoursAndMinutes = (timeInMs) => {
   if (!timeInMs || timeInMs <= 0) {
     return '';
   }
@@ -41,7 +41,7 @@ export const getHoursAndMinutes = timeInMs => {
  * Returns a string representing a delay.
  * @param {Number} timeInMs Delay time in milliseconds.
  */
-export const getDelayString = timeInMs => {
+export const getDelayString = (timeInMs) => {
   const h = Math.floor(timeInMs / 3600000);
   const m = Math.floor((timeInMs % 3600000) / 60000);
   const s = Math.floor(((timeInMs % 3600000) % 60000) / 1000);
