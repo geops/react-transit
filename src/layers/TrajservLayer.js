@@ -619,8 +619,6 @@ class TrajservLayer extends TrackerLayer {
     const selected = this.selectedVehicleId === id;
     const key = `${z}${type}${name}${delay}${hover}${selected}`;
 
-    this.styleCache[key] = this.styleCache[key] || {};
-
     if (!this.styleCache[key]) {
       let radius = getRadius(type, z);
 
