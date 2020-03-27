@@ -617,16 +617,11 @@ class TrajservLayer extends TrackerLayer {
     const z = Math.min(Math.floor(this.currentZoom || 1), 16);
     const hover = this.tracker.hoverVehicleId === id;
     const selected = this.selectedVehicleId === id;
+    const key = `${z}${type}${name}${delay}${hover}${selected}`;
 
-    this.styleCache[z] = this.styleCache[z] || {};
-    this.styleCache[z][type] = this.styleCache[z][type] || {};
-    this.styleCache[z][type][name] = this.styleCache[z][type][name] || {};
-    this.styleCache[z][type][name][delay] =
-      this.styleCache[z][type][name][delay] || {};
-    this.styleCache[z][type][name][delay][hover] =
-      this.styleCache[z][type][name][delay][hover] || {};
+    this.styleCache[key] = this.styleCache[key] || {};
 
-    if (!this.styleCache[z][type][name][delay][hover][selected]) {
+    if (!this.styleCache[key]) {
       let radius = getRadius(type, z);
 
       if (hover || selected) {
@@ -698,13 +693,12 @@ class TrajservLayer extends TrackerLayer {
           ? textColor || getTextColor(type)
           : '#000000';
         ctx.font = `bold ${textSize}px Arial`;
-
         ctx.fillText(shortname, origin, origin);
       }
-      this.styleCache[z][type][name][delay][hover][selected] = canvas;
+      this.styleCache[key] = canvas;
     }
 
-    return this.styleCache[z][type][name][delay][hover][selected];
+    return this.styleCache[key];
   }
 }
 
