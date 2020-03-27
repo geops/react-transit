@@ -11,13 +11,13 @@ class StopFinder extends Engine {
 
   search(value) {
     const optionsString = `${Object.keys(this.options)
-      .map(p => `${p}=${this.options[p]}`)
+      .map((p) => `${p}=${this.options[p]}`)
       .join('&')}`;
     return fetch(
       `${this.endpoint}?&q=${value}&key=${this.apiKey}&${optionsString}`,
     )
-      .then(data => data.json())
-      .then(featureCollection => featureCollection.features);
+      .then((data) => data.json())
+      .then((featureCollection) => featureCollection.features);
   }
 
   render(item) {

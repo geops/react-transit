@@ -42,7 +42,7 @@ test('FollowButton should toggle.', () => {
       className="rt-follow-button"
       title="Follow up"
       active={followActive}
-      onClick={active => setFollowActive(active)}
+      onClick={(active) => setFollowActive(active)}
       routeIdentifier="test"
       trackerLayer={trackerLayer}
       setCenter={() => funcs.onClick()}
@@ -53,15 +53,11 @@ test('FollowButton should toggle.', () => {
 
   expect(followActive).toBe(false);
 
-  bt.find('.rt-follow-button')
-    .first()
-    .simulate('click');
+  bt.find('.rt-follow-button').first().simulate('click');
 
   expect(followActive).toBe(true);
 
-  bt.find('.rt-follow-button')
-    .first()
-    .simulate('click');
+  bt.find('.rt-follow-button').first().simulate('click');
 
   expect(followActive).toBe(false);
 });
