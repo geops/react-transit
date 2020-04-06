@@ -46,6 +46,10 @@ function RouteScheduleExample() {
     });
   }, []);
 
+  useEffect(()=> {
+    trackerLayer.map.updateSize();
+  }, [lineInfos]);
+
   return (
     <div className="rt-route-schedule-example">
       <RouteSchedule
