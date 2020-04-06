@@ -36,7 +36,7 @@ test('FollowButton should toggle.', () => {
       className="rt-filter-button"
       routeIdentifier="test"
       active={filterActive}
-      onClick={active => setFilterActive(active)}
+      onClick={(active) => setFilterActive(active)}
       trackerLayer={trackerLayer}
     >
       <MdFilterList />
@@ -45,15 +45,11 @@ test('FollowButton should toggle.', () => {
 
   expect(filterActive).toBe(false);
 
-  bt.find('.rt-filter-button')
-    .first()
-    .simulate('click');
+  bt.find('.rt-filter-button').first().simulate('click');
 
   expect(filterActive).toBe(true);
 
-  bt.find('.rt-filter-button')
-    .first()
-    .simulate('click');
+  bt.find('.rt-filter-button').first().simulate('click');
 
   expect(filterActive).toBe(false);
 });

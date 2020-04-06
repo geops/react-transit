@@ -98,7 +98,7 @@ class FilterButton extends PureComponent {
         className={`${className}${active ? ' rt-active' : ' rt-inactive'}`}
         title={title}
         onClick={toggle}
-        onKeyPress={e => e.which === 13 && toggle()}
+        onKeyPress={(e) => e.which === 13 && toggle()}
         role="button"
         tabIndex={0}
       >

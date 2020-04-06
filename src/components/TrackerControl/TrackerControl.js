@@ -5,7 +5,7 @@ import { FaPlay, FaForward, FaBackward, FaRegDotCircle } from 'react-icons/fa';
 
 import TrackerLayer from '../../layers/TrackerLayer';
 
-const increaseSpeed = speed => {
+const increaseSpeed = (speed) => {
   let delta = 0.1;
   if (speed >= 1) {
     delta = 1;
@@ -17,7 +17,7 @@ const increaseSpeed = speed => {
   return nextSpeed > 30 ? speed : nextSpeed;
 };
 
-const decreaseSpeed = speed => {
+const decreaseSpeed = (speed) => {
   let delta = 0.1;
   if (speed > 1) {
     delta = 1;
@@ -63,7 +63,7 @@ function TrackerControl({
 }) {
   const [speed, setSpeed] = useState(1);
 
-  const onSpeedChange = newSpeed => {
+  const onSpeedChange = (newSpeed) => {
     trackerLayer.setSpeed(newSpeed);
   };
 

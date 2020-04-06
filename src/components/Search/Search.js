@@ -54,7 +54,7 @@ const defaultProps = {
   engines: { stops: new StopFinder() },
   getRenderSectionTitle: () => () => null,
   onHighlight: () => null,
-  shouldRenderSuggestions: newValue => newValue.trim().length > 2,
+  shouldRenderSuggestions: (newValue) => newValue.trim().length > 2,
   onSelect: () => null,
   className: 'rt-search',
   inputProps: {},
@@ -108,7 +108,7 @@ function Search({
             onChange: (e, { newValue }) => setValue(newValue),
             onKeyUp: ({ key }) => {
               if (key === 'Enter') {
-                const filtered = suggestions.filter(s => s.items.length > 0);
+                const filtered = suggestions.filter((s) => s.items.length > 0);
                 if (filtered.length > 0) {
                   const { items, section } = filtered[0];
                   searchService.select({ ...items[0], section });
@@ -125,18 +125,18 @@ function Search({
           }}
           multiSection
           getSectionSuggestions={({ items, section }) =>
-            items ? items.map(i => ({ ...i, section })) : []
+            items ? items.map((i) => ({ ...i, section })) : []
           }
-          getSuggestionValue={suggestion => searchService.value(suggestion)}
+          getSuggestionValue={(suggestion) => searchService.value(suggestion)}
           onSuggestionsFetchRequested={({ value: newValue }) =>
             searchService.search(newValue)
           }
           onSuggestionsClearRequested={() => setSuggestions([])}
           onSuggestionHighlighted={({ suggestion }) => onHighlight(suggestion)}
           onSuggestionSelected={(e, { suggestion }) => onSelect(suggestion)}
-          renderSuggestion={suggestion => searchService.render(suggestion)}
+          renderSuggestion={(suggestion) => searchService.render(suggestion)}
           renderSectionTitle={getRenderSectionTitle(searchService)}
-          shouldRenderSuggestions={newValue =>
+          shouldRenderSuggestions={(newValue) =>
             shouldRenderSuggestions(newValue)
           }
           suggestions={suggestions}

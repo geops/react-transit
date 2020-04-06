@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const pad = integer => {
+const pad = (integer) => {
   return integer < 10 ? `0${integer}` : integer;
 };
 

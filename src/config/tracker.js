@@ -74,9 +74,9 @@ export const timeSteps = [
   50,
 ];
 
-const getTypeIndex = type => {
+const getTypeIndex = (type) => {
   if (typeof type === 'string') {
-    const matched = types.find(t => new RegExp(type).test(t));
+    const matched = types.find((t) => new RegExp(type).test(t));
     return types.indexOf(matched);
   }
   return type;

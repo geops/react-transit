@@ -91,7 +91,7 @@ class TrackerLayer extends Layer {
       this.start();
     }
 
-    this.visibilityRef = this.on('change:visible', evt => {
+    this.visibilityRef = this.on('change:visible', (evt) => {
       if (evt.target.getVisible()) {
         this.start();
       } else {
@@ -168,7 +168,7 @@ class TrackerLayer extends Layer {
           this.startUpdateTime();
         }
       }),
-      this.map.on('pointermove', evt => {
+      this.map.on('pointermove', (evt) => {
         if (this.map.getView().getInteracting() || !this.isHoverActive) {
           return;
         }
