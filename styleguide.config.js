@@ -29,6 +29,10 @@ module.exports = {
       context: 'README.md',
     },
     {
+      name: 'Tralis',
+      content: 'src/examples/TralisLayer/README.md',
+    },
+    {
       name: 'Components',
       components: [
         'src/components/RouteSchedule/[A-Z]*.js',

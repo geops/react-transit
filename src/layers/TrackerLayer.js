@@ -1,5 +1,6 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import { touchOnly } from 'ol/events/condition';
 import { unByKey } from 'ol/Observable';
 import Layer from 'react-spatial/layers/Layer';
 import { buffer, containsCoordinate } from 'ol/extent';
@@ -58,8 +59,7 @@ class TrackerLayer extends Layer {
      * Activate/deactivate pointer hover effect.
      * @private
      */
-    this.isHoverActive =
-      options.isHoverActive !== undefined ? options.isHoverActive : true;
+    this.isHoverActive = !!options.isHoverActive;
 
     /**
      * Callback function when a user click on a vehicle.
@@ -169,7 +169,13 @@ class TrackerLayer extends Layer {
         }
       }),
       this.map.on('pointermove', (evt) => {
-        if (this.map.getView().getInteracting() || !this.isHoverActive) {
+        const view = evt.map.getView();
+        if (
+          !this.isHoverActive ||
+          touchOnly(evt) ||
+          view.getInteracting() ||
+          view.getAnimating()
+        ) {
           return;
         }
         const [vehicle] = this.getVehiclesAtCoordinate(evt.coordinate);
