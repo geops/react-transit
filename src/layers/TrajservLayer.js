@@ -477,6 +477,14 @@ class TrajservLayer extends TrackerLayer {
     });
   }
 
+  getApiKey() {
+    return this.apiKey;
+  }
+
+  setApiKey(apiKey) {
+    this.apiKey = apiKey;
+  }
+
   /**
    * Returns the URL Parameters
    * @param {Object} extraParams
