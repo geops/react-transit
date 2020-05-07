@@ -310,8 +310,10 @@ class TrackerLayer extends Layer {
    *   the layer instance and the click event.
    */
   onClick(callback) {
+    console.log('eva', 'TrackerLayer', this, 'onClick', callback);
     if (typeof callback === 'function') {
       if (!this.clickCallbacks.includes(callback)) {
+        console.log('eva', 'TrackerLayer', this, 'onClick', 'push', 'clickCallbacks', callback);
         this.clickCallbacks.push(callback);
       }
     } else {
@@ -326,9 +328,11 @@ class TrackerLayer extends Layer {
    *   the layer instance and the click event.
    */
   unClick(callback) {
+    console.log('eva', 'TrackerLayer', this, 'unClick', callback);
     if (typeof callback === 'function') {
       const idx = this.clickCallbacks.indexOf(callback);
       if (idx >= -1) {
+        console.log('eva', 'TrackerLayer', this, 'onClick', 'splice', 'clickCallbacks', callback);
         this.clickCallbacks.splice(idx, 1);
       }
     }

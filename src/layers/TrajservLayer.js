@@ -203,6 +203,7 @@ class TrajservLayer extends TrackerLayer {
     this.showVehicleTraj =
       options.showVehicleTraj !== undefined ? options.showVehicleTraj : true;
     this.apiKey = options.apiKey;
+    console.log('eva', 'TrajservLayer.js', this, 'constructor', this.apiKey, options.apiKey);
     this.delayDisplay = options.delayDisplay || 300000;
     this.requestIntervalSeconds = 3;
     this.useDelayStyle = options.useDelayStyle || false;
@@ -267,6 +268,7 @@ class TrajservLayer extends TrackerLayer {
     this.olEventsKeys = [
       ...this.olEventsKeys,
       this.map.on('singleclick', (e) => {
+        console.log('eva', 'TrajservLayer', this, 'singleclick', this.clickCallbacks);
         if (!this.clickCallbacks.length) {
           return;
         }
@@ -283,6 +285,7 @@ class TrajservLayer extends TrackerLayer {
           if (features.length) {
             this.selectedVehicleId = features[0].get('id');
             this.journeyId = features[0].get('journeyIdentifier');
+            console.log('eva', 'TrajservLayer', this, 'singleclick', 'fetchTrajectoryStations', features);;
             this.fetchTrajectoryStations(this.selectedVehicleId).then((r) => {
               this.clickCallbacks.forEach((c) => c(r, this, e));
             });
@@ -522,6 +525,7 @@ class TrajservLayer extends TrackerLayer {
       key: this.apiKey,
       // toff: this.currTime.getTime() / 1000,
     };
+    console.log('eva', 'TrajservLayer.js', this, 'getUrlParams', params);
 
     // Allow to load only differences between the last request,
     // but currently the Tracker render method doesn't manage to render only diff.
@@ -561,6 +565,7 @@ class TrajservLayer extends TrackerLayer {
    * @private
    */
   updateTrajectories() {
+    console.log('eva', 'TrajservLayer.js', this, 'fetchTrajectories');
     this.fetchTrajectories(
       `${this.url}/trajectory_collection?${this.getUrlParams({
         attr_det: 1,
