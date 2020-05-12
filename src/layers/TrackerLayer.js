@@ -71,6 +71,13 @@ class TrackerLayer extends Layer {
     if (options.onClick) {
       this.onClick(options.onClick);
     }
+
+    /**
+     * Custom property for duck typing since `instanceof` is not working
+     * when the instance was created on different bundles.
+     * @public
+     */
+    this.isTrackerLayer = true;
   }
 
   /**
