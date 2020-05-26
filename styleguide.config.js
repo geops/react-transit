@@ -31,6 +31,18 @@ module.exports = {
     {
       name: 'Live Data in OpenLayers',
       content: 'src/examples/LiveData/README.md',
+      exampleMode: 'collapse',
+      usageMode: 'collapse',
+    },
+    {
+      name: 'Components',
+      components: [
+        'src/components/RouteSchedule/[A-Z]*.js',
+        'src/components/Search/Search.js',
+        'src/components/TrackerControl/[A-Z]*.js',
+      ],
+      exampleMode: 'collapse',
+      usageMode: 'collapse',
     },
   ],
   webpackConfig: {
