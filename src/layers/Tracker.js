@@ -3,7 +3,7 @@ import { unByKey } from 'ol/Observable';
 /**
  * Tracker for OpenLayers.
  * @class
- * @param {ol.map} map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
+ * @param {ol/Map} map (https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html)
  * @param {Object} options
  */
 export default class Tracker {
