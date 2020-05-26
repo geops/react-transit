@@ -75,7 +75,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Initialize the layer and listen to feature clicks.
-   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html Map}
+   * @param {ol/Map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html Map}
    * @private
    */
   init(map) {
@@ -149,7 +149,7 @@ class TrackerLayer extends Layer {
 
   /**
    * Trackerlayer is started
-   * @param {ol.map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
+   * @param {ol/Map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html ol/Map}
    * @private
    */
   start() {
@@ -179,7 +179,7 @@ class TrackerLayer extends Layer {
           return;
         }
         const [vehicle] = this.getVehiclesAtCoordinate(evt.coordinate);
-        this.map.getTarget().style.cursor = vehicle ? 'pointer' : 'auto';
+        this.map.getTargetElement().style.cursor = vehicle ? 'pointer' : 'auto';
         this.tracker.setHoverVehicleId(vehicle && vehicle.id);
       }),
       this.map.on('postrender', () => {

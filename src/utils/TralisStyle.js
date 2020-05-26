@@ -18,6 +18,9 @@ import s20Arrow from '../images/lines/s20pfeil.url.svg';
 
 import imgUnknown from '../images/lines/unknown.url.svg';
 
+/**
+ * @private
+ */
 const rotateCanvas = (canvas, rotation) => {
   const ctx = canvas.getContext('2d');
   ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -25,6 +28,9 @@ const rotateCanvas = (canvas, rotation) => {
   ctx.translate(-canvas.width / 2, -canvas.height / 2);
 };
 
+/**
+ * @private
+ */
 const getImageScaled = (image, scale) => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -34,6 +40,9 @@ const getImageScaled = (image, scale) => {
   return canvas;
 };
 
+/**
+ * @private
+ */
 const getImageArrowRotated = (image, imageArrow, rotation) => {
   const rot = rotation + (90 * Math.PI) / 180;
   const canvas = document.createElement('canvas');
@@ -47,11 +56,15 @@ const getImageArrowRotated = (image, imageArrow, rotation) => {
   return canvas;
 };
 
+/**
+ * @private
+ */
 const canvasCache = {};
 
 /**
  * Cache for line styles.
  * @type {Object.<ol.style.Style}}
+ * @private
  */
 const lineImages = {
   S1: {
@@ -112,6 +125,7 @@ lineImages[undefined] = { circle: unknownImage };
 /**
  * Return the canvas for the line style consisting of an arrow
  * pointing in the given direction and a line number.
+ * @private
  */
 export default (line, rotation, scale) => {
   const approxRotation = parseFloat(rotation.toFixed(1));

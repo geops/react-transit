@@ -29,18 +29,8 @@ module.exports = {
       context: 'README.md',
     },
     {
-      name: 'Tralis',
-      content: 'src/examples/TralisLayer/README.md',
-    },
-    {
-      name: 'Components',
-      components: [
-        'src/components/RouteSchedule/[A-Z]*.js',
-        'src/components/Search/Search.js',
-        'src/components/TrackerControl/[A-Z]*.js',
-      ],
-      exampleMode: 'collapse',
-      usageMode: 'collapse',
+      name: 'Live Data in OpenLayers',
+      content: 'src/examples/LiveData/README.md',
     },
   ],
   webpackConfig: {

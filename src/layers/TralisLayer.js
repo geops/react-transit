@@ -5,10 +5,14 @@ import TralisAPI, { modes } from '../utils/TralisAPI';
 import getVehicleImage from '../utils/TralisStyle';
 
 /**
- * Responsible for loading tracker data from Trajserv.
+ * Responsible for loading live data from Realtime service.
  * @class
- * @param {Object} [options]
  * @inheritDoc
+ * @param {Object} options Layer options.
+ * @param {string} options.url Realtime service url.
+ * @param {string} options.apiKey Access key for [geOps services](https://developer.geops.io/).
+ * @param {boolean} [options.debug=false] Display additional debug informations.
+ * @param {TralisMode} [options.mode=TralisMode.TOPOGRAPHIC] Mode.
  */
 class TralisLayer extends TrackerLayer {
   constructor(options = {}) {
@@ -20,7 +24,10 @@ class TralisLayer extends TrackerLayer {
     }
     super({ ...opt });
     this.url = opt.url;
-    this.key = opt.key;
+    this.apiKey = opt.apiKey;
+    if (this.url && opt.apiKey) {
+      this.url = `${this.url}?key=${opt.apiKey}`;
+    }
     this.debug = opt.debug;
     this.mode = opt.mode || modes.TOPOGRAPHIC;
     this.useDynamicIconScale = this.mode === modes.SCHEMATIC;
@@ -28,13 +35,25 @@ class TralisLayer extends TrackerLayer {
     this.format = new GeoJSON();
     this.resZoom11 = null;
     this.resZoom12 = null;
+    this.refreshTimeInMs = 100 / 60;
     this.onMessage = this.onMessage.bind(this);
     this.onDeleteMessage = this.onDeleteMessage.bind(this);
     this.api = new TralisAPI(this.url);
   }
 
+  /**
+   * Initialize the layer:
+   *  - add layer to the OpenLayers Map.
+   *  - add listeners to the OpenLayers Map.
+   *  - subscribe to the Realtime service.
+   * @param {ol/Map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html Map}   *
+   */
   init(map) {
     super.init(map);
+
+    if (!this.map) {
+      return;
+    }
 
     this.resZoom11 = map.getView().getResolutionForZoom(11); // res zoom 11
     this.resZoom12 = map.getView().getResolutionForZoom(12);
@@ -54,6 +73,19 @@ class TralisLayer extends TrackerLayer {
 
     this.api.subscribeTrajectory(this.mode, this.onMessage);
     this.api.subscribeDeletedVehicles(this.mode, this.onDeleteMessage);
+  }
+
+  /**
+   * Terminate the layer:
+   *  - remove layer from the OpenLayers Map.
+   *  - remove listeners from the OpenLayers Map.
+   *  - unsubscribe to the Realtime service.
+   * @param {ol/Map} map {@link https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html Map}   *
+   */
+  terminate(map) {
+    this.api.unsubscribeTrajectory();
+    this.api.unsubscribeDeletedVehicles();
+    super.terminate(map);
   }
 
   getIconScaleFromRes(res) {
@@ -129,6 +161,7 @@ class TralisLayer extends TrackerLayer {
    * @param {Boolean} addOnTop If true, the trajectory is added on top of
    *   the trajectory object. This affects the draw order. If addOnTop is
    *   true, the trajectory is drawn first and appears on bottom.
+   * @private
    */
   addTrajectory(id, traj, addOnTop) {
     const idx = this.trajectories.findIndex((t) => t.train_id === id);
@@ -154,6 +187,7 @@ class TralisLayer extends TrackerLayer {
   /**
    * Remove a trajectory with a given id.
    * @param {Number} id The trajectory id
+   * @private
    */
   removeTrajectory(id) {
     for (let i = 0, len = this.trajectories.length; i < len; i += 1) {
@@ -183,9 +217,8 @@ class TralisLayer extends TrackerLayer {
     this.tracker.setTrajectories(this.trajectories);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getRefreshTimeInMs() {
-    return 1000 / 60;
+    return this.refreshTimeInMs;
   }
 }
 

@@ -16,6 +16,7 @@ class WebSocketConnector {
    * @param {string} params.channel Channel name
    * @param {string} [params.args] Request arguments
    * @param {Number} [params.id] Request identifier
+   * @private
    */
   static getRequestString(method, params) {
     let reqStr = `${method} ${params.channel}`;
@@ -26,6 +27,7 @@ class WebSocketConnector {
 
   /**
    * (Re)connect the websocket.
+   * @private
    */
   connect(url) {
     if (this.websocket && this.websocket.readyState !== this.websocket.CLOSED) {
@@ -55,6 +57,7 @@ class WebSocketConnector {
 
   /**
    * Sends a get request to the websocket.
+   * @private
    */
   get(params, cb, errorCb) {
     const reqStr = WebSocketConnector.getRequestString('GET', params);
@@ -64,6 +67,7 @@ class WebSocketConnector {
 
   /**
    * Sends a message to the websocket.
+   * @private
    */
   send(message) {
     const send = () => {
@@ -79,6 +83,7 @@ class WebSocketConnector {
 
   /**
    * Set the projection for websocket responses.
+   * @private
    */
   setProjection(value) {
     this.currentProj = value;
@@ -87,6 +92,7 @@ class WebSocketConnector {
 
   /**
    * Set the BBOX for websocket responses.
+   * @private
    */
   setBbox(coordinates) {
     this.currentBbox = coordinates;
@@ -98,6 +104,7 @@ class WebSocketConnector {
 
   /**
    * Listen to websocket responses.
+   * @private
    */
   listen(params, cb, errorCb) {
     const onMessage = (e) => {
@@ -125,6 +132,7 @@ class WebSocketConnector {
 
   /**
    * Subscribe to a given channel.
+   * @private
    */
   subscribe(params, cb, errorCb, quiet) {
     const { onMessageCb, onErrorCb } = this.listen(params, cb, errorCb);
@@ -140,6 +148,7 @@ class WebSocketConnector {
 
   /**
    * Unsubscribe from a channel.
+   * @private
    */
   unsubscribe(source) {
     this.subscriptions

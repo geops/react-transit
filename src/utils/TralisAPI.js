@@ -1,6 +1,15 @@
 import GeoJSON from 'ol/format/GeoJSON';
 import WebSocketConnector from './WebSocketConnector';
 
+/**
+ * Enum for Tralis modes.
+ * @readonly
+ * @typedef {string} TralisMode
+ * @property {string} RAW "raw"
+ * @property {string} SCHEMATIC "schematic"
+ * @property {string} TOPOGRAPHIC "topographic"
+ * @enum {TralisMode}
+ */
 export const modes = {
   RAW: 'raw',
   TOPOGRAPHIC: 'topographic',
@@ -10,6 +19,7 @@ export const modes = {
 /**
  * Get the websocket channel suffix, depending on the current mode.
  * @param {String} mode Mode 'topographic' ou 'schematic'.
+ * @private
  */
 const getModeSuffix = (mode) => (mode === modes.SCHEMATIC ? '_schematic' : '');
 
@@ -17,6 +27,7 @@ const getModeSuffix = (mode) => (mode === modes.SCHEMATIC ? '_schematic' : '');
  * Compare two given departures for sort alogithm,
  * @param {Object} a First departure.
  * @param {Object} b Second departure.
+ * @private
  */
 const compareDepartures = (a, b, sortByMinArrivalTime = false) => {
   // First LEAVING and HIDDEN, then BOARDING and then sorted by time.
@@ -52,6 +63,7 @@ const compareDepartures = (a, b, sortByMinArrivalTime = false) => {
 
 /**
  * Remove the delay from arrivalTime and departureTime
+ * @private
  */
 const cleanStopTime = (content) => {
   if (!content) {
@@ -77,6 +89,11 @@ const cleanStopTime = (content) => {
   return content;
 };
 
+/**
+ * Class use to request the Realtime service.
+ * @class
+ * @private
+ */
 class TralisAPI {
   constructor(url) {
     this.dfltProjection = 'epsg:3857';
