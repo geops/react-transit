@@ -14,7 +14,9 @@ class StopFinder extends Engine {
       .map((p) => `${p}=${this.options[p]}`)
       .join('&')}`;
     return fetch(
-      `${this.endpoint}?&q=${value}&key=${this.apiKey}&${optionsString}`,
+      `${this.endpoint}?&q=${encodeURIComponent(value)}&key=${
+        this.apiKey
+      }&${optionsString}`,
     )
       .then((data) => data.json())
       .then((featureCollection) => featureCollection.features);
