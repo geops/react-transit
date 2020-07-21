@@ -1,4 +1,5 @@
 {
   "extends": ["config:js-lib", "schedule:monthly"],
-  "assignees": ["@oterral"]
+  "assignees": ["@oterral"],
+  "enabled": false
 }
