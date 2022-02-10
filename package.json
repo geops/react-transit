@@ -55,7 +55,7 @@
     "jsts": "^2.1.0",
     "lint-staged": "^10.1.2",
     "mapbox-gl": "^1.9.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^7.0.0",
     "ol": "6.1.1",
     "prettier": "^2.0.3",
     "proj4": "^2.6.1",
